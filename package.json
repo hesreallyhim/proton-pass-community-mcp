@@ -14,6 +14,8 @@
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest",
     "coverage": "vitest run --coverage --passWithNoTests",
+    "mcp:inspect": "npm run build && mcp-inspector --transport stdio -- node dist/index.js",
+    "mcp:inspect:smoke": "npm run build && node scripts/inspector-smoke.mjs",
     "check": "npm run lint && npm run format:check && npm run typecheck && npm run coverage",
     "prepare": "husky"
   },
@@ -23,6 +25,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@modelcontextprotocol/inspector": "^0.21.1",
     "@vitest/coverage-v8": "^4.0.18",
     "eslint": "^10.0.2",
     "globals": "^17.3.0",
@@ -32,5 +35,8 @@
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.56.1",
     "vitest": "^4.0.18"
+  },
+  "engines": {
+    "node": "22"
   }
 }
