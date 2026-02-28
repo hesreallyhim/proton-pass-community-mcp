@@ -11,13 +11,16 @@ function logErr(msg: string) {
   process.stderr.write(`[proton-pass-mcp] ${msg}\n`);
 }
 
-async function runPassCli(args: string[], stdin?: string): Promise<{ stdout: string; stderr: string }> {
+async function runPassCli(
+  args: string[],
+  stdin?: string,
+): Promise<{ stdout: string; stderr: string }> {
   const cmd = process.env.PASS_CLI_BIN || "pass-cli";
   try {
     const { stdout, stderr } = await execFileAsync(cmd, args, {
       env: process.env,
       maxBuffer: 10 * 1024 * 1024,
-      input: stdin
+      input: stdin,
     } as any);
     return { stdout: String(stdout ?? ""), stderr: String(stderr ?? "") };
   } catch (e: any) {
@@ -27,8 +30,9 @@ async function runPassCli(args: string[], stdin?: string): Promise<{ stdout: str
     const message = e?.message ?? "pass-cli invocation failed";
     throw new Error(
       `pass-cli failed (code=${code ?? "unknown"}): ${message}\n` +
-      (stderr ? `stderr:\n${stderr}\n` : "") +
-      (stdout ? `stdout:\n${stdout}\n` : "")
+        (stderr ? `stderr:\n${stderr}\n` : "") +
+        (stdout ? `stdout:\n${stdout}\n` : ""),
+      { cause: e },
     );
   }
 }
@@ -55,7 +59,7 @@ function requireWriteGate(confirm?: boolean) {
 
 const server = new McpServer({
   name: "proton-pass-cli",
-  version: "0.0.1"
+  version: "0.0.1",
 });
 
 /** Read-only tools **/
@@ -73,7 +77,7 @@ server.registerTool(
   async ({ output }) => {
     const { stdout } = await runPassCli(["vault", "list", "--output", output]);
     return { content: [{ type: "text", text: asJsonTextOrRaw(stdout) }] };
-  }
+  },
 );
 
 server.registerTool(
@@ -94,7 +98,7 @@ server.registerTool(
 
     const { stdout } = await runPassCli(args);
     return { content: [{ type: "text", text: asJsonTextOrRaw(stdout) }] };
-  }
+  },
 );
 
 server.registerTool(
@@ -142,7 +146,7 @@ server.registerTool(
 
     const { stdout } = await runPassCli(args);
     return { content: [{ type: "text", text: asJsonTextOrRaw(stdout) }] };
-  }
+  },
 );
 
 /** Write tools (gated by ALLOW_WRITE=1 + confirm:true) **/
@@ -155,7 +159,7 @@ server.registerTool(
     const { stdout, stderr } = await runPassCli(["vault", "create", "--name", name]);
     const out = [stdout, stderr].filter(Boolean).join("\n").trim();
     return { content: [{ type: "text", text: out || "OK" }] };
-  }
+  },
 );
 
 server.registerTool(
@@ -178,7 +182,7 @@ server.registerTool(
     const { stdout, stderr } = await runPassCli(args);
     const out = [stdout, stderr].filter(Boolean).join("\n").trim();
     return { content: [{ type: "text", text: out || "OK" }] };
-  }
+  },
 );
 
 server.registerTool(
@@ -199,7 +203,7 @@ server.registerTool(
     const { stdout, stderr } = await runPassCli(args);
     const out = [stdout, stderr].filter(Boolean).join("\n").trim();
     return { content: [{ type: "text", text: out || "OK" }] };
-  }
+  },
 );
 
 server.registerTool(
@@ -220,7 +224,8 @@ server.registerTool(
   },
   async (input) => {
     requireWriteGate(input.confirm);
-    if (input.shareId && input.vaultName) throw new Error("Provide only one of shareId or vaultName.");
+    if (input.shareId && input.vaultName)
+      throw new Error("Provide only one of shareId or vaultName.");
 
     const args: string[] = ["item", "create", "login"];
     if (input.shareId) args.push("--share-id", input.shareId);
@@ -243,7 +248,7 @@ server.registerTool(
     const { stdout, stderr } = await runPassCli(args);
     const out = [stdout, stderr].filter(Boolean).join("\n").trim();
     return { content: [{ type: "text", text: asJsonTextOrRaw(out) }] };
-  }
+  },
 );
 
 server.registerTool(
@@ -260,7 +265,8 @@ server.registerTool(
   },
   async (input) => {
     requireWriteGate(input.confirm);
-    if (input.shareId && input.vaultName) throw new Error("Provide only one of shareId or vaultName.");
+    if (input.shareId && input.vaultName)
+      throw new Error("Provide only one of shareId or vaultName.");
 
     const args: string[] = ["item", "create", input.itemType, "--from-template", "-"];
     if (input.shareId) args.push("--share-id", input.shareId);
@@ -271,7 +277,7 @@ server.registerTool(
     const { stdout, stderr } = await runPassCli(args, input.templateJson);
     const out = [stdout, stderr].filter(Boolean).join("\n").trim();
     return { content: [{ type: "text", text: asJsonTextOrRaw(out) }] };
-  }
+  },
 );
 
 server.registerTool(
@@ -304,18 +310,31 @@ server.registerTool(
     const { stdout, stderr } = await runPassCli(args);
     const out = [stdout, stderr].filter(Boolean).join("\n").trim();
     return { content: [{ type: "text", text: out || "OK" }] };
-  }
+  },
 );
 
 server.registerTool(
   "pass_item_delete",
-  { inputSchema: z.object({ shareId: z.string(), itemId: z.string(), confirm: z.boolean().optional() }) },
+  {
+    inputSchema: z.object({
+      shareId: z.string(),
+      itemId: z.string(),
+      confirm: z.boolean().optional(),
+    }),
+  },
   async ({ shareId, itemId, confirm }) => {
     requireWriteGate(confirm);
-    const { stdout, stderr } = await runPassCli(["item", "delete", "--share-id", shareId, "--item-id", itemId]);
+    const { stdout, stderr } = await runPassCli([
+      "item",
+      "delete",
+      "--share-id",
+      shareId,
+      "--item-id",
+      itemId,
+    ]);
     const out = [stdout, stderr].filter(Boolean).join("\n").trim();
     return { content: [{ type: "text", text: out || "OK" }] };
-  }
+  },
 );
 
 const transport = new StdioServerTransport();
