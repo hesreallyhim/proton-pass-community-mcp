@@ -1,0 +1,460 @@
+import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
+import { z } from "zod";
+
+const execFileAsync = promisify(execFile);
+
+export type PassCliResult = { stdout: string; stderr: string };
+export type PassCliRunner = (args: string[], stdin?: string) => Promise<PassCliResult>;
+
+type ExecFileAsyncLike = (
+  file: string,
+  args: readonly string[],
+  options: {
+    env: NodeJS.ProcessEnv;
+    maxBuffer: number;
+    input?: string;
+  },
+) => Promise<{ stdout?: string | Buffer; stderr?: string | Buffer }>;
+
+function asTextContent(text: string) {
+  return { content: [{ type: "text" as const, text }] };
+}
+
+function joinStdoutStderr(stdout: string, stderr: string): string {
+  return [stdout, stderr].filter(Boolean).join("\n").trim();
+}
+
+export function logErr(msg: string) {
+  // IMPORTANT: never write to stdout in stdio MCP servers.
+  process.stderr.write(`[proton-pass-mcp] ${msg}\n`);
+}
+
+export function createRunPassCli(
+  execFileImpl: ExecFileAsyncLike = execFileAsync as ExecFileAsyncLike,
+) {
+  return async (args: string[], stdin?: string): Promise<PassCliResult> => {
+    const cmd = process.env.PASS_CLI_BIN || "pass-cli";
+    try {
+      const { stdout, stderr } = await execFileImpl(cmd, args, {
+        env: process.env,
+        maxBuffer: 10 * 1024 * 1024,
+        input: stdin,
+      });
+      return { stdout: String(stdout ?? ""), stderr: String(stderr ?? "") };
+    } catch (e: any) {
+      const stderr = String(e?.stderr ?? "");
+      const stdout = String(e?.stdout ?? "");
+      const code = e?.code;
+      const message = e?.message ?? "pass-cli invocation failed";
+      throw new Error(
+        `pass-cli failed (code=${code ?? "unknown"}): ${message}\n` +
+          (stderr ? `stderr:\n${stderr}\n` : "") +
+          (stdout ? `stdout:\n${stdout}\n` : ""),
+        { cause: e },
+      );
+    }
+  };
+}
+
+export const runPassCli = createRunPassCli();
+
+export function asJsonTextOrRaw(text: string): string {
+  const trimmed = (text ?? "").trim();
+  if (!trimmed) return "";
+  try {
+    const obj = JSON.parse(trimmed);
+    return JSON.stringify(obj, null, 2);
+  } catch {
+    return trimmed;
+  }
+}
+
+export function requireWriteGate(confirm?: boolean) {
+  if (process.env.ALLOW_WRITE !== "1") {
+    throw new Error("Write operations are disabled. Set ALLOW_WRITE=1 to enable.");
+  }
+  if (confirm !== true) {
+    throw new Error('Write operation requires explicit confirmation: set {"confirm": true}.');
+  }
+}
+
+export const passVaultListInputSchema = z.object({
+  output: z.enum(["json", "human"]).default("json"),
+});
+
+export const passItemListInputSchema = z.object({
+  vaultName: z.string().optional(),
+  shareId: z.string().optional(),
+  output: z.enum(["json", "human"]).default("json"),
+});
+
+export const passItemViewInputSchema = z.object({
+  uri: z.string().optional(),
+  shareId: z.string().optional(),
+  vaultName: z.string().optional(),
+  itemId: z.string().optional(),
+  itemTitle: z.string().optional(),
+  field: z.string().optional(),
+  output: z.enum(["json", "human"]).default("json"),
+});
+
+export const passVaultCreateInputSchema = z.object({
+  name: z.string(),
+  confirm: z.boolean().optional(),
+});
+
+export const passVaultUpdateInputSchema = z.object({
+  shareId: z.string().optional(),
+  vaultName: z.string().optional(),
+  newName: z.string(),
+  confirm: z.boolean().optional(),
+});
+
+export const passVaultDeleteInputSchema = z.object({
+  shareId: z.string().optional(),
+  vaultName: z.string().optional(),
+  confirm: z.boolean().optional(),
+});
+
+export const passItemCreateLoginInputSchema = z.object({
+  shareId: z.string().optional(),
+  vaultName: z.string().optional(),
+  title: z.string(),
+  username: z.string().optional(),
+  email: z.string().optional(),
+  password: z.string().optional(),
+  url: z.string().optional(),
+  generatePassword: z.string().optional(),
+  output: z.enum(["json", "human"]).default("json"),
+  confirm: z.boolean().optional(),
+});
+
+export const passItemCreateFromTemplateInputSchema = z.object({
+  itemType: z.string(),
+  shareId: z.string().optional(),
+  vaultName: z.string().optional(),
+  templateJson: z.string(),
+  output: z.enum(["json", "human"]).default("json"),
+  confirm: z.boolean().optional(),
+});
+
+export const passItemUpdateInputSchema = z.object({
+  shareId: z.string().optional(),
+  vaultName: z.string().optional(),
+  itemId: z.string().optional(),
+  itemTitle: z.string().optional(),
+  fields: z.array(z.string()).min(1),
+  confirm: z.boolean().optional(),
+});
+
+export const passItemDeleteInputSchema = z.object({
+  shareId: z.string(),
+  itemId: z.string(),
+  confirm: z.boolean().optional(),
+});
+
+export type PassVaultListInput = z.infer<typeof passVaultListInputSchema>;
+export type PassItemListInput = z.infer<typeof passItemListInputSchema>;
+export type PassItemViewInput = z.infer<typeof passItemViewInputSchema>;
+export type PassVaultCreateInput = z.infer<typeof passVaultCreateInputSchema>;
+export type PassVaultUpdateInput = z.infer<typeof passVaultUpdateInputSchema>;
+export type PassVaultDeleteInput = z.infer<typeof passVaultDeleteInputSchema>;
+export type PassItemCreateLoginInput = z.infer<typeof passItemCreateLoginInputSchema>;
+export type PassItemCreateFromTemplateInput = z.infer<typeof passItemCreateFromTemplateInputSchema>;
+export type PassItemUpdateInput = z.infer<typeof passItemUpdateInputSchema>;
+export type PassItemDeleteInput = z.infer<typeof passItemDeleteInputSchema>;
+
+export async function passInfoHandler(passCli: PassCliRunner) {
+  const { stdout } = await passCli(["info"]);
+  return asTextContent(stdout.trim());
+}
+
+export async function passVaultListHandler(passCli: PassCliRunner, { output }: PassVaultListInput) {
+  const { stdout } = await passCli(["vault", "list", "--output", output]);
+  return asTextContent(asJsonTextOrRaw(stdout));
+}
+
+export async function passItemListHandler(
+  passCli: PassCliRunner,
+  { vaultName, shareId, output }: PassItemListInput,
+) {
+  if (vaultName && shareId) throw new Error("Provide only one of vaultName or shareId.");
+
+  const args = ["item", "list", "--output", output];
+  if (shareId) args.splice(2, 0, "--share-id", shareId);
+  else if (vaultName) args.splice(2, 0, vaultName);
+
+  const { stdout } = await passCli(args);
+  return asTextContent(asJsonTextOrRaw(stdout));
+}
+
+export async function passItemViewHandler(passCli: PassCliRunner, input: PassItemViewInput) {
+  const { uri, shareId, vaultName, itemId, itemTitle, field, output } = input;
+
+  const usingUri = !!uri;
+  const usingSelectors = (shareId || vaultName) && (itemId || itemTitle);
+
+  if (!usingUri && !usingSelectors) {
+    throw new Error("Provide either uri OR (shareId|vaultName) AND (itemId|itemTitle).");
+  }
+  if (usingUri && (shareId || vaultName || itemId || itemTitle)) {
+    throw new Error("uri is mutually exclusive with selector arguments.");
+  }
+  if (shareId && vaultName) throw new Error("shareId and vaultName are mutually exclusive.");
+  if (itemId && itemTitle) throw new Error("itemId and itemTitle are mutually exclusive.");
+
+  const args: string[] = ["item", "view"];
+
+  if (usingUri) {
+    args.push("--output", output, uri);
+  } else {
+    if (shareId) args.push("--share-id", shareId);
+    else args.push("--vault-name", vaultName!);
+
+    if (itemId) args.push("--item-id", itemId);
+    else args.push("--item-title", itemTitle!);
+
+    if (field) args.push("--field", field);
+    args.push("--output", output);
+  }
+
+  const { stdout } = await passCli(args);
+  return asTextContent(asJsonTextOrRaw(stdout));
+}
+
+export async function passVaultCreateHandler(
+  passCli: PassCliRunner,
+  { name, confirm }: PassVaultCreateInput,
+) {
+  requireWriteGate(confirm);
+  const { stdout, stderr } = await passCli(["vault", "create", "--name", name]);
+  const out = joinStdoutStderr(stdout, stderr);
+  return asTextContent(out || "OK");
+}
+
+export async function passVaultUpdateHandler(
+  passCli: PassCliRunner,
+  { shareId, vaultName, newName, confirm }: PassVaultUpdateInput,
+) {
+  requireWriteGate(confirm);
+  if (!!shareId === !!vaultName) throw new Error("Provide exactly one of shareId or vaultName.");
+  const args = ["vault", "update"];
+  if (shareId) args.push("--share-id", shareId);
+  else args.push("--vault-name", vaultName!);
+  args.push("--name", newName);
+  const { stdout, stderr } = await passCli(args);
+  const out = joinStdoutStderr(stdout, stderr);
+  return asTextContent(out || "OK");
+}
+
+export async function passVaultDeleteHandler(
+  passCli: PassCliRunner,
+  { shareId, vaultName, confirm }: PassVaultDeleteInput,
+) {
+  requireWriteGate(confirm);
+  if (!!shareId === !!vaultName) throw new Error("Provide exactly one of shareId or vaultName.");
+  const args = ["vault", "delete"];
+  if (shareId) args.push("--share-id", shareId);
+  else args.push("--vault-name", vaultName!);
+  const { stdout, stderr } = await passCli(args);
+  const out = joinStdoutStderr(stdout, stderr);
+  return asTextContent(out || "OK");
+}
+
+export async function passItemCreateLoginHandler(
+  passCli: PassCliRunner,
+  input: PassItemCreateLoginInput,
+) {
+  requireWriteGate(input.confirm);
+  if (input.shareId && input.vaultName)
+    throw new Error("Provide only one of shareId or vaultName.");
+
+  const args: string[] = ["item", "create", "login"];
+  if (input.shareId) args.push("--share-id", input.shareId);
+  else if (input.vaultName) args.push("--vault-name", input.vaultName);
+
+  args.push("--title", input.title);
+
+  if (input.username) args.push("--username", input.username);
+  if (input.email) args.push("--email", input.email);
+  if (input.password) args.push("--password", input.password);
+  if (input.url) args.push("--url", input.url);
+
+  if (input.generatePassword) {
+    if (input.generatePassword === "true") args.push("--generate-password");
+    else args.push(`--generate-password=${input.generatePassword}`);
+  }
+
+  args.push("--output", input.output);
+
+  const { stdout, stderr } = await passCli(args);
+  const out = joinStdoutStderr(stdout, stderr);
+  return asTextContent(asJsonTextOrRaw(out));
+}
+
+export async function passItemCreateFromTemplateHandler(
+  passCli: PassCliRunner,
+  input: PassItemCreateFromTemplateInput,
+) {
+  requireWriteGate(input.confirm);
+  if (input.shareId && input.vaultName)
+    throw new Error("Provide only one of shareId or vaultName.");
+
+  const args: string[] = ["item", "create", input.itemType, "--from-template", "-"];
+  if (input.shareId) args.push("--share-id", input.shareId);
+  else if (input.vaultName) args.push("--vault-name", input.vaultName);
+
+  args.push("--output", input.output);
+
+  const { stdout, stderr } = await passCli(args, input.templateJson);
+  const out = joinStdoutStderr(stdout, stderr);
+  return asTextContent(asJsonTextOrRaw(out));
+}
+
+export async function passItemUpdateHandler(
+  passCli: PassCliRunner,
+  { shareId, vaultName, itemId, itemTitle, fields, confirm }: PassItemUpdateInput,
+) {
+  requireWriteGate(confirm);
+  if (shareId && vaultName) throw new Error("Provide only one of shareId or vaultName.");
+  if (itemId && itemTitle) throw new Error("Provide only one of itemId or itemTitle.");
+  if (!itemId && !itemTitle) throw new Error("Provide itemId or itemTitle.");
+
+  const args: string[] = ["item", "update"];
+  if (shareId) args.push("--share-id", shareId);
+  else if (vaultName) args.push("--vault-name", vaultName);
+
+  if (itemId) args.push("--item-id", itemId);
+  else args.push("--item-title", itemTitle!);
+
+  for (const field of fields) args.push("--field", field);
+
+  const { stdout, stderr } = await passCli(args);
+  const out = joinStdoutStderr(stdout, stderr);
+  return asTextContent(out || "OK");
+}
+
+export async function passItemDeleteHandler(
+  passCli: PassCliRunner,
+  { shareId, itemId, confirm }: PassItemDeleteInput,
+) {
+  requireWriteGate(confirm);
+  const { stdout, stderr } = await passCli([
+    "item",
+    "delete",
+    "--share-id",
+    shareId,
+    "--item-id",
+    itemId,
+  ]);
+  const out = joinStdoutStderr(stdout, stderr);
+  return asTextContent(out || "OK");
+}
+
+export function createServer(deps: { runPassCli?: PassCliRunner } = {}) {
+  const passCli = deps.runPassCli ?? runPassCli;
+  const server = new McpServer({
+    name: "proton-pass-cli",
+    version: "0.0.1",
+  });
+
+  server.registerTool("pass_info", {}, async () => passInfoHandler(passCli));
+
+  server.registerTool(
+    "pass_vault_list",
+    {
+      inputSchema: passVaultListInputSchema,
+      outputSchema: z.enum(["json", "human"]).default("json"),
+    },
+    async (input) => passVaultListHandler(passCli, input),
+  );
+
+  server.registerTool(
+    "pass_item_list",
+    {
+      inputSchema: passItemListInputSchema,
+    },
+    async (input) => passItemListHandler(passCli, input),
+  );
+
+  server.registerTool(
+    "pass_item_view",
+    {
+      inputSchema: passItemViewInputSchema,
+    },
+    async (input) => passItemViewHandler(passCli, input),
+  );
+
+  server.registerTool(
+    "pass_vault_create",
+    { inputSchema: passVaultCreateInputSchema },
+    async (input) => passVaultCreateHandler(passCli, input),
+  );
+
+  server.registerTool(
+    "pass_vault_update",
+    {
+      inputSchema: passVaultUpdateInputSchema,
+    },
+    async (input) => passVaultUpdateHandler(passCli, input),
+  );
+
+  server.registerTool(
+    "pass_vault_delete",
+    {
+      inputSchema: passVaultDeleteInputSchema,
+    },
+    async (input) => passVaultDeleteHandler(passCli, input),
+  );
+
+  server.registerTool(
+    "pass_item_create_login",
+    {
+      inputSchema: passItemCreateLoginInputSchema,
+    },
+    async (input) => passItemCreateLoginHandler(passCli, input),
+  );
+
+  server.registerTool(
+    "pass_item_create_from_template",
+    {
+      inputSchema: passItemCreateFromTemplateInputSchema,
+    },
+    async (input) => passItemCreateFromTemplateHandler(passCli, input),
+  );
+
+  server.registerTool(
+    "pass_item_update",
+    {
+      inputSchema: passItemUpdateInputSchema,
+    },
+    async (input) => passItemUpdateHandler(passCli, input),
+  );
+
+  server.registerTool(
+    "pass_item_delete",
+    {
+      inputSchema: passItemDeleteInputSchema,
+    },
+    async (input) => passItemDeleteHandler(passCli, input),
+  );
+
+  return server;
+}
+
+export async function startServer(
+  options: {
+    server?: Pick<McpServer, "connect">;
+    transport?: StdioServerTransport;
+    onStarted?: (message: string) => void;
+  } = {},
+) {
+  const server = options.server ?? createServer();
+  const transport = options.transport ?? new StdioServerTransport();
+  await server.connect(transport);
+  const onStarted = options.onStarted ?? logErr;
+  onStarted("started");
+}
