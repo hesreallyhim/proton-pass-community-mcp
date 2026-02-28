@@ -19,6 +19,9 @@
     "check": "npm run lint && npm run format:check && npm run typecheck && npm run coverage",
     "prepare": "husky"
   },
+  "engines": {
+    "node": ">=24"
+  },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.27.1",
     "zod": "^4.3.6"
@@ -35,9 +38,6 @@
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.56.1",
     "vitest": "^4.0.18"
-  },
-  "engines": {
-    "node": "22"
   },
   "overrides": {
     "minimatch": "^3.1.4"
