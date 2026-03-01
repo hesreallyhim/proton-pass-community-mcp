@@ -59,6 +59,12 @@ Write tools are blocked unless:
 
 This protects against accidental destructive calls.
 
+Authentication handling:
+
+1. Authentication is user-managed outside MCP with `pass-cli login`.
+2. On auth failure, tools return standardized `AUTH_*` errors and a retry instruction.
+3. The MCP server does not collect credentials, OTP codes, or private keys.
+
 ## Environment Variables
 
 - `PASS_CLI_BIN`: override CLI binary path/name (default `pass-cli`)
