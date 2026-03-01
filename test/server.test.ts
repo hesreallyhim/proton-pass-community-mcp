@@ -2,9 +2,11 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 
 import {
   asJsonTextOrRaw,
+  classifyPassCliAuthErrorText,
   createRunPassCli,
   createServer,
   logErr,
+  PassCliAuthError,
   passInfoHandler,
   passItemCreateFromTemplateHandler,
   passItemCreateLoginHandler,
@@ -125,6 +127,32 @@ describe("helpers", () => {
     await expect(run(["info"])).rejects.toThrow(
       "pass-cli failed (code=unknown): pass-cli invocation failed",
     );
+  });
+
+  it("classifies auth failure text", () => {
+    expect(classifyPassCliAuthErrorText("Please log in first")).toBe("AUTH_REQUIRED");
+    expect(classifyPassCliAuthErrorText("Session expired, run login")).toBe("AUTH_EXPIRED");
+    expect(classifyPassCliAuthErrorText("unknown error")).toBeNull();
+  });
+
+  it("surfaces standardized auth errors from pass-cli failures", async () => {
+    const execImpl = vi.fn().mockRejectedValue({
+      message: "command failed",
+      code: 1,
+      stderr: "not logged in",
+      stdout: "",
+    });
+    const run = createRunPassCli(execImpl as any);
+
+    await expect(run(["info"])).rejects.toBeInstanceOf(PassCliAuthError);
+
+    try {
+      await run(["info"]);
+    } catch (error) {
+      expect(error).toBeInstanceOf(PassCliAuthError);
+      expect((error as Error).message).toContain("[AUTH_REQUIRED]");
+      expect((error as Error).message).toContain("Do not provide credentials");
+    }
   });
 
   it("logErr writes to stderr with server prefix", () => {
@@ -631,6 +659,27 @@ describe("server setup", () => {
     await tools.pass_item_delete.handler({ shareId: "s1", itemId: "i1", confirm: true });
 
     expect(runner).toHaveBeenCalledTimes(11);
+  });
+
+  it("registered tool handlers return standardized auth error payloads", async () => {
+    const runner = makeRunner(async () => {
+      throw new PassCliAuthError("AUTH_REQUIRED");
+    });
+    const server = createServer({ runPassCli: runner });
+    const tools = (server as any)._registeredTools as Record<
+      string,
+      { handler: (input?: any) => Promise<unknown> }
+    >;
+
+    const result = (await tools.pass_info.handler()) as any;
+
+    expect(result.isError).toBe(true);
+    expect(result.structuredContent).toMatchObject({
+      error_code: "AUTH_REQUIRED",
+      retryable: true,
+      auth_managed_by_user: true,
+    });
+    expect(result.content?.[0]?.text).toContain('Run "pass-cli login"');
   });
 
   it("startServer uses provided server, transport, and callback", async () => {

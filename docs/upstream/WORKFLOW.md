@@ -122,6 +122,16 @@ Notes:
 1. Some non-help CLI commands require authenticated state and cannot be fully validated offline.
 2. For safety-first probing, prefer `--help` contract checks and docs diffs; run non-help probes only in controlled test environments.
 
+## Authentication Error Contract
+
+1. Authentication is handled by the user outside MCP (`pass-cli login` in terminal).
+2. MCP tools do not collect credentials, OTP codes, or private keys.
+3. Auth failures should emit standardized codes (`AUTH_REQUIRED`, `AUTH_EXPIRED`) with explicit user remediation.
+4. On `AUTH_*`, model behavior should be:
+   - ask user to re-authenticate outside MCP
+   - retry after user confirms
+   - never request secrets directly in chat/tool inputs
+
 ## Observed Drift Register
 
 Use this table as the running baseline for known docs vs CLI mismatches.

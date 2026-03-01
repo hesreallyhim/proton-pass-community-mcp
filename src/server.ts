@@ -23,8 +23,84 @@ function asTextContent(text: string) {
   return { content: [{ type: "text" as const, text }] };
 }
 
+export type PassCliAuthErrorCode = "AUTH_REQUIRED" | "AUTH_EXPIRED";
+
+export class PassCliAuthError extends Error {
+  readonly name = "PassCliAuthError";
+  readonly retryable = true;
+  readonly userAction = 'Run "pass-cli login" outside MCP, then retry this tool.';
+
+  constructor(
+    readonly code: PassCliAuthErrorCode,
+    readonly details?: string,
+  ) {
+    const description =
+      code === "AUTH_EXPIRED"
+        ? "Proton Pass session expired."
+        : "Proton Pass authentication is required.";
+    super(
+      `[${code}] ${description} Authentication is user-managed outside MCP. ` +
+        "Do not provide credentials, OTP codes, or keys to the model. " +
+        'Run "pass-cli login" in your terminal and retry.',
+    );
+  }
+}
+
 function joinStdoutStderr(stdout: string, stderr: string): string {
   return [stdout, stderr].filter(Boolean).join("\n").trim();
+}
+
+export function classifyPassCliAuthErrorText(text: string): PassCliAuthErrorCode | null {
+  const normalized = (text ?? "").toLowerCase();
+
+  if (
+    normalized.includes("session expired") ||
+    normalized.includes("expired session") ||
+    (normalized.includes("token") && normalized.includes("expired"))
+  ) {
+    return "AUTH_EXPIRED";
+  }
+
+  if (
+    normalized.includes("not logged in") ||
+    normalized.includes("please login") ||
+    normalized.includes("please log in") ||
+    normalized.includes("authentication required") ||
+    normalized.includes("unauthorized") ||
+    normalized.includes("forbidden")
+  ) {
+    return "AUTH_REQUIRED";
+  }
+
+  return null;
+}
+
+function asAuthErrorToolResult(error: PassCliAuthError) {
+  return {
+    isError: true,
+    content: [{ type: "text" as const, text: error.message }],
+    structuredContent: {
+      error_code: error.code,
+      retryable: error.retryable,
+      user_action: error.userAction,
+      auth_managed_by_user: true,
+    },
+  };
+}
+
+function withAuthErrorHandling<TArgs extends unknown[], TResult>(
+  handler: (...args: TArgs) => Promise<TResult>,
+) {
+  return async (...args: TArgs): Promise<TResult | ReturnType<typeof asAuthErrorToolResult>> => {
+    try {
+      return await handler(...args);
+    } catch (error) {
+      if (error instanceof PassCliAuthError) {
+        return asAuthErrorToolResult(error);
+      }
+      throw error;
+    }
+  };
 }
 
 export function logErr(msg: string) {
@@ -49,6 +125,12 @@ export function createRunPassCli(
       const stdout = String(e?.stdout ?? "");
       const code = e?.code;
       const message = e?.message ?? "pass-cli invocation failed";
+      const authCode = classifyPassCliAuthErrorText(
+        [stderr, stdout, message].filter(Boolean).join("\n"),
+      );
+      if (authCode) {
+        throw new PassCliAuthError(authCode, stderr || stdout || message);
+      }
       throw new Error(
         `pass-cli failed (code=${code ?? "unknown"}): ${message}\n` +
           (stderr ? `stderr:\n${stderr}\n` : "") +
@@ -415,14 +497,18 @@ export function createServer(deps: { runPassCli?: PassCliRunner } = {}) {
     version: "0.0.1",
   });
 
-  server.registerTool("pass_info", {}, async () => passInfoHandler(passCli));
+  server.registerTool(
+    "pass_info",
+    {},
+    withAuthErrorHandling(async () => passInfoHandler(passCli)),
+  );
 
   server.registerTool(
     "pass_vault_list",
     {
       inputSchema: passVaultListInputSchema,
     },
-    async (input) => passVaultListHandler(passCli, input),
+    withAuthErrorHandling(async (input) => passVaultListHandler(passCli, input)),
   );
 
   server.registerTool(
@@ -430,7 +516,7 @@ export function createServer(deps: { runPassCli?: PassCliRunner } = {}) {
     {
       inputSchema: passItemListInputSchema,
     },
-    async (input) => passItemListHandler(passCli, input),
+    withAuthErrorHandling(async (input) => passItemListHandler(passCli, input)),
   );
 
   server.registerTool(
@@ -438,13 +524,13 @@ export function createServer(deps: { runPassCli?: PassCliRunner } = {}) {
     {
       inputSchema: passItemViewInputSchema,
     },
-    async (input) => passItemViewHandler(passCli, input),
+    withAuthErrorHandling(async (input) => passItemViewHandler(passCli, input)),
   );
 
   server.registerTool(
     "pass_vault_create",
     { inputSchema: passVaultCreateInputSchema },
-    async (input) => passVaultCreateHandler(passCli, input),
+    withAuthErrorHandling(async (input) => passVaultCreateHandler(passCli, input)),
   );
 
   server.registerTool(
@@ -452,7 +538,7 @@ export function createServer(deps: { runPassCli?: PassCliRunner } = {}) {
     {
       inputSchema: passVaultUpdateInputSchema,
     },
-    async (input) => passVaultUpdateHandler(passCli, input),
+    withAuthErrorHandling(async (input) => passVaultUpdateHandler(passCli, input)),
   );
 
   server.registerTool(
@@ -460,7 +546,7 @@ export function createServer(deps: { runPassCli?: PassCliRunner } = {}) {
     {
       inputSchema: passVaultDeleteInputSchema,
     },
-    async (input) => passVaultDeleteHandler(passCli, input),
+    withAuthErrorHandling(async (input) => passVaultDeleteHandler(passCli, input)),
   );
 
   server.registerTool(
@@ -468,7 +554,7 @@ export function createServer(deps: { runPassCli?: PassCliRunner } = {}) {
     {
       inputSchema: passItemCreateLoginInputSchema,
     },
-    async (input) => passItemCreateLoginHandler(passCli, input),
+    withAuthErrorHandling(async (input) => passItemCreateLoginHandler(passCli, input)),
   );
 
   server.registerTool(
@@ -476,7 +562,7 @@ export function createServer(deps: { runPassCli?: PassCliRunner } = {}) {
     {
       inputSchema: passItemCreateFromTemplateInputSchema,
     },
-    async (input) => passItemCreateFromTemplateHandler(passCli, input),
+    withAuthErrorHandling(async (input) => passItemCreateFromTemplateHandler(passCli, input)),
   );
 
   server.registerTool(
@@ -484,7 +570,7 @@ export function createServer(deps: { runPassCli?: PassCliRunner } = {}) {
     {
       inputSchema: passItemUpdateInputSchema,
     },
-    async (input) => passItemUpdateHandler(passCli, input),
+    withAuthErrorHandling(async (input) => passItemUpdateHandler(passCli, input)),
   );
 
   server.registerTool(
@@ -492,7 +578,7 @@ export function createServer(deps: { runPassCli?: PassCliRunner } = {}) {
     {
       inputSchema: passItemDeleteInputSchema,
     },
-    async (input) => passItemDeleteHandler(passCli, input),
+    withAuthErrorHandling(async (input) => passItemDeleteHandler(passCli, input)),
   );
 
   return server;
