@@ -40,7 +40,7 @@ It is designed as a thin integration layer:
 
 ## Requirements
 
-- Node.js `22` (`.nvmrc`)
+- Node.js `24` (`.nvmrc`)
 - `pass-cli` installed and authenticated
 - MCP client capable of stdio transport
 

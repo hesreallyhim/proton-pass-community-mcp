@@ -20,13 +20,24 @@ function parseCursor(cursor?: string): number {
   return parsed;
 }
 
-export const passItemListInputSchema = z.object({
-  vaultName: z.string().optional(),
-  shareId: z.string().optional(),
-  pageSize: z.number().int().min(1).max(MAX_ITEM_LIST_PAGE_SIZE).optional(),
-  cursor: z.string().optional(),
-  output: z.enum(["json", "human"]).default("json"),
-});
+export const passItemListInputSchema = z
+  .object({
+    vaultName: z.string().optional(),
+    shareId: z.string().optional(),
+    pageSize: z.number().int().min(1).max(MAX_ITEM_LIST_PAGE_SIZE).optional(),
+    cursor: z.string().optional(),
+    output: z.enum(["json", "human"]).default("json"),
+  })
+  .refine(
+    (input) => {
+      const hasVaultName = Boolean(input.vaultName);
+      const hasShareId = Boolean(input.shareId);
+      return hasVaultName !== hasShareId;
+    },
+    {
+      message: "Provide exactly one of vaultName or shareId.",
+    },
+  );
 
 export const passItemViewInputSchema = z.object({
   uri: z.string().optional(),
@@ -86,6 +97,9 @@ export async function passItemListHandler(
   passCli: PassCliRunner,
   { vaultName, shareId, pageSize, cursor, output }: PassItemListInput,
 ) {
+  if (!vaultName && !shareId) {
+    throw new Error("Provide exactly one of vaultName or shareId.");
+  }
   if (vaultName && shareId) throw new Error("Provide only one of vaultName or shareId.");
   if (output !== "json" && (pageSize !== undefined || cursor !== undefined)) {
     throw new Error('Pagination is supported only with {"output":"json"}.');

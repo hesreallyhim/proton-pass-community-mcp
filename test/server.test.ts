@@ -278,6 +278,13 @@ describe("read-only handlers", () => {
     ).rejects.toThrow("Provide only one of vaultName or shareId");
   });
 
+  it("passItemListHandler requires a scope selector", async () => {
+    const runner = makeRunner();
+    await expect(passItemListHandler(runner, { output: "json" })).rejects.toThrow(
+      "Provide exactly one of vaultName or shareId",
+    );
+  });
+
   it("passItemListHandler supports share-id and vault selector modes", async () => {
     const runner = makeRunner({ stdout: "[]", stderr: "" });
 
@@ -299,7 +306,7 @@ describe("read-only handlers", () => {
     const payload = Array.from({ length: 130 }, (_, i) => ({ id: `item-${i + 1}` }));
     const runner = makeRunner({ stdout: JSON.stringify(payload), stderr: "" });
 
-    const result = await passItemListHandler(runner, { output: "json" });
+    const result = await passItemListHandler(runner, { shareId: "s1", output: "json" });
     const structured = (result as any).structuredContent;
 
     expect(structured).toBeTruthy();
@@ -318,6 +325,7 @@ describe("read-only handlers", () => {
     const runner = makeRunner({ stdout: JSON.stringify(payload), stderr: "" });
 
     const result = await passItemListHandler(runner, {
+      shareId: "s1",
       output: "json",
       pageSize: 20,
       cursor: "40",
@@ -339,6 +347,7 @@ describe("read-only handlers", () => {
 
     await expect(
       passItemListHandler(runner, {
+        shareId: "s1",
         output: "json",
         cursor: "abc",
       }),
@@ -350,6 +359,7 @@ describe("read-only handlers", () => {
 
     await expect(
       passItemListHandler(runner, {
+        shareId: "s1",
         output: "human",
         pageSize: 10,
       }),
@@ -726,7 +736,7 @@ describe("server setup", () => {
     await tools.check_status.handler();
     await tools.view_user_info.handler({ output: "json" });
     await tools.list_vaults.handler({ output: "json" });
-    await tools.list_items.handler({ output: "json" });
+    await tools.list_items.handler({ shareId: "s1", output: "json" });
     await tools.view_item.handler({ uri: "pass://Work/GitHub/password", output: "json" });
     await tools.create_vault.handler({ name: "Vault", confirm: true });
     await tools.update_vault.handler({ shareId: "s1", newName: "Renamed", confirm: true });
