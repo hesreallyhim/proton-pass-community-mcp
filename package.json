@@ -16,6 +16,7 @@
     "coverage": "vitest run --coverage --passWithNoTests",
     "mcp:inspect": "npm run build && mcp-inspector --transport stdio -- node dist/index.js",
     "mcp:inspect:smoke": "npm run build && node scripts/inspector-smoke.mjs",
+    "docs:sync:pass-cli": "scripts/sync-pass-cli-docs.sh",
     "check": "npm run lint && npm run format:check && npm run typecheck && npm run coverage",
     "prepare": "husky"
   },

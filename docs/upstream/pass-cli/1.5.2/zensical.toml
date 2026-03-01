@@ -1,0 +1,97 @@
+[project]
+site_name = "Proton Pass CLI documentation"
+site_description = "Proton Pass command line interface documentation."
+site_author = "pass@proton.me"
+# Read more: https://zensical.org/docs/setup/basics/#site_url
+#site_url = "https://www.example.com/"
+copyright = "Copyright &copy; 2025 Proton AG"
+repo_url = "https://github.com/protonpass/pass-cli"
+
+nav = [
+  {"Overview" = "index.md"},
+  {"Installation" = ["get-started/installation.md", "get-started/configuration.md"]},
+  {"Object types" = ["objects/share.md", "objects/vault.md", "objects/item.md"]},
+  {"Commands" = [
+    "commands/login.md",
+    "commands/logout.md",
+    "commands/info.md",
+    "commands/user.md",
+    "commands/settings.md",
+    "commands/share.md",
+    "commands/vault.md",
+    "commands/item.md",
+    "commands/invite.md",
+    "commands/password.md",
+    "commands/test.md",
+    "commands/ssh-agent.md",
+    "commands/update.md",
+    {"View item contents" = [
+      "commands/contents/secret-references.md",
+      "commands/contents/view.md",
+      "commands/contents/run.md",
+      "commands/contents/inject.md",
+    ]},
+  ]},
+  {"Help" = ["help/faq.md", "help/troubleshoot.md"]}
+]
+
+[project.theme]
+logo = "assets/logo.png"
+favicon = "assets/logo.png"
+language = "en"
+
+features = [
+    "announce.dismiss",
+    "content.code.copy",
+    "content.code.select",
+    "content.footnote.tooltips",
+    "content.tabs.link",
+    "content.tooltips",
+    "navigation.expand",
+    "navigation.footer",
+    "navigation.indexes",
+    "navigation.instant",
+    "navigation.instant.prefetch",
+    "navigation.instant.progress",
+    "navigation.path",
+    "navigation.prune",
+    "navigation.sections",
+    "navigation.tabs",
+    "navigation.tabs.sticky",
+    "navigation.top",
+    "navigation.tracking",
+    "search.highlight",
+    "toc.follow",
+]
+
+[[project.theme.palette]]
+scheme = "default"
+toggle.icon = "lucide/sun"
+toggle.name = "Switch to dark mode"
+
+[[project.theme.palette]]
+scheme = "slate"
+toggle.icon = "lucide/moon"
+toggle.name = "Switch to light mode"
+
+[project.theme.font]
+text = "Inter"
+code = "Jetbrains Mono"
+
+[project.extra]
+generator = false
+
+[[project.extra.social]]
+icon = "fontawesome/brands/github"
+link = "https://github.com/ProtonPass"
+
+[[project.extra.social]]
+icon = "fontawesome/brands/x-twitter"
+link = "https://x.com/Proton_Pass"
+
+[project.markdown_extensions.pymdownx.superfences]
+custom_fences = [
+  { name = "mermaid", class = "mermaid", format = "pymdownx.superfences.fence_code_format" }
+]
+
+[project.markdown_extensions.admonition]
