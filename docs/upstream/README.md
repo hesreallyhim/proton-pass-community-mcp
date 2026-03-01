@@ -1,3 +1,8 @@
+---
+name: upstream-docs-workflow
+description: Canonical process for pinning upstream pass-cli documentation snapshots and tracking docs-versus-runtime drift.
+---
+
 # Upstream Docs Snapshots and Drift Workflow
 
 This directory contains pinned snapshots of upstream documentation used as a local reference for schema design and drift checks.
