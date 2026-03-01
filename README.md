@@ -13,6 +13,7 @@ It is designed as a thin integration layer:
 | Tool                             | Purpose                                     |
 | -------------------------------- | ------------------------------------------- |
 | `pass_info`                      | Session/account status from `pass-cli info` |
+| `pass_test`                      | Session/API connectivity preflight          |
 | `pass_vault_list`                | List vaults                                 |
 | `pass_item_list`                 | List items by vault name or share ID        |
 | `pass_item_view`                 | View item by URI or selectors               |
@@ -64,6 +65,7 @@ Authentication handling:
 1. Authentication is user-managed outside MCP with `pass-cli login`.
 2. On auth failure, tools return standardized `AUTH_*` errors and a retry instruction.
 3. The MCP server does not collect credentials, OTP codes, or private keys.
+4. Use `pass_test` once as a session preflight (not per tool call); rely on `AUTH_*` fallback errors if the session later expires.
 
 ## Environment Variables
 

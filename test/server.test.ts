@@ -18,6 +18,7 @@ import {
   passVaultDeleteHandler,
   passVaultListHandler,
   passVaultUpdateHandler,
+  passTestHandler,
   requireWriteGate,
   startServer,
   type PassCliResult,
@@ -131,6 +132,9 @@ describe("helpers", () => {
 
   it("classifies auth failure text", () => {
     expect(classifyPassCliAuthErrorText("Please log in first")).toBe("AUTH_REQUIRED");
+    expect(classifyPassCliAuthErrorText("This operation requires an authenticated client")).toBe(
+      "AUTH_REQUIRED",
+    );
     expect(classifyPassCliAuthErrorText("Session expired, run login")).toBe("AUTH_EXPIRED");
     expect(classifyPassCliAuthErrorText("unknown error")).toBeNull();
   });
@@ -169,6 +173,16 @@ describe("read-only handlers", () => {
 
     expect(runner).toHaveBeenCalledWith(["info"]);
     expect(result).toEqual({ content: [{ type: "text", text: "hello" }] });
+  });
+
+  it("passTestHandler joins stdout and stderr", async () => {
+    const runner = makeRunner({ stdout: "Connection successful", stderr: "ping=31ms" });
+    const result = await passTestHandler(runner);
+
+    expect(runner).toHaveBeenCalledWith(["test"]);
+    expect(result).toEqual({
+      content: [{ type: "text", text: "Connection successful\nping=31ms" }],
+    });
   });
 
   it("passVaultListHandler requests output format", async () => {
@@ -631,6 +645,7 @@ describe("server setup", () => {
     >;
 
     await tools.pass_info.handler();
+    await tools.pass_test.handler();
     await tools.pass_vault_list.handler({ output: "json" });
     await tools.pass_item_list.handler({ output: "json" });
     await tools.pass_item_view.handler({ uri: "pass://Work/GitHub/password", output: "json" });
@@ -658,7 +673,7 @@ describe("server setup", () => {
     });
     await tools.pass_item_delete.handler({ shareId: "s1", itemId: "i1", confirm: true });
 
-    expect(runner).toHaveBeenCalledTimes(11);
+    expect(runner).toHaveBeenCalledTimes(12);
   });
 
   it("registered tool handlers return standardized auth error payloads", async () => {

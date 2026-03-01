@@ -2,6 +2,21 @@
 
 This project is intentionally small, so the roadmap focuses on high-leverage additions with clear utility.
 
+## Top Priority Next (Post-0.1 / Early 0.2)
+
+1. Ship dedicated `password` tooling as a high-value track.
+
+- Commands:
+  - `pass-cli password generate random`
+  - `pass-cli password generate passphrase`
+  - `pass-cli password score`
+- Rationale:
+  - These commands are useful even without Proton authentication.
+  - They provide immediate standalone value for secure credential hygiene.
+- Product direction:
+  - Include this in `0.2` planning immediately after `0.1`.
+  - Evaluate packaging as both MCP tools and a standalone skill profile.
+
 ## Near-Term (Practical Additions)
 
 1. Add `pass-cli` wrappers with immediate utility.

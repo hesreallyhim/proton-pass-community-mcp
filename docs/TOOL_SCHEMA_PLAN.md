@@ -108,7 +108,7 @@ Status key:
 | -------------- | ------------------ | ----------- | ------------------------------------------------------ | --------------------------------- |
 | `pass_login`   | `pass-cli login`   | Planned     | `username?`, `interactive?`                            | Session/login result text or json |
 | `pass_logout`  | `pass-cli logout`  | Planned     | `force?`, `confirm`                                    | Operation result                  |
-| `pass_test`    | `pass-cli test`    | Planned     | none                                                   | Connectivity result               |
+| `pass_test`    | `pass-cli test`    | Implemented | none                                                   | Connectivity/session preflight    |
 | `pass_info`    | `pass-cli info`    | Implemented | `output?`                                              | Account/session info              |
 | `pass_update`  | `pass-cli update`  | Planned     | `yes?`, `setTrack?`, `confirm`                         | Update result                     |
 | `pass_support` | `pass-cli support` | Planned     | none                                                   | Support guidance text             |
