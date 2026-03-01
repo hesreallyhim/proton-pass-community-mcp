@@ -10,22 +10,23 @@ It is designed as a thin integration layer:
 
 ## Current Tool Surface
 
-| Tool                             | Purpose                                     |
-| -------------------------------- | ------------------------------------------- |
-| `pass_info`                      | Session/account status from `pass-cli info` |
-| `pass_test`                      | Session/API connectivity preflight          |
-| `pass_vault_list`                | List vaults                                 |
-| `pass_item_list`                 | List items by vault name or share ID        |
-| `pass_item_view`                 | View item by URI or selectors               |
-| `pass_vault_create`              | Create vault (write)                        |
-| `pass_vault_update`              | Rename vault (write)                        |
-| `pass_vault_delete`              | Delete vault (write)                        |
-| `pass_item_create_login`         | Create login item (write)                   |
-| `pass_item_create_from_template` | Create item from JSON template (write)      |
-| `pass_item_update`               | Update item fields (write)                  |
-| `pass_item_delete`               | Delete item (write)                         |
+| Tool                        | Purpose                                        |
+| --------------------------- | ---------------------------------------------- |
+| `view_session_info`         | Session/account status from `pass-cli info`    |
+| `view_user_info`            | User account details from `pass-cli user info` |
+| `test`                      | Session/API connectivity preflight             |
+| `list_vaults`               | List vaults                                    |
+| `list_items`                | List items by vault name or share ID           |
+| `view_item`                 | View item by URI or selectors                  |
+| `create_vault`              | Create vault (write)                           |
+| `update_vault`              | Rename vault (write)                           |
+| `delete_vault`              | Delete vault (write)                           |
+| `create_login_item`         | Create login item (write)                      |
+| `create_item_from_template` | Create item from JSON template (write)         |
+| `update_item`               | Update item fields (write)                     |
+| `delete_item`               | Delete item (write)                            |
 
-## `pass_item_list` Pagination
+## `list_items` Pagination
 
 `pass-cli item list` does not expose native paging flags, so this server paginates JSON output in-process.
 
@@ -35,7 +36,7 @@ It is designed as a thin integration layer:
 - Behavior:
   - Pagination is supported only with `{"output":"json"}`.
   - Response includes `structuredContent` with `items`, `pageSize`, `cursor`, `returned`, `total`, and `nextCursor`.
-  - Use `nextCursor` in a follow-up `pass_item_list` call to fetch the next page.
+  - Use `nextCursor` in a follow-up `list_items` call to fetch the next page.
 
 ## Requirements
 
@@ -65,7 +66,7 @@ Authentication handling:
 1. Authentication is user-managed outside MCP with `pass-cli login`.
 2. On auth failure, tools return standardized `AUTH_*` errors and a retry instruction.
 3. The MCP server does not collect credentials, OTP codes, or private keys.
-4. Use `pass_test` once as a session preflight (not per tool call); rely on `AUTH_*` fallback errors if the session later expires.
+4. Use `test` once as a session preflight (not per tool call); rely on `AUTH_*` fallback errors if the session later expires.
 
 ## Environment Variables
 

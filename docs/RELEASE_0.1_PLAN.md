@@ -8,19 +8,20 @@ Ship a safe, useful first release of `proton-pass-mcp` focused on read-oriented 
 
 ### In Scope (Release 0.1)
 
-1. `pass_info`
-2. `pass_test`
-3. `pass_vault_list`
-4. `pass_item_list`
-5. `pass_item_view`
-6. `pass_item_search`
-7. `pass_share_list`
+1. `view_session_info`
+2. `view_user_info`
+3. `test`
+4. `list_vaults`
+5. `list_items`
+6. `view_item`
+7. `search_items`
+8. `list_shares`
 
 ### Stretch Scope (Release 0.1 if low risk)
 
-1. `pass_item_list` filter parity (`filterType`, `filterState`, `sortBy`)
-2. `pass_item_list` reference-first output contract stabilization (`ItemRef` + pagination consistency)
-3. `pass_vault_search` (if real-world vault counts justify dedicated search)
+1. `list_items` filter parity (`filterType`, `filterState`, `sortBy`)
+2. `list_items` reference-first output contract stabilization (`ItemRef` + pagination consistency)
+3. `search_vaults` (if real-world vault counts justify dedicated search)
 
 ### Out of Scope (Release 0.1)
 
@@ -38,10 +39,10 @@ Ship a safe, useful first release of `proton-pass-mcp` focused on read-oriented 
 
 Decision for Release 0.1:
 
-1. Do **not** include `pass_inject` in 0.1.
+1. Do **not** include `inject` in 0.1.
 2. Revisit in 0.2+ behind a stricter permission profile and explicit data-handling safeguards.
 
-Re-entry criteria for `pass_inject`:
+Re-entry criteria for `inject`:
 
 1. Explicit consent boundary for secret materialization.
 2. Default-safe mode (for example: stdout-only disabled by default, or explicit destination constraints).
@@ -50,9 +51,9 @@ Re-entry criteria for `pass_inject`:
 ## Safety Model for 0.1
 
 1. Maintain strict separation of list vs full-read operations.
-2. Keep `pass_item_list` token-minimized (reference-first payload).
-3. Keep `pass_item_search` result payloads token-minimized (reference-first payload).
-4. Require explicit item selection (`pass_item_view`) for sensitive field access.
+2. Keep `list_items` token-minimized (reference-first payload).
+3. Keep `search_items` result payloads token-minimized (reference-first payload).
+4. Require explicit item selection (`view_item`) for sensitive field access.
 5. Avoid hidden cross-tool state that implicitly broadens access.
 6. Preserve least-privilege assumptions per tool invocation.
 
@@ -63,7 +64,7 @@ Re-entry criteria for `pass_inject`:
 3. On authentication failures, tools return a standardized error contract and remediation:
    - `AUTH_REQUIRED` or `AUTH_EXPIRED`
    - user action: run `pass-cli login` outside MCP and retry
-4. Use `pass_test` once as a session preflight before normal tool workflows (not before every tool call).
+4. Use `test` once as a session preflight before normal tool workflows (not before every tool call).
 5. If auth later expires mid-session, rely on `AUTH_*` tool errors and re-authenticate out-of-band before retrying.
 6. Model-facing guidance for auth errors:
    - explain required user action
@@ -86,18 +87,19 @@ Example contract:
 2. Treat `share_id` as canonical operational selector for deterministic tool chaining.
 3. Include `share_id` and `vault_id` in item reference outputs where available.
 4. Support both vault-oriented and share-oriented selector inputs where CLI supports both.
-5. Expose `pass_share_list` so clients can reason about vault/item sharing relationships explicitly.
+5. Expose `list_shares` so clients can reason about vault/item sharing relationships explicitly.
 
 ## Product Requirements
 
 ### Functional Requirements
 
-1. `pass_info` returns account/session status reliably in JSON/human outputs where supported.
-2. `pass_vault_list` returns vault references without schema validation errors.
-3. `pass_share_list` returns share relationships in structured output.
-4. `pass_item_list` supports vault selection, pagination, and stable cursor behavior.
-5. `pass_item_search` supports title-based lookup with pagination and stable matching behavior.
-6. `pass_item_view` supports URI mode and selector mode with strict argument validation.
+1. `view_session_info` returns account/session status reliably.
+2. `view_user_info` returns user account details in JSON/human output modes.
+3. `list_vaults` returns vault references without schema validation errors.
+4. `list_shares` returns share relationships in structured output.
+5. `list_items` supports vault selection, pagination, and stable cursor behavior.
+6. `search_items` supports title-based lookup with pagination and stable matching behavior.
+7. `view_item` supports URI mode and selector mode with strict argument validation.
 
 ### Quality Requirements
 
@@ -118,7 +120,7 @@ Example contract:
 
 ## Risks and Mitigations
 
-1. Risk: `pass_item_list` payload shape drift from CLI output (`{items:[...]}` vs assumptions).
+1. Risk: `list_items` payload shape drift from CLI output (`{items:[...]}` vs assumptions).
    - Mitigation: normalize shape in MCP layer and keep tests for observed formats.
 2. Risk: docs vs CLI contract drift.
    - Mitigation: maintain drift register and validate against installed CLI behavior.
@@ -127,15 +129,15 @@ Example contract:
 
 ## Execution Plan
 
-1. Finalize `pass_item_list` contract (reference-first output + filters + pagination consistency).
-2. Implement `pass_item_search` (title-based) with pagination and reference-first output.
-3. Implement `pass_share_list` wrapper and structured output.
-4. Verify `pass_item_view` selector/URI validation and output behavior against test fixtures.
+1. Finalize `list_items` contract (reference-first output + filters + pagination consistency).
+2. Implement `search_items` (title-based) with pagination and reference-first output.
+3. Implement `list_shares` wrapper and structured output.
+4. Verify `view_item` selector/URI validation and output behavior against test fixtures.
 5. Expand inspector smoke checks for in-scope tools.
 6. Publish release notes defining 0.1 read-focused boundaries and explicit non-goals.
 
 ## Open Questions
 
-1. Should 0.1 break `pass_item_list` output compatibility immediately or ship a temporary compatibility flag?
-2. Should `pass_item_view` default to minimal field output in JSON mode, or keep full item JSON by default?
-3. Is `pass_vault_search` necessary for 0.1, or defer until observed vault-scale demand?
+1. Should 0.1 break `list_items` output compatibility immediately or ship a temporary compatibility flag?
+2. Should `view_item` default to minimal field output in JSON mode, or keep full item JSON by default?
+3. Is `search_vaults` necessary for 0.1, or defer until observed vault-scale demand?
