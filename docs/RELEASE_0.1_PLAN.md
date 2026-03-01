@@ -22,17 +22,51 @@ Ship a safe, useful first release of `proton-pass-mcp` focused on read-oriented 
 7. `search_items`
 8. `list_shares`
 
+## Current Gap Analysis (2026-03-01)
+
+Status is evaluated against currently registered MCP tools (`src/server/register-tools.ts`).
+
+### In-Scope Tool Coverage
+
+1. `view_session_info`: Implemented and registered.
+2. `view_user_info`: Implemented and registered.
+3. `check_status`: Implemented and registered.
+4. `list_vaults`: Implemented and registered.
+5. `list_items`: Implemented and registered. [USER: MAKE SURE LIST CONTAINS REFERENCES/METADATA ONLY, NOT CONTENT]
+6. `view_item`: Implemented and registered.
+7. `search_items`: Not implemented and not registered.
+8. `list_shares`: Handler exists (`src/tools/share.ts`) but tool is not registered.
+
+### Remaining Work for 0.1
+
+0. Go through codebase and change all `command_subcommand` style wording to the reverse (and remove `pass_` prefixes) (e.g. `pass_vault_list` => `list_vaults`).
+1. Implement `search_items` with title-based matching and pagination.
+2. Register `list_shares` and add tests for registration/behavior.
+3. Remove non-0.1 mutative tools from default registration surface.
+4. Align inspector smoke checks to 0.1 in-scope tools. [USER: SKIP FOR NOW]
+5. Finalize `list_items` output contract for token-efficient reference-first behavior. [USER: ITEM-REFERENCES-ONLY]
+6. ... [USER: SEE EXECUTION PLAN BELOW]
+
 ### Stretch Scope (Release 0.1 if low risk)
 
 1. `list_items` filter parity (`filterType`, `filterState`, `sortBy`)
-2. `list_items` reference-first output contract stabilization (`ItemRef` + pagination consistency)
-3. `search_vaults` (if real-world vault counts justify dedicated search)
+2. `search_vaults` (if real-world vault counts justify dedicated search)
 
 ### Out of Scope (Release 0.1)
 
 1. All mutative operations (`vault create/update/delete`, `item create/update/delete`, etc.)
 2. Sharing/member management tools
 3. Advanced workflow tools (`run`, `ssh-agent`, attachment download)
+
+## Release Surface Policy
+
+Policy for release branches when code exists but is not in release scope:
+
+1. Code may remain in the repository if it is not part of the release contract.
+2. Out-of-scope tools must not be exposed in MCP by default.
+   - Operational rule: do not call `server.registerTool(...)` for out-of-scope tools.
+3. Release docs and smoke tests must reflect only the registered release surface.
+4. If a future release needs the retained code, exposure happens by explicit tool registration and docs update.
 
 ## `inject` Evaluation and Decision
 
@@ -144,11 +178,15 @@ Example contract:
 2. Implement `search_items` (title-based) with pagination and reference-first output.
 3. Implement `list_shares` wrapper and structured output.
 4. Verify `view_item` selector/URI validation and output behavior against test fixtures.
-5. Expand inspector smoke checks for in-scope tools.
+5. Expand inspector smoke checks for in-scope tools. [USER: DEFER]
 6. Publish release notes defining 0.1 read-focused boundaries and explicit non-goals.
+7. Revise README.md
+8. Add LICENSE (GPL 3+) and other community health files.
+9. Add SKILL.md.
+10. Add CI workflows and formalize release strategy.
 
 ## Open Questions
 
-1. Should 0.1 break `list_items` output compatibility immediately or ship a temporary compatibility flag?
-2. Should `view_item` default to minimal field output in JSON mode, or keep full item JSON by default?
-3. Is `search_vaults` necessary for 0.1, or defer until observed vault-scale demand?
+1. Should 0.1 break `list_items` output compatibility immediately or ship a temporary compatibility flag? [USER: Q IS MIS-STATED - NOT ABOUT COMPATIBILITY - LIST_ITEMS MUST NOT EXPOSE ITEM CONTENTS - HARD CONSTRAINT]
+2. Should `view_item` default to minimal field output in JSON mode, or keep full item JSON by default? [USER: FULL ITEM]
+3. Is `search_vaults` necessary for 0.1, or defer until observed vault-scale demand? [USER: INCLUDE IT]
