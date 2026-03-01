@@ -1,3 +1,8 @@
+---
+name: tool-schema-plan
+description: Canonical specification and phased roadmap for proton-pass-mcp tool contracts and naming conventions.
+---
+
 # MCP Tool Schema Plan
 
 ## Intent

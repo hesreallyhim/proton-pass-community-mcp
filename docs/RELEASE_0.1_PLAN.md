@@ -1,3 +1,8 @@
+---
+name: release-0-1-plan
+description: Canonical product and engineering plan for proton-pass-mcp release 0.1 scope and acceptance criteria.
+---
+
 # Release 0.1 Plan (First Public Release)
 
 ## Goal
