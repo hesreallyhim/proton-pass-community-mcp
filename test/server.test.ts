@@ -2,10 +2,15 @@ import { describe, it, expect, vi, afterEach } from "vitest";
 
 import {
   asJsonTextOrRaw,
+  checkPassCliVersion,
+  checkPassConnectivity,
   classifyPassCliAuthErrorText,
   createRunPassCli,
   createServer,
+  evaluatePassCliCompatibility,
   logErr,
+  parseSemver,
+  passCheckStatusHandler,
   PassCliAuthError,
   passInfoHandler,
   passItemCreateFromTemplateHandler,
@@ -19,7 +24,6 @@ import {
   passVaultDeleteHandler,
   passVaultListHandler,
   passVaultUpdateHandler,
-  passTestHandler,
   requireWriteGate,
   startServer,
   type PassCliResult,
@@ -28,6 +32,7 @@ import {
 
 const originalAllowWrite = process.env.ALLOW_WRITE;
 const originalPassCliBin = process.env.PASS_CLI_BIN;
+const originalPinnedVersion = process.env.PASS_CLI_PINNED_VERSION;
 
 afterEach(() => {
   if (originalAllowWrite === undefined) delete process.env.ALLOW_WRITE;
@@ -35,6 +40,9 @@ afterEach(() => {
 
   if (originalPassCliBin === undefined) delete process.env.PASS_CLI_BIN;
   else process.env.PASS_CLI_BIN = originalPassCliBin;
+
+  if (originalPinnedVersion === undefined) delete process.env.PASS_CLI_PINNED_VERSION;
+  else process.env.PASS_CLI_PINNED_VERSION = originalPinnedVersion;
 
   vi.restoreAllMocks();
 });
@@ -65,6 +73,42 @@ describe("helpers", () => {
 
   it("returns empty string for blank input", () => {
     expect(asJsonTextOrRaw("\n\t  ")).toBe("");
+  });
+
+  it("parses semver from version text", () => {
+    expect(parseSemver("pass-cli 1.5.2 (41cf394)")).toEqual({
+      major: 1,
+      minor: 5,
+      patch: 2,
+    });
+    expect(parseSemver("no-version")).toBeNull();
+  });
+
+  it("evaluates compatibility policy", () => {
+    expect(
+      evaluatePassCliCompatibility(
+        { major: 1, minor: 5, patch: 9 },
+        { major: 1, minor: 5, patch: 2 },
+      ),
+    ).toMatchObject({ compatibilityStatus: "warn" });
+    expect(
+      evaluatePassCliCompatibility(
+        { major: 1, minor: 6, patch: 0 },
+        { major: 1, minor: 5, patch: 2 },
+      ),
+    ).toMatchObject({ compatibilityStatus: "warn" });
+    expect(
+      evaluatePassCliCompatibility(
+        { major: 1, minor: 4, patch: 9 },
+        { major: 1, minor: 5, patch: 2 },
+      ),
+    ).toMatchObject({ compatibilityStatus: "error" });
+    expect(
+      evaluatePassCliCompatibility(
+        { major: 2, minor: 0, patch: 0 },
+        { major: 1, minor: 5, patch: 2 },
+      ),
+    ).toMatchObject({ compatibilityStatus: "error" });
   });
 
   it("enforces write gate by env and confirmation", () => {
@@ -176,14 +220,39 @@ describe("read-only handlers", () => {
     expect(result).toEqual({ content: [{ type: "text", text: "hello" }] });
   });
 
-  it("passTestHandler joins stdout and stderr", async () => {
-    const runner = makeRunner({ stdout: "Connection successful", stderr: "ping=31ms" });
-    const result = await passTestHandler(runner);
+  it("checkPassCliVersion parses and evaluates compatibility", async () => {
+    const runner = makeRunner({ stdout: "1.5.9 (abc123)", stderr: "" });
+    const result = await checkPassCliVersion(runner);
 
-    expect(runner).toHaveBeenCalledWith(["test"]);
-    expect(result).toEqual({
-      content: [{ type: "text", text: "Connection successful\nping=31ms" }],
+    expect(runner).toHaveBeenCalledWith(["--version"]);
+    expect(result.detectedVersion).toBe("1.5.9");
+    expect(result.compatibilityStatus).toBe("warn");
+  });
+
+  it("checkPassConnectivity normalizes auth failures", async () => {
+    const runner = makeRunner(async () => {
+      throw new PassCliAuthError("AUTH_REQUIRED");
     });
+    const result = await checkPassConnectivity(runner);
+
+    expect(result.status).toBe("error");
+    expect(result.authErrorCode).toBe("AUTH_REQUIRED");
+    expect(result.authManagedByUser).toBe(true);
+  });
+
+  it("passCheckStatusHandler combines version and connectivity checks", async () => {
+    const runner = makeRunner(async (args) => {
+      if (args[0] === "--version") return { stdout: "1.5.2 (abc123)", stderr: "" };
+      if (args[0] === "test") return { stdout: "Connection successful", stderr: "" };
+      return { stdout: "", stderr: "" };
+    });
+
+    const result = (await passCheckStatusHandler(runner)) as any;
+    expect(result.isError).toBeUndefined();
+    expect(result.structuredContent.overall_status).toBe("ok");
+    expect(result.structuredContent.version.compatibilityStatus).toBe("ok");
+    expect(result.structuredContent.connectivity.status).toBe("ok");
+    expect(runner).toHaveBeenCalledTimes(2);
   });
 
   it("passUserInfoHandler forwards output format", async () => {
@@ -654,7 +723,7 @@ describe("server setup", () => {
     >;
 
     await tools.view_session_info.handler();
-    await tools.test.handler();
+    await tools.check_status.handler();
     await tools.view_user_info.handler({ output: "json" });
     await tools.list_vaults.handler({ output: "json" });
     await tools.list_items.handler({ output: "json" });
@@ -683,7 +752,7 @@ describe("server setup", () => {
     });
     await tools.delete_item.handler({ shareId: "s1", itemId: "i1", confirm: true });
 
-    expect(runner).toHaveBeenCalledTimes(13);
+    expect(runner).toHaveBeenCalledTimes(14);
   });
 
   it("registered tool handlers return standardized auth error payloads", async () => {

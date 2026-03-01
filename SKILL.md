@@ -12,14 +12,17 @@ Use this skill as a thin protocol layer around the `proton-pass-mcp` MCP server.
 
 Run this flow once when the skill is loaded for a new chat session:
 
-1. Call `test`.
+1. Call `check_status`.
 2. If it succeeds, proceed with requested tools.
 3. If it returns `AUTH_REQUIRED` or `AUTH_EXPIRED`:
    - Tell the user to run `pass-cli login` outside MCP.
    - Tell the user to confirm when login is complete.
-   - Retry `test` once user confirms.
+   - Retry `check_status` once user confirms.
+4. If it returns a CLI version compatibility error:
+   - Tell the user the detected version and pinned requirement.
+   - Ask the user to update/downgrade `pass-cli` outside MCP before continuing.
 
-Do not run `test` before every subsequent tool call in the same session.
+Do not run `check_status` before every subsequent tool call in the same session.
 Only run it again if an `AUTH_*` error occurs and the user says they re-authenticated.
 
 ## Authentication Safety Rules

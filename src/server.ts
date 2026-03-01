@@ -155,8 +155,208 @@ export function asJsonTextOrRaw(text: string): string {
   }
 }
 
+const DEFAULT_PINNED_PASS_CLI_VERSION = "1.5.2";
 const DEFAULT_ITEM_LIST_PAGE_SIZE = 100;
 const MAX_ITEM_LIST_PAGE_SIZE = 250;
+
+type Semver = { major: number; minor: number; patch: number };
+type CompatibilityStatus = "ok" | "warn" | "error" | "unknown";
+
+type PassCliVersionStatus = {
+  pinnedVersion: string;
+  detectedVersion: string | null;
+  detectedRaw: string;
+  compatibilityStatus: CompatibilityStatus;
+  reason: string;
+};
+
+type PassConnectivityStatus = {
+  status: "ok" | "error";
+  message: string;
+  authErrorCode?: PassCliAuthErrorCode;
+  retryable?: boolean;
+  userAction?: string;
+  authManagedByUser?: boolean;
+};
+
+export function parseSemver(text: string): Semver | null {
+  const match = (text ?? "").match(/(\d+)\.(\d+)\.(\d+)/);
+  if (!match) return null;
+
+  const major = Number(match[1]);
+  const minor = Number(match[2]);
+  const patch = Number(match[3]);
+
+  if (![major, minor, patch].every((n) => Number.isSafeInteger(n))) {
+    return null;
+  }
+
+  return { major, minor, patch };
+}
+
+export function evaluatePassCliCompatibility(
+  detected: Semver,
+  pinned: Semver,
+): { compatibilityStatus: Exclude<CompatibilityStatus, "unknown">; reason: string } {
+  if (detected.major !== pinned.major) {
+    return {
+      compatibilityStatus: "error",
+      reason: `Major version mismatch (detected ${detected.major}, expected ${pinned.major}).`,
+    };
+  }
+
+  if (detected.minor < pinned.minor) {
+    return {
+      compatibilityStatus: "error",
+      reason: `Detected minor version ${detected.minor} is lower than required ${pinned.minor}.`,
+    };
+  }
+
+  if (detected.minor > pinned.minor) {
+    return {
+      compatibilityStatus: "warn",
+      reason: `Detected minor version ${detected.minor} is newer than pinned ${pinned.minor}.`,
+    };
+  }
+
+  if (detected.patch !== pinned.patch) {
+    return {
+      compatibilityStatus: "warn",
+      reason: `Patch version differs (detected ${detected.patch}, pinned ${pinned.patch}).`,
+    };
+  }
+
+  return {
+    compatibilityStatus: "ok",
+    reason: "Detected version matches pinned version.",
+  };
+}
+
+function getPinnedPassCliVersion(): string {
+  return process.env.PASS_CLI_PINNED_VERSION || DEFAULT_PINNED_PASS_CLI_VERSION;
+}
+
+export async function checkPassCliVersion(passCli: PassCliRunner): Promise<PassCliVersionStatus> {
+  const pinnedVersion = getPinnedPassCliVersion();
+  const pinnedSemver = parseSemver(pinnedVersion);
+  if (!pinnedSemver) {
+    return {
+      pinnedVersion,
+      detectedVersion: null,
+      detectedRaw: "",
+      compatibilityStatus: "error",
+      reason: `Configured pinned version "${pinnedVersion}" is not valid semver.`,
+    };
+  }
+
+  try {
+    const { stdout, stderr } = await passCli(["--version"]);
+    const detectedRaw = joinStdoutStderr(stdout, stderr);
+    const detectedSemver = parseSemver(detectedRaw);
+
+    if (!detectedSemver) {
+      return {
+        pinnedVersion,
+        detectedVersion: null,
+        detectedRaw,
+        compatibilityStatus: "unknown",
+        reason: "Could not parse semantic version from pass-cli --version output.",
+      };
+    }
+
+    const { compatibilityStatus, reason } = evaluatePassCliCompatibility(
+      detectedSemver,
+      pinnedSemver,
+    );
+    return {
+      pinnedVersion,
+      detectedVersion: `${detectedSemver.major}.${detectedSemver.minor}.${detectedSemver.patch}`,
+      detectedRaw,
+      compatibilityStatus,
+      reason,
+    };
+  } catch (error) {
+    return {
+      pinnedVersion,
+      detectedVersion: null,
+      detectedRaw: error instanceof Error ? error.message : String(error),
+      compatibilityStatus: "error",
+      reason: 'Failed to execute "pass-cli --version".',
+    };
+  }
+}
+
+export async function checkPassConnectivity(
+  passCli: PassCliRunner,
+): Promise<PassConnectivityStatus> {
+  try {
+    const { stdout, stderr } = await passCli(["test"]);
+    const out = joinStdoutStderr(stdout, stderr);
+    return {
+      status: "ok",
+      message: out || "Connection test succeeded.",
+    };
+  } catch (error) {
+    if (error instanceof PassCliAuthError) {
+      return {
+        status: "error",
+        message: error.message,
+        authErrorCode: error.code,
+        retryable: error.retryable,
+        userAction: error.userAction,
+        authManagedByUser: true,
+      };
+    }
+
+    return {
+      status: "error",
+      message: error instanceof Error ? error.message : String(error),
+    };
+  }
+}
+
+export async function passCheckStatusHandler(passCli: PassCliRunner) {
+  const [version, connectivity] = await Promise.all([
+    checkPassCliVersion(passCli),
+    checkPassConnectivity(passCli),
+  ]);
+
+  const overallStatus: "ok" | "warn" | "error" =
+    connectivity.status === "error" || version.compatibilityStatus === "error"
+      ? "error"
+      : version.compatibilityStatus === "warn" || version.compatibilityStatus === "unknown"
+        ? "warn"
+        : "ok";
+
+  const structuredContent: Record<string, unknown> = {
+    overall_status: overallStatus,
+    connectivity,
+    version,
+  };
+
+  if (connectivity.authErrorCode) {
+    structuredContent.error_code = connectivity.authErrorCode;
+    structuredContent.retryable = connectivity.retryable ?? true;
+    structuredContent.user_action = connectivity.userAction;
+    structuredContent.auth_managed_by_user = true;
+  }
+
+  const summary = [
+    `Overall status: ${overallStatus.toUpperCase()}`,
+    `Connectivity: ${connectivity.status.toUpperCase()} - ${connectivity.message}`,
+    `Version compatibility: ${version.compatibilityStatus.toUpperCase()} - ${version.reason}`,
+    `Pinned version: ${version.pinnedVersion}`,
+    `Detected version: ${version.detectedVersion ?? "unknown"}${
+      version.detectedRaw ? ` (${version.detectedRaw})` : ""
+    }`,
+  ].join("\n");
+
+  return {
+    ...(overallStatus === "error" ? { isError: true as const } : {}),
+    content: [{ type: "text" as const, text: summary }],
+    structuredContent,
+  };
+}
 
 function parseCursor(cursor?: string): number {
   if (!cursor) return 0;
@@ -276,12 +476,6 @@ export type PassItemDeleteInput = z.infer<typeof passItemDeleteInputSchema>;
 export async function passInfoHandler(passCli: PassCliRunner) {
   const { stdout } = await passCli(["info"]);
   return asTextContent(stdout.trim());
-}
-
-export async function passTestHandler(passCli: PassCliRunner) {
-  const { stdout, stderr } = await passCli(["test"]);
-  const out = joinStdoutStderr(stdout, stderr);
-  return asTextContent(out || "Connection test succeeded.");
 }
 
 export async function passUserInfoHandler(passCli: PassCliRunner, { output }: PassUserInfoInput) {
@@ -520,11 +714,7 @@ export function createServer(deps: { runPassCli?: PassCliRunner } = {}) {
     withAuthErrorHandling(async () => passInfoHandler(passCli)),
   );
 
-  server.registerTool(
-    "test",
-    {},
-    withAuthErrorHandling(async () => passTestHandler(passCli)),
-  );
+  server.registerTool("check_status", {}, async () => passCheckStatusHandler(passCli));
 
   server.registerTool(
     "view_user_info",

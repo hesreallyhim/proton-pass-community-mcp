@@ -44,6 +44,7 @@ async function main() {
   const toolNames = new Set(toolsList.tools.map((tool) => tool.name));
 
   assert(toolNames.has("view_session_info"), "Expected view_session_info tool to be registered");
+  assert(toolNames.has("check_status"), "Expected check_status tool to be registered");
   assert(toolNames.has("view_item"), "Expected view_item tool to be registered");
   assert(toolNames.has("delete_item"), "Expected delete_item tool to be registered");
 

@@ -10,7 +10,7 @@ Ship a safe, useful first release of `proton-pass-mcp` focused on read-oriented 
 
 1. `view_session_info`
 2. `view_user_info`
-3. `test`
+3. `check_status`
 4. `list_vaults`
 5. `list_items`
 6. `view_item`
@@ -64,9 +64,15 @@ Re-entry criteria for `inject`:
 3. On authentication failures, tools return a standardized error contract and remediation:
    - `AUTH_REQUIRED` or `AUTH_EXPIRED`
    - user action: run `pass-cli login` outside MCP and retry
-4. Use `test` once as a session preflight before normal tool workflows (not before every tool call).
-5. If auth later expires mid-session, rely on `AUTH_*` tool errors and re-authenticate out-of-band before retrying.
-6. Model-facing guidance for auth errors:
+4. `check_status` also validates CLI version compatibility against the pinned MCP baseline.
+   - baseline default: `pass-cli` `1.5.2`
+   - patch mismatch: warn
+   - higher minor on same major: warn
+   - lower minor on same major: error
+   - major mismatch: error
+5. Use `check_status` once as a session preflight before normal tool workflows (not before every tool call).
+6. If auth later expires mid-session, rely on `AUTH_*` tool errors and re-authenticate out-of-band before retrying.
+7. Model-facing guidance for auth errors:
    - explain required user action
    - do not attempt credential collection or secret recovery workflows
 
