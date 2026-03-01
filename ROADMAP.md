@@ -61,47 +61,6 @@ Why: resources are better than tools for browse/read usage, caching, and context
 - `item move`
 - vault/item member management wrappers
 
-## GitHub Credential Management (Research Notes)
-
-Goal: reduce friction for rotating GitHub credentials/tokens.
-
-### What appears possible now
-
-1. PAT creation/rotation is still UI-centric for user tokens.
-
-- GitHub docs for managing personal access tokens describe UI flows.
-- You can pre-fill token-creation forms with URL query parameters, but this is still web UI-based.
-
-2. `gh` CLI does not expose PAT create/rotate commands.
-
-- `gh auth` supports login/status/refresh/token, but not PAT lifecycle creation APIs.
-
-3. Organization-level token governance APIs exist, but they are not personal PAT self-service creation APIs.
-
-- Examples include fine-grained PAT request management APIs for org governance.
-
-### Practical alternatives worth exploring
-
-1. Prefer GitHub Apps for automation where possible.
-
-- Installation access tokens are short-lived (hour-scale) and mintable via API.
-- This gives the "short-lived credential" behavior people often want from PAT rotation.
-
-2. Use repo/org secret automation to reduce rotation pain.
-
-- Keep generated credentials in a secret manager (for example Proton Pass).
-- Script propagation to GitHub with `gh secret set` so changing tokens is one command, not many manual updates.
-
-3. Keep PAT usage narrow.
-
-- Use fine-grained PATs with shortest practical expiry and minimum scopes.
-- Use prefilled token creation URLs to reduce UI friction when PATs are required.
-
-4. Automate distribution, not token minting.
-
-- Use `gh secret set` to push rotated credentials across repos/environments.
-- This removes most manual touch points even when PAT creation remains UI-driven.
-
 ## Proton Mail Automation (Reality Check)
 
 There does not appear to be a comparable public, user-facing Proton Mail CLI for full mailbox administration comparable to `pass-cli` for Proton Pass.
@@ -124,16 +83,6 @@ This is useful for mailbox pipeline workflows, but it is not the same as a direc
 
 ## References
 
-- GitHub PAT management:
-  - <https://docs.github.com/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token>
-- PAT prefilled URL parameters:
-  - <https://docs.github.com/en/enterprise-server%403.14/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens>
-- GitHub App installation token auth:
-  - <https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/authenticating-as-a-github-app-installation>
-- Installation-token endpoint support matrix:
-  - <https://docs.github.com/en/rest/authentication/endpoints-available-for-github-app-installation-access-tokens>
-- Org PAT governance endpoints:
-  - <https://docs.github.com/en/rest/orgs/personal-access-tokens>
 - Proton Bridge CLI:
   - <https://proton.me/support/bridge-cli-guide>
 - Proton Mail export/import options:

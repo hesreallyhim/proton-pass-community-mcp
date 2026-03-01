@@ -21,6 +21,7 @@ Primary optimization target: item discovery (`pass-cli item list`) should return
 3. Read tools default to structured, token-efficient JSON in `structuredContent`.
 4. `content` text remains present for interoperability/debugging.
 5. Listing/search tools return references, then callers use `view_item` for full content.
+6. Release branches may retain non-release code paths, but only release-scoped tools are registered/exposed by default.
 
 ## Shared Schemas
 
