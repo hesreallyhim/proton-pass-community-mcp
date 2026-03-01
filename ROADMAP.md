@@ -99,6 +99,14 @@ Most practical official automation-adjacent options today:
 
 This is useful for mailbox pipeline workflows, but it is not the same as a direct public "manage mailbox via official API" model.
 
+## Open Questions
+
+1. MCP scope across Proton offerings.
+
+- The ProtonPass GitHub organization includes Proton Pass and Proton Authenticator repositories, with overlap around TOTP workflows.
+- Decide whether this MCP remains strictly Proton Pass (`pass-cli`) or intentionally expands to include Proton Authenticator-related capabilities.
+- Define whether TOTP features in this MCP should be treated as Pass-only scope or cross-offering scope.
+
 ## References
 
 - GitHub PAT management:
