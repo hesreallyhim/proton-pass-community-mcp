@@ -10,21 +10,21 @@ It is designed as a thin integration layer:
 
 ## Current Tool Surface
 
-| Tool                        | Purpose                                        |
-| --------------------------- | ---------------------------------------------- |
-| `view_session_info`         | Session/account status from `pass-cli info`    |
-| `view_user_info`            | User account details from `pass-cli user info` |
-| `test`                      | Session/API connectivity preflight             |
-| `list_vaults`               | List vaults                                    |
-| `list_items`                | List items by vault name or share ID           |
-| `view_item`                 | View item by URI or selectors                  |
-| `create_vault`              | Create vault (write)                           |
-| `update_vault`              | Rename vault (write)                           |
-| `delete_vault`              | Delete vault (write)                           |
-| `create_login_item`         | Create login item (write)                      |
-| `create_item_from_template` | Create item from JSON template (write)         |
-| `update_item`               | Update item fields (write)                     |
-| `delete_item`               | Delete item (write)                            |
+| Tool                        | Purpose                                           |
+| --------------------------- | ------------------------------------------------- |
+| `view_session_info`         | Session/account status from `pass-cli info`       |
+| `view_user_info`            | User account details from `pass-cli user info`    |
+| `check_status`              | Session/API preflight + CLI version compatibility |
+| `list_vaults`               | List vaults                                       |
+| `list_items`                | List items by vault name or share ID              |
+| `view_item`                 | View item by URI or selectors                     |
+| `create_vault`              | Create vault (write)                              |
+| `update_vault`              | Rename vault (write)                              |
+| `delete_vault`              | Delete vault (write)                              |
+| `create_login_item`         | Create login item (write)                         |
+| `create_item_from_template` | Create item from JSON template (write)            |
+| `update_item`               | Update item fields (write)                        |
+| `delete_item`               | Delete item (write)                               |
 
 ## `list_items` Pagination
 
@@ -66,11 +66,17 @@ Authentication handling:
 1. Authentication is user-managed outside MCP with `pass-cli login`.
 2. On auth failure, tools return standardized `AUTH_*` errors and a retry instruction.
 3. The MCP server does not collect credentials, OTP codes, or private keys.
-4. Use `test` once as a session preflight (not per tool call); rely on `AUTH_*` fallback errors if the session later expires.
+4. Use `check_status` once as a session preflight (not per tool call); rely on `AUTH_*` fallback errors if the session later expires.
+5. `check_status` enforces CLI compatibility against pinned `pass-cli` `1.5.2` by default:
+   - patch mismatch: warn
+   - higher minor (same major): warn
+   - lower minor (same major): error
+   - major mismatch: error
 
 ## Environment Variables
 
 - `PASS_CLI_BIN`: override CLI binary path/name (default `pass-cli`)
+- `PASS_CLI_PINNED_VERSION`: override pinned compatibility baseline for `check_status` (default `1.5.2`)
 - `ALLOW_WRITE`: enable write tools when set to `1`
 
 ## Validation / QA

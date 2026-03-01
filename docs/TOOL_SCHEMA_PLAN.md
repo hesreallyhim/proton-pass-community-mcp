@@ -104,17 +104,17 @@ Status key:
 
 ### Session and Utilities
 
-| Tool                | Source               | Status      | Input Summary                                          | Output Summary                    |
-| ------------------- | -------------------- | ----------- | ------------------------------------------------------ | --------------------------------- |
-| `login`             | `pass-cli login`     | Planned     | `username?`, `interactive?`                            | Session/login result text or json |
-| `logout`            | `pass-cli logout`    | Planned     | `force?`, `confirm`                                    | Operation result                  |
-| `test`              | `pass-cli test`      | Implemented | none                                                   | Connectivity/session preflight    |
-| `view_session_info` | `pass-cli info`      | Implemented | `output?`                                              | Account/session info              |
-| `view_user_info`    | `pass-cli user info` | Implemented | `output?`                                              | User profile                      |
-| `update`            | `pass-cli update`    | Planned     | `yes?`, `setTrack?`, `confirm`                         | Update result                     |
-| `support`           | `pass-cli support`   | Planned     | none                                                   | Support guidance text             |
-| `inject`            | `pass-cli inject`    | Planned     | `inFile`, `outFile?`, `fileMode?`, `force?`, `confirm` | Output path/status                |
-| `run`               | `pass-cli run`       | Planned     | `command[]`, `envFile[]?`, `noMasking?`, `confirm`     | Exit code/stdout/stderr summary   |
+| Tool                | Source                                 | Status      | Input Summary                                          | Output Summary                                          |
+| ------------------- | -------------------------------------- | ----------- | ------------------------------------------------------ | ------------------------------------------------------- |
+| `login`             | `pass-cli login`                       | Planned     | `username?`, `interactive?`                            | Session/login result text or json                       |
+| `logout`            | `pass-cli logout`                      | Planned     | `force?`, `confirm`                                    | Operation result                                        |
+| `check_status`      | `pass-cli test` + `pass-cli --version` | Implemented | none                                                   | Connectivity/auth preflight + CLI version compatibility |
+| `view_session_info` | `pass-cli info`                        | Implemented | `output?`                                              | Account/session info                                    |
+| `view_user_info`    | `pass-cli user info`                   | Implemented | `output?`                                              | User profile                                            |
+| `update`            | `pass-cli update`                      | Planned     | `yes?`, `setTrack?`, `confirm`                         | Update result                                           |
+| `support`           | `pass-cli support`                     | Planned     | none                                                   | Support guidance text                                   |
+| `inject`            | `pass-cli inject`                      | Planned     | `inFile`, `outFile?`, `fileMode?`, `force?`, `confirm` | Output path/status                                      |
+| `run`               | `pass-cli run`                         | Planned     | `command[]`, `envFile[]?`, `noMasking?`, `confirm`     | Exit code/stdout/stderr summary                         |
 
 ### Vault Tools
 

@@ -9,6 +9,16 @@ if [[ "$cmd1" == "info" ]]; then
   exit 0
 fi
 
+if [[ "$cmd1" == "test" ]]; then
+  printf 'mock-pass-test-ok\n'
+  exit 0
+fi
+
+if [[ "$cmd1" == "--version" ]]; then
+  printf '1.5.2 (mock)\n'
+  exit 0
+fi
+
 if [[ "$cmd1" == "vault" && "$cmd2" == "list" ]]; then
   printf '{"vaults":[{"name":"Work"}]}'
   exit 0
