@@ -65,6 +65,7 @@ export function classifyPassCliAuthErrorText(text: string): PassCliAuthErrorCode
     normalized.includes("not logged in") ||
     normalized.includes("please login") ||
     normalized.includes("please log in") ||
+    normalized.includes("requires an authenticated client") ||
     normalized.includes("authentication required") ||
     normalized.includes("unauthorized") ||
     normalized.includes("forbidden")
@@ -270,6 +271,12 @@ export type PassItemDeleteInput = z.infer<typeof passItemDeleteInputSchema>;
 export async function passInfoHandler(passCli: PassCliRunner) {
   const { stdout } = await passCli(["info"]);
   return asTextContent(stdout.trim());
+}
+
+export async function passTestHandler(passCli: PassCliRunner) {
+  const { stdout, stderr } = await passCli(["test"]);
+  const out = joinStdoutStderr(stdout, stderr);
+  return asTextContent(out || "Connection test succeeded.");
 }
 
 export async function passVaultListHandler(passCli: PassCliRunner, { output }: PassVaultListInput) {
@@ -501,6 +508,12 @@ export function createServer(deps: { runPassCli?: PassCliRunner } = {}) {
     "pass_info",
     {},
     withAuthErrorHandling(async () => passInfoHandler(passCli)),
+  );
+
+  server.registerTool(
+    "pass_test",
+    {},
+    withAuthErrorHandling(async () => passTestHandler(passCli)),
   );
 
   server.registerTool(

@@ -9,11 +9,12 @@ Ship a safe, useful first release of `proton-pass-mcp` focused on read-oriented 
 ### In Scope (Release 0.1)
 
 1. `pass_info`
-2. `pass_vault_list`
-3. `pass_item_list`
-4. `pass_item_view`
-5. `pass_item_search`
-6. `pass_share_list`
+2. `pass_test`
+3. `pass_vault_list`
+4. `pass_item_list`
+5. `pass_item_view`
+6. `pass_item_search`
+7. `pass_share_list`
 
 ### Stretch Scope (Release 0.1 if low risk)
 
@@ -62,7 +63,9 @@ Re-entry criteria for `pass_inject`:
 3. On authentication failures, tools return a standardized error contract and remediation:
    - `AUTH_REQUIRED` or `AUTH_EXPIRED`
    - user action: run `pass-cli login` outside MCP and retry
-4. Model-facing guidance for auth errors:
+4. Use `pass_test` once as a session preflight before normal tool workflows (not before every tool call).
+5. If auth later expires mid-session, rely on `AUTH_*` tool errors and re-authenticate out-of-band before retrying.
+6. Model-facing guidance for auth errors:
    - explain required user action
    - do not attempt credential collection or secret recovery workflows
 
