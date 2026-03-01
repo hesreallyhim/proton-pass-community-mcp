@@ -42,7 +42,7 @@ Status is evaluated against currently registered MCP tools (`src/server/register
 0. Go through codebase and change all `command_subcommand` style wording to the reverse (and remove `pass_` prefixes) (e.g. `pass_vault_list` => `list_vaults`).
 1. Implement `search_items` with title-based matching and pagination.
 2. Register `list_shares` and add tests for registration/behavior.
-3. Remove non-0.1 mutative tools from default registration surface.
+3. De-register non-0.1 mutative tools from default registration surface by commenting out `server.registerTool(...)` lines in `src/server/register-tools.ts` (retain implementation code for later releases).
 4. Align inspector smoke checks to 0.1 in-scope tools. [USER: SKIP FOR NOW]
 5. Finalize `list_items` output contract for token-efficient reference-first behavior. [USER: ITEM-REFERENCES-ONLY]
 6. ... [USER: SEE EXECUTION PLAN BELOW]
@@ -95,6 +95,12 @@ Re-entry criteria for `inject`:
 4. Require explicit item selection (`view_item`) for sensitive field access.
 5. Avoid hidden cross-tool state that implicitly broadens access.
 6. Preserve least-privilege assumptions per tool invocation.
+
+## Search Policy (0.1)
+
+1. `search_items` is title-based by project policy.
+2. Title is not guaranteed by upstream contract, but 0.1 search semantics are still title-only.
+3. Items without a usable title are discoverable via `list_items` and then `view_item`.
 
 ## Authentication Strategy (0.1)
 
@@ -153,6 +159,13 @@ Example contract:
 3. Error messages are actionable and deterministic for invalid input combinations.
 4. Tool outputs are structured enough for downstream model reasoning without excessive payload bloat.
 
+## Runtime Baseline (0.1)
+
+1. Baseline runtime is Node.js `24` (`.nvmrc` and package engine policy).
+2. Rationale: dependency/audit pressure and Node.js `22` lifecycle risk near release.
+3. Although this project is a stdio server, runtime baseline still follows dependency/security constraints first.
+4. Re-evaluate Node.js `22` compatibility post-0.1 only if ecosystem pressure justifies back-compat.
+
 ## Success Criteria
 
 1. Models can complete common read workflows:
@@ -181,12 +194,37 @@ Example contract:
 5. Expand inspector smoke checks for in-scope tools. [USER: DEFER]
 6. Publish release notes defining 0.1 read-focused boundaries and explicit non-goals.
 7. Revise README.md
-8. Add LICENSE (GPL 3+) and other community health files.
+8. Add LICENSE (GPL 3+) and other community health files. [USER: NOTE! ADD THIRD-PARTY LICENSE FOR PROTON DOCS]
 9. Add SKILL.md.
 10. Add CI workflows and formalize release strategy.
+
+## CI and Release Strategy (0.1)
+
+1. CI gate (`.github/workflows/ci.yml`):
+   - Trigger on pull requests and pushes to `main`.
+   - Use Node.js `24`.
+   - Run `npm ci`.
+   - Run `npm run check`.
+   - Keep inspector smoke/integration out of required CI checks for now.
+2. Conventional commit enforcement (`.github/workflows/conventional-pr-title.yml`):
+   - Trigger on pull requests targeting `main` and release-style `v*` branches.
+   - Use a GitHub Marketplace action (`amannn/action-semantic-pull-request`) to validate Conventional Commit PR titles.
+   - No local branch commit hook is required by default; policy is enforced at PR gate for `main`/`v*` targets.
+3. Release automation (`.github/workflows/release-please.yml`):
+   - Use Release Please for single-package versioning/changelog/tag/release flow.
+   - Release PR is the formal pre-release checkpoint.
+   - Merging the release PR cuts the Git tag and GitHub Release.
+4. Commit policy for maintainers:
+   - Use Conventional Commits for all merge-bound work.
+   - If a PR title is non-conforming, update title before merge.
+
+## Stretch Goals
+
+1. filter and sort operations on list_items (by title, created_at, or modified_at (no content-based fields)).
+2. search_vaults and search_shares.
 
 ## Open Questions
 
 1. Should 0.1 break `list_items` output compatibility immediately or ship a temporary compatibility flag? [USER: Q IS MIS-STATED - NOT ABOUT COMPATIBILITY - LIST_ITEMS MUST NOT EXPOSE ITEM CONTENTS - HARD CONSTRAINT]
 2. Should `view_item` default to minimal field output in JSON mode, or keep full item JSON by default? [USER: FULL ITEM]
-3. Is `search_vaults` necessary for 0.1, or defer until observed vault-scale demand? [USER: INCLUDE IT]
+3. Is `search_vaults` necessary for 0.1, or defer until observed vault-scale demand? [USER: STRETCH GOAL]
