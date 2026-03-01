@@ -72,6 +72,22 @@ export function asJsonTextOrRaw(text: string): string {
   }
 }
 
+const DEFAULT_ITEM_LIST_PAGE_SIZE = 100;
+const MAX_ITEM_LIST_PAGE_SIZE = 250;
+
+function parseCursor(cursor?: string): number {
+  if (!cursor) return 0;
+  if (!/^\d+$/.test(cursor)) {
+    throw new Error('Invalid cursor. Expected a non-negative integer string (example: "100").');
+  }
+
+  const parsed = Number(cursor);
+  if (!Number.isSafeInteger(parsed)) {
+    throw new Error("Invalid cursor. Value is too large.");
+  }
+  return parsed;
+}
+
 export function requireWriteGate(confirm?: boolean) {
   if (process.env.ALLOW_WRITE !== "1") {
     throw new Error("Write operations are disabled. Set ALLOW_WRITE=1 to enable.");
@@ -88,6 +104,8 @@ export const passVaultListInputSchema = z.object({
 export const passItemListInputSchema = z.object({
   vaultName: z.string().optional(),
   shareId: z.string().optional(),
+  pageSize: z.number().int().min(1).max(MAX_ITEM_LIST_PAGE_SIZE).optional(),
+  cursor: z.string().optional(),
   output: z.enum(["json", "human"]).default("json"),
 });
 
@@ -179,16 +197,52 @@ export async function passVaultListHandler(passCli: PassCliRunner, { output }: P
 
 export async function passItemListHandler(
   passCli: PassCliRunner,
-  { vaultName, shareId, output }: PassItemListInput,
+  { vaultName, shareId, pageSize, cursor, output }: PassItemListInput,
 ) {
   if (vaultName && shareId) throw new Error("Provide only one of vaultName or shareId.");
+  if (output !== "json" && (pageSize !== undefined || cursor !== undefined)) {
+    throw new Error('Pagination is supported only with {"output":"json"}.');
+  }
 
   const args = ["item", "list", "--output", output];
   if (shareId) args.splice(2, 0, "--share-id", shareId);
   else if (vaultName) args.splice(2, 0, vaultName);
 
   const { stdout } = await passCli(args);
-  return asTextContent(asJsonTextOrRaw(stdout));
+  if (output !== "json") {
+    return asTextContent(asJsonTextOrRaw(stdout));
+  }
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(stdout);
+  } catch {
+    return asTextContent(asJsonTextOrRaw(stdout));
+  }
+
+  if (!Array.isArray(parsed)) {
+    return asTextContent(asJsonTextOrRaw(stdout));
+  }
+
+  const start = parseCursor(cursor);
+  const size = pageSize ?? DEFAULT_ITEM_LIST_PAGE_SIZE;
+  const end = start + size;
+  const items = parsed.slice(start, end);
+  const nextCursor = end < parsed.length ? String(end) : undefined;
+
+  const structuredContent = {
+    items,
+    pageSize: size,
+    cursor: String(start),
+    returned: items.length,
+    total: parsed.length,
+    nextCursor,
+  };
+
+  return {
+    content: [{ type: "text" as const, text: JSON.stringify(structuredContent, null, 2) }],
+    structuredContent,
+  };
 }
 
 export async function passItemViewHandler(passCli: PassCliRunner, input: PassItemViewInput) {
@@ -367,7 +421,6 @@ export function createServer(deps: { runPassCli?: PassCliRunner } = {}) {
     "pass_vault_list",
     {
       inputSchema: passVaultListInputSchema,
-      outputSchema: z.enum(["json", "human"]).default("json"),
     },
     async (input) => passVaultListHandler(passCli, input),
   );
