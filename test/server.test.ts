@@ -14,6 +14,7 @@ import {
   passItemListHandler,
   passItemUpdateHandler,
   passItemViewHandler,
+  passUserInfoHandler,
   passVaultCreateHandler,
   passVaultDeleteHandler,
   passVaultListHandler,
@@ -183,6 +184,14 @@ describe("read-only handlers", () => {
     expect(result).toEqual({
       content: [{ type: "text", text: "Connection successful\nping=31ms" }],
     });
+  });
+
+  it("passUserInfoHandler forwards output format", async () => {
+    const runner = makeRunner({ stdout: '{"email":"user@proton.me"}', stderr: "" });
+    const result = await passUserInfoHandler(runner, { output: "json" });
+
+    expect(runner).toHaveBeenCalledWith(["user", "info", "--output", "json"]);
+    expect(result.content[0].text).toContain('"email": "user@proton.me"');
   });
 
   it("passVaultListHandler requests output format", async () => {
@@ -644,36 +653,37 @@ describe("server setup", () => {
       { handler: (input?: any) => Promise<unknown> }
     >;
 
-    await tools.pass_info.handler();
-    await tools.pass_test.handler();
-    await tools.pass_vault_list.handler({ output: "json" });
-    await tools.pass_item_list.handler({ output: "json" });
-    await tools.pass_item_view.handler({ uri: "pass://Work/GitHub/password", output: "json" });
-    await tools.pass_vault_create.handler({ name: "Vault", confirm: true });
-    await tools.pass_vault_update.handler({ shareId: "s1", newName: "Renamed", confirm: true });
-    await tools.pass_vault_delete.handler({ shareId: "s1", confirm: true });
-    await tools.pass_item_create_login.handler({
+    await tools.view_session_info.handler();
+    await tools.test.handler();
+    await tools.view_user_info.handler({ output: "json" });
+    await tools.list_vaults.handler({ output: "json" });
+    await tools.list_items.handler({ output: "json" });
+    await tools.view_item.handler({ uri: "pass://Work/GitHub/password", output: "json" });
+    await tools.create_vault.handler({ name: "Vault", confirm: true });
+    await tools.update_vault.handler({ shareId: "s1", newName: "Renamed", confirm: true });
+    await tools.delete_vault.handler({ shareId: "s1", confirm: true });
+    await tools.create_login_item.handler({
       shareId: "s1",
       title: "GitHub",
       output: "json",
       confirm: true,
     });
-    await tools.pass_item_create_from_template.handler({
+    await tools.create_item_from_template.handler({
       itemType: "login",
       shareId: "s1",
       templateJson: "{}",
       output: "json",
       confirm: true,
     });
-    await tools.pass_item_update.handler({
+    await tools.update_item.handler({
       shareId: "s1",
       itemId: "i1",
       fields: ["password=abc"],
       confirm: true,
     });
-    await tools.pass_item_delete.handler({ shareId: "s1", itemId: "i1", confirm: true });
+    await tools.delete_item.handler({ shareId: "s1", itemId: "i1", confirm: true });
 
-    expect(runner).toHaveBeenCalledTimes(12);
+    expect(runner).toHaveBeenCalledTimes(13);
   });
 
   it("registered tool handlers return standardized auth error payloads", async () => {
@@ -686,7 +696,7 @@ describe("server setup", () => {
       { handler: (input?: any) => Promise<unknown> }
     >;
 
-    const result = (await tools.pass_info.handler()) as any;
+    const result = (await tools.view_session_info.handler()) as any;
 
     expect(result.isError).toBe(true);
     expect(result.structuredContent).toMatchObject({

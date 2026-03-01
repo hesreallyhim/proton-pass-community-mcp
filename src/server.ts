@@ -184,6 +184,10 @@ export const passVaultListInputSchema = z.object({
   output: z.enum(["json", "human"]).default("json"),
 });
 
+export const passUserInfoInputSchema = z.object({
+  output: z.enum(["json", "human"]).default("json"),
+});
+
 export const passItemListInputSchema = z.object({
   vaultName: z.string().optional(),
   shareId: z.string().optional(),
@@ -258,6 +262,7 @@ export const passItemDeleteInputSchema = z.object({
 });
 
 export type PassVaultListInput = z.infer<typeof passVaultListInputSchema>;
+export type PassUserInfoInput = z.infer<typeof passUserInfoInputSchema>;
 export type PassItemListInput = z.infer<typeof passItemListInputSchema>;
 export type PassItemViewInput = z.infer<typeof passItemViewInputSchema>;
 export type PassVaultCreateInput = z.infer<typeof passVaultCreateInputSchema>;
@@ -277,6 +282,11 @@ export async function passTestHandler(passCli: PassCliRunner) {
   const { stdout, stderr } = await passCli(["test"]);
   const out = joinStdoutStderr(stdout, stderr);
   return asTextContent(out || "Connection test succeeded.");
+}
+
+export async function passUserInfoHandler(passCli: PassCliRunner, { output }: PassUserInfoInput) {
+  const { stdout } = await passCli(["user", "info", "--output", output]);
+  return asTextContent(asJsonTextOrRaw(stdout));
 }
 
 export async function passVaultListHandler(passCli: PassCliRunner, { output }: PassVaultListInput) {
@@ -505,19 +515,27 @@ export function createServer(deps: { runPassCli?: PassCliRunner } = {}) {
   });
 
   server.registerTool(
-    "pass_info",
+    "view_session_info",
     {},
     withAuthErrorHandling(async () => passInfoHandler(passCli)),
   );
 
   server.registerTool(
-    "pass_test",
+    "test",
     {},
     withAuthErrorHandling(async () => passTestHandler(passCli)),
   );
 
   server.registerTool(
-    "pass_vault_list",
+    "view_user_info",
+    {
+      inputSchema: passUserInfoInputSchema,
+    },
+    withAuthErrorHandling(async (input) => passUserInfoHandler(passCli, input)),
+  );
+
+  server.registerTool(
+    "list_vaults",
     {
       inputSchema: passVaultListInputSchema,
     },
@@ -525,7 +543,7 @@ export function createServer(deps: { runPassCli?: PassCliRunner } = {}) {
   );
 
   server.registerTool(
-    "pass_item_list",
+    "list_items",
     {
       inputSchema: passItemListInputSchema,
     },
@@ -533,7 +551,7 @@ export function createServer(deps: { runPassCli?: PassCliRunner } = {}) {
   );
 
   server.registerTool(
-    "pass_item_view",
+    "view_item",
     {
       inputSchema: passItemViewInputSchema,
     },
@@ -541,13 +559,13 @@ export function createServer(deps: { runPassCli?: PassCliRunner } = {}) {
   );
 
   server.registerTool(
-    "pass_vault_create",
+    "create_vault",
     { inputSchema: passVaultCreateInputSchema },
     withAuthErrorHandling(async (input) => passVaultCreateHandler(passCli, input)),
   );
 
   server.registerTool(
-    "pass_vault_update",
+    "update_vault",
     {
       inputSchema: passVaultUpdateInputSchema,
     },
@@ -555,7 +573,7 @@ export function createServer(deps: { runPassCli?: PassCliRunner } = {}) {
   );
 
   server.registerTool(
-    "pass_vault_delete",
+    "delete_vault",
     {
       inputSchema: passVaultDeleteInputSchema,
     },
@@ -563,7 +581,7 @@ export function createServer(deps: { runPassCli?: PassCliRunner } = {}) {
   );
 
   server.registerTool(
-    "pass_item_create_login",
+    "create_login_item",
     {
       inputSchema: passItemCreateLoginInputSchema,
     },
@@ -571,7 +589,7 @@ export function createServer(deps: { runPassCli?: PassCliRunner } = {}) {
   );
 
   server.registerTool(
-    "pass_item_create_from_template",
+    "create_item_from_template",
     {
       inputSchema: passItemCreateFromTemplateInputSchema,
     },
@@ -579,7 +597,7 @@ export function createServer(deps: { runPassCli?: PassCliRunner } = {}) {
   );
 
   server.registerTool(
-    "pass_item_update",
+    "update_item",
     {
       inputSchema: passItemUpdateInputSchema,
     },
@@ -587,7 +605,7 @@ export function createServer(deps: { runPassCli?: PassCliRunner } = {}) {
   );
 
   server.registerTool(
-    "pass_item_delete",
+    "delete_item",
     {
       inputSchema: passItemDeleteInputSchema,
     },
