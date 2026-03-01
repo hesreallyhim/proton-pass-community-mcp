@@ -175,6 +175,67 @@ describe("read-only handlers", () => {
     expect(runner).toHaveBeenNthCalledWith(2, ["item", "list", "Work", "--output", "human"]);
   });
 
+  it("passItemListHandler paginates json output by default", async () => {
+    const payload = Array.from({ length: 130 }, (_, i) => ({ id: `item-${i + 1}` }));
+    const runner = makeRunner({ stdout: JSON.stringify(payload), stderr: "" });
+
+    const result = await passItemListHandler(runner, { output: "json" });
+    const structured = (result as any).structuredContent;
+
+    expect(structured).toBeTruthy();
+    expect(structured.pageSize).toBe(100);
+    expect(structured.cursor).toBe("0");
+    expect(structured.returned).toBe(100);
+    expect(structured.total).toBe(130);
+    expect(structured.nextCursor).toBe("100");
+    expect(structured.items).toHaveLength(100);
+    expect(structured.items[0]).toEqual({ id: "item-1" });
+    expect(structured.items[99]).toEqual({ id: "item-100" });
+  });
+
+  it("passItemListHandler supports cursor and pageSize for follow-up pages", async () => {
+    const payload = Array.from({ length: 75 }, (_, i) => ({ id: `item-${i + 1}` }));
+    const runner = makeRunner({ stdout: JSON.stringify(payload), stderr: "" });
+
+    const result = await passItemListHandler(runner, {
+      output: "json",
+      pageSize: 20,
+      cursor: "40",
+    });
+    const structured = (result as any).structuredContent;
+
+    expect(structured.pageSize).toBe(20);
+    expect(structured.cursor).toBe("40");
+    expect(structured.returned).toBe(20);
+    expect(structured.total).toBe(75);
+    expect(structured.nextCursor).toBe("60");
+    expect(structured.items).toHaveLength(20);
+    expect(structured.items[0]).toEqual({ id: "item-41" });
+    expect(structured.items[19]).toEqual({ id: "item-60" });
+  });
+
+  it("passItemListHandler rejects invalid cursor values", async () => {
+    const runner = makeRunner({ stdout: "[]", stderr: "" });
+
+    await expect(
+      passItemListHandler(runner, {
+        output: "json",
+        cursor: "abc",
+      }),
+    ).rejects.toThrow("Invalid cursor");
+  });
+
+  it("passItemListHandler rejects pagination params for human output", async () => {
+    const runner = makeRunner({ stdout: "ok", stderr: "" });
+
+    await expect(
+      passItemListHandler(runner, {
+        output: "human",
+        pageSize: 10,
+      }),
+    ).rejects.toThrow('Pagination is supported only with {"output":"json"}');
+  });
+
   it("passItemViewHandler validates selector combinations", async () => {
     const runner = makeRunner();
 

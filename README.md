@@ -24,6 +24,18 @@ It is designed as a thin integration layer:
 | `pass_item_update`               | Update item fields (write)                  |
 | `pass_item_delete`               | Delete item (write)                         |
 
+## `pass_item_list` Pagination
+
+`pass-cli item list` does not expose native paging flags, so this server paginates JSON output in-process.
+
+- Input fields:
+  - `pageSize` (optional, `1..250`, default `100` for JSON output)
+  - `cursor` (optional non-negative integer string offset, for example `"100"`)
+- Behavior:
+  - Pagination is supported only with `{"output":"json"}`.
+  - Response includes `structuredContent` with `items`, `pageSize`, `cursor`, `returned`, `total`, and `nextCursor`.
+  - Use `nextCursor` in a follow-up `pass_item_list` call to fetch the next page.
+
 ## Requirements
 
 - Node.js `22` (`.nvmrc`)
