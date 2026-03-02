@@ -1,4 +1,6 @@
-# proton-pass-community-mcp
+<div align="center"><img src="./assets/social-preview-image.png" width="400px"></div>
+
+<br />
 
 `proton-pass-community-mcp` is an MCP server that wraps selected commands from the Proton Pass CLI (`pass-cli`).
 
