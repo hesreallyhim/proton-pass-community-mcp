@@ -1,80 +1,74 @@
 ---
 name: upstream-docs-workflow
-description: Canonical process for tracking pass-cli docs/runtime drift without committing upstream docs snapshots.
+description: Canonical workflow for local docs sync and upstream version/SHA change watch.
 ---
 
-# Upstream Docs and Drift Workflow
+# Upstream Sync and Watch Protocol
 
-This directory tracks upstream metadata and drift decisions for `pass-cli`.
+This project does not commit upstream Proton Pass docs snapshots.
 
-Policy decision:
+## Policy
 
-1. Upstream Proton Pass CLI docs are **not committed** to this repository.
-2. Upstream docs may be fetched locally into `docs/upstream/pass-cli/` for analysis.
-3. The local docs cache is ignored by git.
+1. `docs/upstream/pass-cli/` is a local cache only and is git-ignored.
+2. CI does not classify drift.
+3. CI only reports whether tracked upstream references changed:
+   - `upstream_repo_head_sha`
+   - `latest_known_version`
 
-## Tracked Files
+## Tracked Metadata
 
-1. `docs/upstream/README.md` (this policy/workflow)
-2. `docs/upstream/PASS_CLI_SOURCE_METADATA.json` (upstream refs and latest known version)
+File: `docs/upstream/PASS_CLI_SOURCE_METADATA.json`
 
-## Local Fetch Workflow (Ignored Cache)
+Maintained fields used by CI watch:
 
-Use the existing sync command when docs inspection is needed:
+1. `upstream_repo`
+2. `upstream_repo_head_sha`
+3. `latest_known_version`
+4. `latest_known_version_source`
+5. `latest_known_version_published_date`
+6. `last_checked_utc`
+
+## Local Sync (On Demand)
+
+Fetch docs to local ignored cache only when needed:
 
 ```bash
 npm run docs:sync:pass-cli -- <ref>
 ```
 
-Equivalent script:
+Equivalent command:
 
 ```bash
 scripts/sync-pass-cli-docs.sh <ref>
 ```
 
-This writes into `docs/upstream/pass-cli/<ref>/` locally. Those files remain untracked.
+Result location (untracked): `docs/upstream/pass-cli/<ref>/`
 
-## Source-of-Truth Assumptions
+## CI Watch
 
-1. Runtime truth is installed CLI behavior.
-2. `pass-cli --help` is authoritative for command shape and flag support.
-3. Changelog/release notes provide intent and release deltas.
-4. Fetched docs are a secondary transient reference during drift analysis.
+Workflow: `.github/workflows/upstream-pass-cli-watch.yml`
 
-## Authority Order
+Script: `scripts/check-pass-cli-upstream.mjs`
 
-For implementation and debugging decisions:
+Local run:
 
-1. Installed CLI runtime behavior.
-2. CLI help output (`--help`).
-3. Upstream changelog/release notes.
-4. Transiently fetched docs cache.
+```bash
+npm run check:upstream:pass-cli
+```
 
-## Drift Protocol
+Behavior:
 
-When drift is suspected:
+1. Reads tracked metadata file.
+2. Fetches current upstream HEAD SHA from `upstream_repo`.
+3. Fetches changelog from `latest_known_version_source` and parses latest version.
+4. Fails when either tracked value changed.
 
-1. Capture CLI evidence:
-   - `pass-cli --version`
-   - relevant `pass-cli <command> --help`
-2. Review upstream changelog for matching release notes.
-3. Optionally fetch docs to ignored cache for deeper comparison.
-4. Classify drift:
-   - `shape`: command/flag/argument differences
-   - `semantic`: behavior/meaning differences
-   - `docs-only`: wording/example differences
-5. Update:
-   - tool schemas/handlers
-   - tests
-   - `docs/TOOL_SCHEMA_PLAN.md`
-   - drift register below
+This is an upstream-change alert only, not a drift verdict.
 
-## Observed Drift Register
+## Maintainer CTA When Watch Fails
 
-| Date (UTC) | CLI Version | Area                                  | Upstream Docs/Changelog Observation                                              | CLI Observation                                    | Class    | Status | Notes                                                  |
-| ---------- | ----------- | ------------------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------- | -------- | ------ | ------------------------------------------------------ |
-| 2026-03-01 | 1.5.2       | `item list` options                   | Upstream docs list synopsis omits `--filter-type`, `--filter-state`, `--sort-by` | CLI help for `item list` includes all three flags  | shape    | Open   | MCP now forwards these filters in `list_items`         |
-| 2026-03-01 | 1.5.2       | command coverage                      | Upstream docs command pages missing `totp` and `support`                         | CLI has top-level `totp` and `support` commands    | shape    | Open   | Track for future parity phases                         |
-| 2026-03-01 | 1.5.2       | `item create login` title requirement | Upstream docs say `--title` required unless template                             | CLI help does not mark `--title` as required       | semantic | Open   | Keep explicit validation expectations in MCP contracts |
-| 2026-03-01 | 1.5.2       | `item view` semantics                 | Upstream docs wording differs across pages                                       | CLI help aligns with `item view` command shape     | semantic | Open   | Prefer CLI help wording                                |
-| 2026-03-01 | 1.5.2       | `item list --output json` shape       | No explicit JSON response schema documented                                      | Runtime has `items` container in some environments | semantic | Open   | MCP now normalizes array/object item-list shapes       |
+1. Confirm the reported upstream changes.
+2. Decide whether the change implies actionable drift for this project.
+3. Update `docs/upstream/PASS_CLI_SOURCE_METADATA.json` with newly accepted baseline values.
+4. If needed, run deeper contract checks (`pass-cli --help`, runtime probes, optional local docs sync).
+5. Record any real drift decisions in project docs/tests.

@@ -1,0 +1,35 @@
+name: Upstream Pass CLI Watch
+
+on:
+  schedule:
+    - cron: "0 13 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  watch-upstream:
+    name: Watch upstream version and SHA
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+
+      - name: Compare tracked metadata with upstream
+        shell: bash
+        run: |
+          set +e
+          npm run check:upstream:pass-cli -- --report /tmp/pass-cli-upstream-report.json
+          code=$?
+          cat /tmp/pass-cli-upstream-report.json
+          if [ "$code" -eq 2 ]; then
+            echo "::error title=Upstream changed::pass-cli upstream SHA/version changed. Review and update docs/upstream/PASS_CLI_SOURCE_METADATA.json after triage."
+            exit 1
+          fi
+          exit "$code"
