@@ -2,31 +2,35 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
 import { withAuthErrorHandling } from "../pass-cli/errors.js";
 import type { PassCliRunner } from "../pass-cli/runner.js";
-import { passCheckStatusHandler } from "../tools/check-status.js";
+import { checkStatusHandler } from "../tools/check-status.js";
 import {
-  passItemCreateFromTemplateHandler,
-  passItemCreateLoginHandler,
-  passItemDeleteHandler,
-  passItemDeleteInputSchema,
-  passItemListHandler,
-  passItemListInputSchema,
-  passItemUpdateHandler,
-  passItemUpdateInputSchema,
-  passItemViewHandler,
-  passItemViewInputSchema,
-  passItemCreateLoginInputSchema,
-  passItemCreateFromTemplateInputSchema,
+  createItemFromTemplateHandler,
+  createLoginItemHandler,
+  deleteItemHandler,
+  deleteItemInputSchema,
+  listItemsHandler,
+  listItemsInputSchema,
+  updateItemHandler,
+  updateItemInputSchema,
+  viewItemHandler,
+  viewItemInputSchema,
+  createLoginItemInputSchema,
+  createItemFromTemplateInputSchema,
 } from "../tools/item.js";
-import { passInfoHandler, passUserInfoHandler, passUserInfoInputSchema } from "../tools/session.js";
 import {
-  passVaultCreateHandler,
-  passVaultCreateInputSchema,
-  passVaultDeleteHandler,
-  passVaultDeleteInputSchema,
-  passVaultListHandler,
-  passVaultListInputSchema,
-  passVaultUpdateHandler,
-  passVaultUpdateInputSchema,
+  viewSessionInfoHandler,
+  viewUserInfoHandler,
+  viewUserInfoInputSchema,
+} from "../tools/session.js";
+import {
+  createVaultHandler,
+  createVaultInputSchema,
+  deleteVaultHandler,
+  deleteVaultInputSchema,
+  listVaultsHandler,
+  listVaultsInputSchema,
+  updateVaultHandler,
+  updateVaultInputSchema,
 } from "../tools/vault.js";
 
 export function registerTools(server: McpServer, passCli: PassCliRunner) {
@@ -35,7 +39,7 @@ export function registerTools(server: McpServer, passCli: PassCliRunner) {
     {
       description: "View current Proton Pass session/account summary from pass-cli info.",
     },
-    withAuthErrorHandling(async () => passInfoHandler(passCli)),
+    withAuthErrorHandling(async () => viewSessionInfoHandler(passCli)),
   );
 
   server.registerTool(
@@ -44,34 +48,34 @@ export function registerTools(server: McpServer, passCli: PassCliRunner) {
       description:
         "Run preflight checks for connectivity/authentication and CLI version compatibility.",
     },
-    async () => passCheckStatusHandler(passCli),
+    async () => checkStatusHandler(passCli),
   );
 
   server.registerTool(
     "view_user_info",
     {
       description: "View Proton user profile/account details from pass-cli user info.",
-      inputSchema: passUserInfoInputSchema,
+      inputSchema: viewUserInfoInputSchema,
     },
-    withAuthErrorHandling(async (input) => passUserInfoHandler(passCli, input)),
+    withAuthErrorHandling(async (input) => viewUserInfoHandler(passCli, input)),
   );
 
   server.registerTool(
     "list_vaults",
     {
       description: "List vaults accessible to the current authenticated user.",
-      inputSchema: passVaultListInputSchema,
+      inputSchema: listVaultsInputSchema,
     },
-    withAuthErrorHandling(async (input) => passVaultListHandler(passCli, input)),
+    withAuthErrorHandling(async (input) => listVaultsHandler(passCli, input)),
   );
 
   server.registerTool(
     "list_items",
     {
       description: "List items for a vault or share with MCP pagination support for JSON output.",
-      inputSchema: passItemListInputSchema,
+      inputSchema: listItemsInputSchema,
     },
-    withAuthErrorHandling(async (input) => passItemListHandler(passCli, input)),
+    withAuthErrorHandling(async (input) => listItemsHandler(passCli, input)),
   );
 
   server.registerTool(
@@ -79,18 +83,18 @@ export function registerTools(server: McpServer, passCli: PassCliRunner) {
     {
       description:
         "View a specific item by URI or selectors, optionally returning a specific field.",
-      inputSchema: passItemViewInputSchema,
+      inputSchema: viewItemInputSchema,
     },
-    withAuthErrorHandling(async (input) => passItemViewHandler(passCli, input)),
+    withAuthErrorHandling(async (input) => viewItemHandler(passCli, input)),
   );
 
   server.registerTool(
     "create_vault",
     {
       description: "Create a new vault (write-gated).",
-      inputSchema: passVaultCreateInputSchema,
+      inputSchema: createVaultInputSchema,
     },
-    withAuthErrorHandling(async (input) => passVaultCreateHandler(passCli, input)),
+    withAuthErrorHandling(async (input) => createVaultHandler(passCli, input)),
   );
 
   server.registerTool(
@@ -98,53 +102,53 @@ export function registerTools(server: McpServer, passCli: PassCliRunner) {
     {
       description:
         "Update vault metadata (currently rename) by share ID or vault name (write-gated).",
-      inputSchema: passVaultUpdateInputSchema,
+      inputSchema: updateVaultInputSchema,
     },
-    withAuthErrorHandling(async (input) => passVaultUpdateHandler(passCli, input)),
+    withAuthErrorHandling(async (input) => updateVaultHandler(passCli, input)),
   );
 
   server.registerTool(
     "delete_vault",
     {
       description: "Delete a vault by share ID or vault name (write-gated).",
-      inputSchema: passVaultDeleteInputSchema,
+      inputSchema: deleteVaultInputSchema,
     },
-    withAuthErrorHandling(async (input) => passVaultDeleteHandler(passCli, input)),
+    withAuthErrorHandling(async (input) => deleteVaultHandler(passCli, input)),
   );
 
   server.registerTool(
     "create_login_item",
     {
       description: "Create a login-type item in a vault/share (write-gated).",
-      inputSchema: passItemCreateLoginInputSchema,
+      inputSchema: createLoginItemInputSchema,
     },
-    withAuthErrorHandling(async (input) => passItemCreateLoginHandler(passCli, input)),
+    withAuthErrorHandling(async (input) => createLoginItemHandler(passCli, input)),
   );
 
   server.registerTool(
     "create_item_from_template",
     {
       description: "Create an item from a JSON template payload (write-gated).",
-      inputSchema: passItemCreateFromTemplateInputSchema,
+      inputSchema: createItemFromTemplateInputSchema,
     },
-    withAuthErrorHandling(async (input) => passItemCreateFromTemplateHandler(passCli, input)),
+    withAuthErrorHandling(async (input) => createItemFromTemplateHandler(passCli, input)),
   );
 
   server.registerTool(
     "update_item",
     {
       description: "Update item fields by item ID or title selectors (write-gated).",
-      inputSchema: passItemUpdateInputSchema,
+      inputSchema: updateItemInputSchema,
     },
-    withAuthErrorHandling(async (input) => passItemUpdateHandler(passCli, input)),
+    withAuthErrorHandling(async (input) => updateItemHandler(passCli, input)),
   );
 
   server.registerTool(
     "delete_item",
     {
       description: "Delete an item by share ID and item ID (write-gated).",
-      inputSchema: passItemDeleteInputSchema,
+      inputSchema: deleteItemInputSchema,
     },
-    withAuthErrorHandling(async (input) => passItemDeleteHandler(passCli, input)),
+    withAuthErrorHandling(async (input) => deleteItemHandler(passCli, input)),
   );
 }

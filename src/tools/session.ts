@@ -3,18 +3,18 @@ import { z } from "zod";
 import { asJsonTextOrRaw, asTextContent } from "../pass-cli/output.js";
 import type { PassCliRunner } from "../pass-cli/runner.js";
 
-export const passUserInfoInputSchema = z.object({
+export const viewUserInfoInputSchema = z.object({
   output: z.enum(["json", "human"]).default("json"),
 });
 
-export type PassUserInfoInput = z.infer<typeof passUserInfoInputSchema>;
+export type ViewUserInfoInput = z.infer<typeof viewUserInfoInputSchema>;
 
-export async function passInfoHandler(passCli: PassCliRunner) {
+export async function viewSessionInfoHandler(passCli: PassCliRunner) {
   const { stdout } = await passCli(["info"]);
   return asTextContent(stdout.trim());
 }
 
-export async function passUserInfoHandler(passCli: PassCliRunner, { output }: PassUserInfoInput) {
+export async function viewUserInfoHandler(passCli: PassCliRunner, { output }: ViewUserInfoInput) {
   const { stdout } = await passCli(["user", "info", "--output", output]);
   return asTextContent(asJsonTextOrRaw(stdout));
 }

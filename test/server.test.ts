@@ -10,20 +10,20 @@ import {
   evaluatePassCliCompatibility,
   logErr,
   parseSemver,
-  passCheckStatusHandler,
+  checkStatusHandler,
   PassCliAuthError,
-  passInfoHandler,
-  passItemCreateFromTemplateHandler,
-  passItemCreateLoginHandler,
-  passItemDeleteHandler,
-  passItemListHandler,
-  passItemUpdateHandler,
-  passItemViewHandler,
-  passUserInfoHandler,
-  passVaultCreateHandler,
-  passVaultDeleteHandler,
-  passVaultListHandler,
-  passVaultUpdateHandler,
+  viewSessionInfoHandler,
+  createItemFromTemplateHandler,
+  createLoginItemHandler,
+  deleteItemHandler,
+  listItemsHandler,
+  updateItemHandler,
+  viewItemHandler,
+  viewUserInfoHandler,
+  createVaultHandler,
+  deleteVaultHandler,
+  listVaultsHandler,
+  updateVaultHandler,
   requireWriteGate,
   startServer,
   type PassCliResult,
@@ -212,9 +212,9 @@ describe("helpers", () => {
 });
 
 describe("read-only handlers", () => {
-  it("passInfoHandler trims output", async () => {
+  it("viewSessionInfoHandler trims output", async () => {
     const runner = makeRunner({ stdout: " hello\n", stderr: "" });
-    const result = await passInfoHandler(runner);
+    const result = await viewSessionInfoHandler(runner);
 
     expect(runner).toHaveBeenCalledWith(["info"]);
     expect(result).toEqual({ content: [{ type: "text", text: "hello" }] });
@@ -240,14 +240,14 @@ describe("read-only handlers", () => {
     expect(result.authManagedByUser).toBe(true);
   });
 
-  it("passCheckStatusHandler combines version and connectivity checks", async () => {
+  it("checkStatusHandler combines version and connectivity checks", async () => {
     const runner = makeRunner(async (args) => {
       if (args[0] === "--version") return { stdout: "1.5.2 (abc123)", stderr: "" };
       if (args[0] === "test") return { stdout: "Connection successful", stderr: "" };
       return { stdout: "", stderr: "" };
     });
 
-    const result = (await passCheckStatusHandler(runner)) as any;
+    const result = (await checkStatusHandler(runner)) as any;
     expect(result.isError).toBeUndefined();
     expect(result.structuredContent.overall_status).toBe("ok");
     expect(result.structuredContent.version.compatibilityStatus).toBe("ok");
@@ -255,41 +255,41 @@ describe("read-only handlers", () => {
     expect(runner).toHaveBeenCalledTimes(2);
   });
 
-  it("passUserInfoHandler forwards output format", async () => {
+  it("viewUserInfoHandler forwards output format", async () => {
     const runner = makeRunner({ stdout: '{"email":"user@proton.me"}', stderr: "" });
-    const result = await passUserInfoHandler(runner, { output: "json" });
+    const result = await viewUserInfoHandler(runner, { output: "json" });
 
     expect(runner).toHaveBeenCalledWith(["user", "info", "--output", "json"]);
     expect(result.content[0].text).toContain('"email": "user@proton.me"');
   });
 
-  it("passVaultListHandler requests output format", async () => {
+  it("listVaultsHandler requests output format", async () => {
     const runner = makeRunner({ stdout: '{"vaults":1}', stderr: "" });
-    const result = await passVaultListHandler(runner, { output: "json" });
+    const result = await listVaultsHandler(runner, { output: "json" });
 
     expect(runner).toHaveBeenCalledWith(["vault", "list", "--output", "json"]);
     expect(result.content[0].text).toContain('"vaults": 1');
   });
 
-  it("passItemListHandler rejects conflicting selectors", async () => {
+  it("listItemsHandler rejects conflicting selectors", async () => {
     const runner = makeRunner();
     await expect(
-      passItemListHandler(runner, { vaultName: "work", shareId: "abc", output: "json" }),
+      listItemsHandler(runner, { vaultName: "work", shareId: "abc", output: "json" }),
     ).rejects.toThrow("Provide only one of vaultName or shareId");
   });
 
-  it("passItemListHandler requires a scope selector", async () => {
+  it("listItemsHandler requires a scope selector", async () => {
     const runner = makeRunner();
-    await expect(passItemListHandler(runner, { output: "json" })).rejects.toThrow(
+    await expect(listItemsHandler(runner, { output: "json" })).rejects.toThrow(
       "Provide exactly one of vaultName or shareId",
     );
   });
 
-  it("passItemListHandler supports share-id and vault selector modes", async () => {
+  it("listItemsHandler supports share-id and vault selector modes", async () => {
     const runner = makeRunner({ stdout: "[]", stderr: "" });
 
-    await passItemListHandler(runner, { shareId: "s1", output: "json" });
-    await passItemListHandler(runner, { vaultName: "Work", output: "human" });
+    await listItemsHandler(runner, { shareId: "s1", output: "json" });
+    await listItemsHandler(runner, { vaultName: "Work", output: "human" });
 
     expect(runner).toHaveBeenNthCalledWith(1, [
       "item",
@@ -302,11 +302,11 @@ describe("read-only handlers", () => {
     expect(runner).toHaveBeenNthCalledWith(2, ["item", "list", "Work", "--output", "human"]);
   });
 
-  it("passItemListHandler paginates json output by default", async () => {
+  it("listItemsHandler paginates json output by default", async () => {
     const payload = Array.from({ length: 130 }, (_, i) => ({ id: `item-${i + 1}` }));
     const runner = makeRunner({ stdout: JSON.stringify(payload), stderr: "" });
 
-    const result = await passItemListHandler(runner, { shareId: "s1", output: "json" });
+    const result = await listItemsHandler(runner, { shareId: "s1", output: "json" });
     const structured = (result as any).structuredContent;
 
     expect(structured).toBeTruthy();
@@ -320,11 +320,11 @@ describe("read-only handlers", () => {
     expect(structured.items[99]).toEqual({ id: "item-100" });
   });
 
-  it("passItemListHandler supports cursor and pageSize for follow-up pages", async () => {
+  it("listItemsHandler supports cursor and pageSize for follow-up pages", async () => {
     const payload = Array.from({ length: 75 }, (_, i) => ({ id: `item-${i + 1}` }));
     const runner = makeRunner({ stdout: JSON.stringify(payload), stderr: "" });
 
-    const result = await passItemListHandler(runner, {
+    const result = await listItemsHandler(runner, {
       shareId: "s1",
       output: "json",
       pageSize: 20,
@@ -342,11 +342,11 @@ describe("read-only handlers", () => {
     expect(structured.items[19]).toEqual({ id: "item-60" });
   });
 
-  it("passItemListHandler rejects invalid cursor values", async () => {
+  it("listItemsHandler rejects invalid cursor values", async () => {
     const runner = makeRunner({ stdout: "[]", stderr: "" });
 
     await expect(
-      passItemListHandler(runner, {
+      listItemsHandler(runner, {
         shareId: "s1",
         output: "json",
         cursor: "abc",
@@ -354,11 +354,11 @@ describe("read-only handlers", () => {
     ).rejects.toThrow("Invalid cursor");
   });
 
-  it("passItemListHandler rejects pagination params for human output", async () => {
+  it("listItemsHandler rejects pagination params for human output", async () => {
     const runner = makeRunner({ stdout: "ok", stderr: "" });
 
     await expect(
-      passItemListHandler(runner, {
+      listItemsHandler(runner, {
         shareId: "s1",
         output: "human",
         pageSize: 10,
@@ -366,15 +366,15 @@ describe("read-only handlers", () => {
     ).rejects.toThrow('Pagination is supported only with {"output":"json"}');
   });
 
-  it("passItemViewHandler validates selector combinations", async () => {
+  it("viewItemHandler validates selector combinations", async () => {
     const runner = makeRunner();
 
-    await expect(passItemViewHandler(runner, { output: "json" })).rejects.toThrow(
+    await expect(viewItemHandler(runner, { output: "json" })).rejects.toThrow(
       "Provide either uri OR",
     );
 
     await expect(
-      passItemViewHandler(runner, {
+      viewItemHandler(runner, {
         uri: "pass://a/b/c",
         shareId: "s",
         itemId: "i",
@@ -383,7 +383,7 @@ describe("read-only handlers", () => {
     ).rejects.toThrow("uri is mutually exclusive");
 
     await expect(
-      passItemViewHandler(runner, {
+      viewItemHandler(runner, {
         shareId: "s",
         vaultName: "v",
         itemId: "i",
@@ -392,7 +392,7 @@ describe("read-only handlers", () => {
     ).rejects.toThrow("shareId and vaultName are mutually exclusive");
 
     await expect(
-      passItemViewHandler(runner, {
+      viewItemHandler(runner, {
         shareId: "s",
         itemId: "i",
         itemTitle: "t",
@@ -401,15 +401,15 @@ describe("read-only handlers", () => {
     ).rejects.toThrow("itemId and itemTitle are mutually exclusive");
   });
 
-  it("passItemViewHandler builds uri and selector argument modes", async () => {
+  it("viewItemHandler builds uri and selector argument modes", async () => {
     const runner = makeRunner({ stdout: '{"ok":true}', stderr: "" });
 
-    await passItemViewHandler(runner, {
+    await viewItemHandler(runner, {
       uri: "pass://Work/GitHub/password",
       output: "json",
     });
 
-    await passItemViewHandler(runner, {
+    await viewItemHandler(runner, {
       vaultName: "Work",
       itemTitle: "GitHub",
       field: "password",
@@ -440,38 +440,38 @@ describe("read-only handlers", () => {
 });
 
 describe("write handlers", () => {
-  it("passVaultCreateHandler enforces gate and falls back to OK", async () => {
+  it("createVaultHandler enforces gate and falls back to OK", async () => {
     const runner = makeRunner({ stdout: "", stderr: "" });
 
     process.env.ALLOW_WRITE = "1";
-    await expect(passVaultCreateHandler(runner, { name: "Vault", confirm: false })).rejects.toThrow(
+    await expect(createVaultHandler(runner, { name: "Vault", confirm: false })).rejects.toThrow(
       "explicit confirmation",
     );
 
-    const result = await passVaultCreateHandler(runner, { name: "Vault", confirm: true });
+    const result = await createVaultHandler(runner, { name: "Vault", confirm: true });
 
     expect(runner).toHaveBeenCalledWith(["vault", "create", "--name", "Vault"]);
     expect(result).toEqual({ content: [{ type: "text", text: "OK" }] });
   });
 
-  it("passVaultUpdateHandler validates selector exclusivity and supports both modes", async () => {
+  it("updateVaultHandler validates selector exclusivity and supports both modes", async () => {
     process.env.ALLOW_WRITE = "1";
     const runner = makeRunner({ stdout: "updated", stderr: "" });
 
     await expect(
-      passVaultUpdateHandler(runner, {
+      updateVaultHandler(runner, {
         newName: "X",
         confirm: true,
       }),
     ).rejects.toThrow("exactly one");
 
-    await passVaultUpdateHandler(runner, {
+    await updateVaultHandler(runner, {
       shareId: "s1",
       newName: "Renamed",
       confirm: true,
     });
 
-    await passVaultUpdateHandler(runner, {
+    await updateVaultHandler(runner, {
       vaultName: "Work",
       newName: "Renamed2",
       confirm: true,
@@ -495,25 +495,25 @@ describe("write handlers", () => {
     ]);
   });
 
-  it("passVaultDeleteHandler validates selector exclusivity and supports both modes", async () => {
+  it("deleteVaultHandler validates selector exclusivity and supports both modes", async () => {
     process.env.ALLOW_WRITE = "1";
     const runner = makeRunner({ stdout: "deleted", stderr: "" });
 
-    await expect(passVaultDeleteHandler(runner, { confirm: true })).rejects.toThrow("exactly one");
+    await expect(deleteVaultHandler(runner, { confirm: true })).rejects.toThrow("exactly one");
 
-    await passVaultDeleteHandler(runner, { shareId: "s1", confirm: true });
-    await passVaultDeleteHandler(runner, { vaultName: "Work", confirm: true });
+    await deleteVaultHandler(runner, { shareId: "s1", confirm: true });
+    await deleteVaultHandler(runner, { vaultName: "Work", confirm: true });
 
     expect(runner).toHaveBeenNthCalledWith(1, ["vault", "delete", "--share-id", "s1"]);
     expect(runner).toHaveBeenNthCalledWith(2, ["vault", "delete", "--vault-name", "Work"]);
   });
 
-  it("passItemCreateLoginHandler handles selector conflicts and generate-password modes", async () => {
+  it("createLoginItemHandler handles selector conflicts and generate-password modes", async () => {
     process.env.ALLOW_WRITE = "1";
     const runner = makeRunner({ stdout: '{"id":"1"}', stderr: "" });
 
     await expect(
-      passItemCreateLoginHandler(runner, {
+      createLoginItemHandler(runner, {
         shareId: "s1",
         vaultName: "Work",
         title: "GitHub",
@@ -522,7 +522,7 @@ describe("write handlers", () => {
       }),
     ).rejects.toThrow("Provide only one of shareId or vaultName");
 
-    await passItemCreateLoginHandler(runner, {
+    await createLoginItemHandler(runner, {
       shareId: "s1",
       title: "GitHub",
       generatePassword: "true",
@@ -530,7 +530,7 @@ describe("write handlers", () => {
       confirm: true,
     });
 
-    await passItemCreateLoginHandler(runner, {
+    await createLoginItemHandler(runner, {
       vaultName: "Work",
       title: "GitLab",
       username: "user",
@@ -577,12 +577,12 @@ describe("write handlers", () => {
     ]);
   });
 
-  it("passItemCreateFromTemplateHandler validates selector conflicts and forwards stdin", async () => {
+  it("createItemFromTemplateHandler validates selector conflicts and forwards stdin", async () => {
     process.env.ALLOW_WRITE = "1";
     const runner = makeRunner({ stdout: '{"ok":true}', stderr: "" });
 
     await expect(
-      passItemCreateFromTemplateHandler(runner, {
+      createItemFromTemplateHandler(runner, {
         itemType: "login",
         shareId: "s1",
         vaultName: "Work",
@@ -592,7 +592,7 @@ describe("write handlers", () => {
       }),
     ).rejects.toThrow("Provide only one of shareId or vaultName");
 
-    await passItemCreateFromTemplateHandler(runner, {
+    await createItemFromTemplateHandler(runner, {
       itemType: "login",
       shareId: "s1",
       templateJson: '{"x":1}',
@@ -605,7 +605,7 @@ describe("write handlers", () => {
       '{"x":1}',
     );
 
-    await passItemCreateFromTemplateHandler(runner, {
+    await createItemFromTemplateHandler(runner, {
       itemType: "login",
       vaultName: "Work",
       templateJson: "{}",
@@ -629,12 +629,12 @@ describe("write handlers", () => {
     );
   });
 
-  it("passItemUpdateHandler validates selectors and builds field arguments", async () => {
+  it("updateItemHandler validates selectors and builds field arguments", async () => {
     process.env.ALLOW_WRITE = "1";
     const runner = makeRunner({ stdout: "", stderr: "updated" });
 
     await expect(
-      passItemUpdateHandler(runner, {
+      updateItemHandler(runner, {
         shareId: "s",
         vaultName: "v",
         itemId: "i",
@@ -644,7 +644,7 @@ describe("write handlers", () => {
     ).rejects.toThrow("Provide only one of shareId or vaultName");
 
     await expect(
-      passItemUpdateHandler(runner, {
+      updateItemHandler(runner, {
         itemId: "i",
         itemTitle: "t",
         fields: ["password=1"],
@@ -653,20 +653,20 @@ describe("write handlers", () => {
     ).rejects.toThrow("Provide only one of itemId or itemTitle");
 
     await expect(
-      passItemUpdateHandler(runner, {
+      updateItemHandler(runner, {
         fields: ["password=1"],
         confirm: true,
       }),
     ).rejects.toThrow("Provide itemId or itemTitle");
 
-    const resultById = await passItemUpdateHandler(runner, {
+    const resultById = await updateItemHandler(runner, {
       shareId: "s1",
       itemId: "i1",
       fields: ["password=abc", "username=u"],
       confirm: true,
     });
 
-    const resultByTitle = await passItemUpdateHandler(runner, {
+    const resultByTitle = await updateItemHandler(runner, {
       vaultName: "Work",
       itemTitle: "GitHub",
       fields: ["password=xyz"],
@@ -701,11 +701,11 @@ describe("write handlers", () => {
     expect(resultByTitle).toEqual({ content: [{ type: "text", text: "updated" }] });
   });
 
-  it("passItemDeleteHandler deletes and falls back to OK", async () => {
+  it("deleteItemHandler deletes and falls back to OK", async () => {
     process.env.ALLOW_WRITE = "1";
     const runner = makeRunner({ stdout: "", stderr: "" });
 
-    const result = await passItemDeleteHandler(runner, {
+    const result = await deleteItemHandler(runner, {
       shareId: "s1",
       itemId: "i1",
       confirm: true,

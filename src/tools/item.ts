@@ -20,7 +20,7 @@ function parseCursor(cursor?: string): number {
   return parsed;
 }
 
-export const passItemListInputSchema = z
+export const listItemsInputSchema = z
   .object({
     vaultName: z.string().optional(),
     shareId: z.string().optional(),
@@ -39,7 +39,7 @@ export const passItemListInputSchema = z
     },
   );
 
-export const passItemViewInputSchema = z.object({
+export const viewItemInputSchema = z.object({
   uri: z.string().optional(),
   shareId: z.string().optional(),
   vaultName: z.string().optional(),
@@ -49,7 +49,7 @@ export const passItemViewInputSchema = z.object({
   output: z.enum(["json", "human"]).default("json"),
 });
 
-export const passItemCreateLoginInputSchema = z.object({
+export const createLoginItemInputSchema = z.object({
   shareId: z.string().optional(),
   vaultName: z.string().optional(),
   title: z.string(),
@@ -62,7 +62,7 @@ export const passItemCreateLoginInputSchema = z.object({
   confirm: z.boolean().optional(),
 });
 
-export const passItemCreateFromTemplateInputSchema = z.object({
+export const createItemFromTemplateInputSchema = z.object({
   itemType: z.string(),
   shareId: z.string().optional(),
   vaultName: z.string().optional(),
@@ -71,7 +71,7 @@ export const passItemCreateFromTemplateInputSchema = z.object({
   confirm: z.boolean().optional(),
 });
 
-export const passItemUpdateInputSchema = z.object({
+export const updateItemInputSchema = z.object({
   shareId: z.string().optional(),
   vaultName: z.string().optional(),
   itemId: z.string().optional(),
@@ -80,22 +80,22 @@ export const passItemUpdateInputSchema = z.object({
   confirm: z.boolean().optional(),
 });
 
-export const passItemDeleteInputSchema = z.object({
+export const deleteItemInputSchema = z.object({
   shareId: z.string(),
   itemId: z.string(),
   confirm: z.boolean().optional(),
 });
 
-export type PassItemListInput = z.infer<typeof passItemListInputSchema>;
-export type PassItemViewInput = z.infer<typeof passItemViewInputSchema>;
-export type PassItemCreateLoginInput = z.infer<typeof passItemCreateLoginInputSchema>;
-export type PassItemCreateFromTemplateInput = z.infer<typeof passItemCreateFromTemplateInputSchema>;
-export type PassItemUpdateInput = z.infer<typeof passItemUpdateInputSchema>;
-export type PassItemDeleteInput = z.infer<typeof passItemDeleteInputSchema>;
+export type ListItemsInput = z.infer<typeof listItemsInputSchema>;
+export type ViewItemInput = z.infer<typeof viewItemInputSchema>;
+export type CreateLoginItemInput = z.infer<typeof createLoginItemInputSchema>;
+export type CreateItemFromTemplateInput = z.infer<typeof createItemFromTemplateInputSchema>;
+export type UpdateItemInput = z.infer<typeof updateItemInputSchema>;
+export type DeleteItemInput = z.infer<typeof deleteItemInputSchema>;
 
-export async function passItemListHandler(
+export async function listItemsHandler(
   passCli: PassCliRunner,
-  { vaultName, shareId, pageSize, cursor, output }: PassItemListInput,
+  { vaultName, shareId, pageSize, cursor, output }: ListItemsInput,
 ) {
   if (!vaultName && !shareId) {
     throw new Error("Provide exactly one of vaultName or shareId.");
@@ -146,7 +146,7 @@ export async function passItemListHandler(
   };
 }
 
-export async function passItemViewHandler(passCli: PassCliRunner, input: PassItemViewInput) {
+export async function viewItemHandler(passCli: PassCliRunner, input: ViewItemInput) {
   const { uri, shareId, vaultName, itemId, itemTitle, field, output } = input;
 
   const usingUri = !!uri;
@@ -180,10 +180,7 @@ export async function passItemViewHandler(passCli: PassCliRunner, input: PassIte
   return asTextContent(asJsonTextOrRaw(stdout));
 }
 
-export async function passItemCreateLoginHandler(
-  passCli: PassCliRunner,
-  input: PassItemCreateLoginInput,
-) {
+export async function createLoginItemHandler(passCli: PassCliRunner, input: CreateLoginItemInput) {
   requireWriteGate(input.confirm);
   if (input.shareId && input.vaultName)
     throw new Error("Provide only one of shareId or vaultName.");
@@ -211,9 +208,9 @@ export async function passItemCreateLoginHandler(
   return asTextContent(asJsonTextOrRaw(out));
 }
 
-export async function passItemCreateFromTemplateHandler(
+export async function createItemFromTemplateHandler(
   passCli: PassCliRunner,
-  input: PassItemCreateFromTemplateInput,
+  input: CreateItemFromTemplateInput,
 ) {
   requireWriteGate(input.confirm);
   if (input.shareId && input.vaultName)
@@ -230,9 +227,9 @@ export async function passItemCreateFromTemplateHandler(
   return asTextContent(asJsonTextOrRaw(out));
 }
 
-export async function passItemUpdateHandler(
+export async function updateItemHandler(
   passCli: PassCliRunner,
-  { shareId, vaultName, itemId, itemTitle, fields, confirm }: PassItemUpdateInput,
+  { shareId, vaultName, itemId, itemTitle, fields, confirm }: UpdateItemInput,
 ) {
   requireWriteGate(confirm);
   if (shareId && vaultName) throw new Error("Provide only one of shareId or vaultName.");
@@ -253,9 +250,9 @@ export async function passItemUpdateHandler(
   return asTextContent(out || "OK");
 }
 
-export async function passItemDeleteHandler(
+export async function deleteItemHandler(
   passCli: PassCliRunner,
-  { shareId, itemId, confirm }: PassItemDeleteInput,
+  { shareId, itemId, confirm }: DeleteItemInput,
 ) {
   requireWriteGate(confirm);
   const { stdout, stderr } = await passCli([
