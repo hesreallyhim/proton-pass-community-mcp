@@ -21,6 +21,8 @@ npm run check
 
 It is recommended to open an issue regarding any substantial change before beginning to work on a contribution. This is in early phases of development, and the ROADMAP has not yet stabilized. Some general strategic decisions remain unresolved. In the intial release, we have confined the scope to read-only operations. Additional infrastuructre is needed before any destructive operations can be introducted.
 
+Administrative maintainer workflows (release operations, upstream watch triage, metadata upkeep) are documented in `MAINTAINERS.md`.
+
 ## Commit and PR Policy
 
 1. Use Conventional Commits for merge-bound work.
