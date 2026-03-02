@@ -1,7 +1,7 @@
 import { PassCliAuthError, type PassCliAuthErrorCode } from "../pass-cli/errors.js";
 import { joinStdoutStderr } from "../pass-cli/output.js";
 import type { PassCliRunner } from "../pass-cli/runner.js";
-import { checkPassCliVersion } from "../pass-cli/version.js";
+import { checkPassCliVersion, type PassCliVersionPolicy } from "../pass-cli/version.js";
 
 export type PassConnectivityStatus = {
   status: "ok" | "error";
@@ -41,16 +41,19 @@ export async function checkPassConnectivity(
   }
 }
 
-export async function checkStatusHandler(passCli: PassCliRunner) {
+export async function checkStatusHandler(
+  passCli: PassCliRunner,
+  versionPolicy: PassCliVersionPolicy = {},
+) {
   const [version, connectivity] = await Promise.all([
-    checkPassCliVersion(passCli),
+    checkPassCliVersion(passCli, versionPolicy),
     checkPassConnectivity(passCli),
   ]);
 
   const overallStatus: "ok" | "warn" | "error" =
-    connectivity.status === "error" || version.compatibilityStatus === "error"
+    connectivity.status === "error"
       ? "error"
-      : version.compatibilityStatus === "warn" || version.compatibilityStatus === "unknown"
+      : version.compatibilityStatus === "possibly_incompatible"
         ? "warn"
         : "ok";
 
@@ -70,15 +73,16 @@ export async function checkStatusHandler(passCli: PassCliRunner) {
   const summary = [
     `Overall status: ${overallStatus.toUpperCase()}`,
     `Connectivity: ${connectivity.status.toUpperCase()} - ${connectivity.message}`,
-    `Version compatibility: ${version.compatibilityStatus.toUpperCase()} - ${version.reason}`,
-    `Pinned version: ${version.pinnedVersion}`,
+    `Version assessment: ${version.compatibilityStatus.toUpperCase()} - ${version.reason}`,
+    `Baseline version: ${version.baselineVersion}`,
     `Detected version: ${version.detectedVersion ?? "unknown"}${
       version.detectedRaw ? ` (${version.detectedRaw})` : ""
     }`,
+    `Allow version drift: ${version.allowVersionDrift ? "enabled" : "disabled"}`,
   ].join("\n");
 
   return {
-    ...(overallStatus === "error" ? { isError: true as const } : {}),
+    ...(connectivity.status === "error" ? { isError: true as const } : {}),
     content: [{ type: "text" as const, text: summary }],
     structuredContent,
   };

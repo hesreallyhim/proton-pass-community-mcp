@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "Community MCP server wrapping Proton Pass CLI (read-only)",
   "license": "GPL-3.0-or-later",
+  "author": "Really Him",
   "repository": {
     "type": "git",
     "url": "https://github.com/hesreallyhim/proton-pass-community-mcp.git"
@@ -10,7 +11,7 @@
   "keywords": [
     "mcp",
     "proton-pass",
-    "pass-cli",
+    "security",
     "password-manager",
     "model-context-protocol"
   ],
