@@ -288,7 +288,13 @@ describe("read-only handlers", () => {
   it("listItemsHandler supports share-id and vault selector modes", async () => {
     const runner = makeRunner({ stdout: "[]", stderr: "" });
 
-    await listItemsHandler(runner, { shareId: "s1", output: "json" });
+    await listItemsHandler(runner, {
+      shareId: "s1",
+      filterType: "login",
+      filterState: "active",
+      sortBy: "modify_time",
+      output: "json",
+    });
     await listItemsHandler(runner, { vaultName: "Work", output: "human" });
 
     expect(runner).toHaveBeenNthCalledWith(1, [
@@ -296,14 +302,31 @@ describe("read-only handlers", () => {
       "list",
       "--share-id",
       "s1",
+      "--filter-type",
+      "login",
+      "--filter-state",
+      "active",
+      "--sort-by",
+      "modify_time",
       "--output",
       "json",
     ]);
     expect(runner).toHaveBeenNthCalledWith(2, ["item", "list", "Work", "--output", "human"]);
   });
 
-  it("listItemsHandler paginates json output by default", async () => {
-    const payload = Array.from({ length: 130 }, (_, i) => ({ id: `item-${i + 1}` }));
+  it("listItemsHandler paginates json output by default with item refs only", async () => {
+    const payload = Array.from({ length: 130 }, (_, i) => ({
+      id: `item-${i + 1}`,
+      share_id: "share-1",
+      vault_id: "vault-1",
+      state: "active",
+      create_time: "2026-01-01T00:00:00Z",
+      modify_time: "2026-01-02T00:00:00Z",
+      content: {
+        title: `Title ${i + 1}`,
+        password: "super-secret-value",
+      },
+    }));
     const runner = makeRunner({ stdout: JSON.stringify(payload), stderr: "" });
 
     const result = await listItemsHandler(runner, { shareId: "s1", output: "json" });
@@ -316,12 +339,26 @@ describe("read-only handlers", () => {
     expect(structured.total).toBe(130);
     expect(structured.nextCursor).toBe("100");
     expect(structured.items).toHaveLength(100);
-    expect(structured.items[0]).toEqual({ id: "item-1" });
-    expect(structured.items[99]).toEqual({ id: "item-100" });
+    expect(structured.items[0]).toEqual({
+      id: "item-1",
+      share_id: "share-1",
+      vault_id: "vault-1",
+      title: "Title 1",
+      display_title: "Title 1",
+      state: "active",
+      create_time: "2026-01-01T00:00:00Z",
+      modify_time: "2026-01-02T00:00:00Z",
+      uri: "pass://share-1/item-1",
+    });
+    expect(structured.items[99].title).toBe("Title 100");
+    expect(structured.items[0].password).toBeUndefined();
   });
 
   it("listItemsHandler supports cursor and pageSize for follow-up pages", async () => {
-    const payload = Array.from({ length: 75 }, (_, i) => ({ id: `item-${i + 1}` }));
+    const payload = Array.from({ length: 75 }, (_, i) => ({
+      id: `item-${i + 1}`,
+      share_id: "s1",
+    }));
     const runner = makeRunner({ stdout: JSON.stringify(payload), stderr: "" });
 
     const result = await listItemsHandler(runner, {
@@ -338,8 +375,40 @@ describe("read-only handlers", () => {
     expect(structured.total).toBe(75);
     expect(structured.nextCursor).toBe("60");
     expect(structured.items).toHaveLength(20);
-    expect(structured.items[0]).toEqual({ id: "item-41" });
-    expect(structured.items[19]).toEqual({ id: "item-60" });
+    expect(structured.items[0].id).toEqual("item-41");
+    expect(structured.items[19].id).toEqual("item-60");
+    expect(structured.items[0].uri).toEqual("pass://s1/item-41");
+  });
+
+  it("listItemsHandler normalizes object payload shape with nested fields", async () => {
+    const payload = {
+      items: [
+        {
+          item_id: "i-1",
+          share: { id: "share-1" },
+          vault: { id: "vault-1" },
+          createdAt: "2026-01-01T00:00:00Z",
+          updatedAt: "2026-01-02T00:00:00Z",
+          content: {},
+        },
+      ],
+    };
+    const runner = makeRunner({ stdout: JSON.stringify(payload), stderr: "" });
+
+    const result = await listItemsHandler(runner, { shareId: "s1", output: "json" });
+    const [item] = (result as any).structuredContent.items;
+
+    expect(item).toEqual({
+      id: "i-1",
+      share_id: "share-1",
+      vault_id: "vault-1",
+      title: null,
+      display_title: "[untitled:i-1]",
+      state: null,
+      create_time: "2026-01-01T00:00:00Z",
+      modify_time: "2026-01-02T00:00:00Z",
+      uri: "pass://share-1/i-1",
+    });
   });
 
   it("listItemsHandler rejects invalid cursor values", async () => {
