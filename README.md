@@ -24,25 +24,11 @@ As this project is in its initial stages, it exposes the following read-only too
 | `search_items`      | Search items by title                            |
 | `view_item`         | View item by URI or selectors                    |
 
+The `search_items` operation is additional functionality that is not provided by the base CLI.
+
 ## Item Discovery Contract
 
-`list_items` and `search_items` return token-efficient `ItemRef` objects:
-
-```json
-{
-  "id": "string",
-  "share_id": "string | null",
-  "vault_id": "string | null",
-  "title": "string | null",
-  "display_title": "string",
-  "state": "string | null",
-  "create_time": "string | null",
-  "modify_time": "string | null",
-  "uri": "string | null"
-}
-```
-
-These operations do not contain the full contents or secrets of any items, thus preventing unnecessary leakage of sensitive data from the CLI to the host application or the LLM.
+`list_items` and `search_items` return token-efficient results. These operations do not contain the full contents or secrets of any items, thus preventing unnecessary leakage of sensitive data from the CLI to the host application or the LLM.
 
 `list_items` and `search_items` both support MCP pagination:
 

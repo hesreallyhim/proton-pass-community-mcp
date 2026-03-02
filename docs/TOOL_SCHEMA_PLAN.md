@@ -34,6 +34,7 @@ Primary optimization target: item discovery (`pass-cli item list`) should return
   "vault_id": "string",
   "title": "string | null",
   "display_title": "string",
+  "type": "string | null",
   "state": "string | null",
   "create_time": "string | null",
   "modify_time": "string | null",
