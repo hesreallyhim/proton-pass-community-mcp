@@ -4,7 +4,7 @@ import { asJsonTextOrRaw, asTextContent } from "../pass-cli/output.js";
 import type { PassCliRunner } from "../pass-cli/runner.js";
 
 export const viewUserInfoInputSchema = z.object({
-  output: z.enum(["json", "human"]).default("json"),
+  output: z.enum(["json", "human"]).default("json").describe("Output format"),
 });
 
 export type ViewUserInfoInput = z.infer<typeof viewUserInfoInputSchema>;

@@ -149,14 +149,36 @@ function extractRawItemList(parsed: unknown): unknown[] | null {
 
 export const listItemsInputSchema = z
   .object({
-    vaultName: z.string().optional(),
-    shareId: z.string().optional(),
-    filterType: z.string().optional(),
-    filterState: z.string().optional(),
-    sortBy: z.string().optional(),
-    pageSize: z.number().int().min(1).max(MAX_ITEM_LIST_PAGE_SIZE).optional(),
-    cursor: z.string().optional(),
-    output: z.enum(["json", "human"]).default("json"),
+    vaultName: z.string().max(255).optional().describe("Vault name to list items from"),
+    shareId: z.string().max(100).optional().describe("Share ID to list items from"),
+    filterType: z
+      .string()
+      .max(50)
+      .optional()
+      .describe("Filter by item type (e.g. login, note, alias)"),
+    filterState: z
+      .string()
+      .max(50)
+      .optional()
+      .describe("Filter by item state (e.g. active, trashed)"),
+    sortBy: z
+      .string()
+      .max(50)
+      .optional()
+      .describe("Sort order (e.g. createTime, modifyTime, title)"),
+    pageSize: z
+      .number()
+      .int()
+      .min(1)
+      .max(MAX_ITEM_LIST_PAGE_SIZE)
+      .optional()
+      .describe("Number of items per page (1-250, default 100)"),
+    cursor: z
+      .string()
+      .max(20)
+      .optional()
+      .describe("Pagination cursor from a previous response's nextCursor"),
+    output: z.enum(["json", "human"]).default("json").describe("Output format"),
   })
   .refine(
     (input) => {
@@ -170,68 +192,97 @@ export const listItemsInputSchema = z
   );
 
 export const viewItemInputSchema = z.object({
-  uri: z.string().optional(),
-  shareId: z.string().optional(),
-  vaultName: z.string().optional(),
-  itemId: z.string().optional(),
-  itemTitle: z.string().optional(),
-  field: z.string().optional(),
-  output: z.enum(["json", "human"]).default("json"),
+  uri: z.string().max(1024).optional().describe("Item URI (e.g. pass://<shareId>/<itemId>)"),
+  shareId: z.string().max(100).optional().describe("Share ID containing the item"),
+  vaultName: z.string().max(255).optional().describe("Vault name containing the item"),
+  itemId: z.string().max(100).optional().describe("Item ID to view"),
+  itemTitle: z.string().max(255).optional().describe("Item title to view"),
+  field: z.string().max(100).optional().describe("Specific field to extract from the item"),
+  output: z.enum(["json", "human"]).default("json").describe("Output format"),
 });
 
 export const searchItemsInputSchema = z
   .object({
-    query: z.string().min(1),
-    field: z.literal("title").default("title"),
-    match: z.enum(["contains", "prefix", "exact"]).default("contains"),
-    caseSensitive: z.boolean().default(false),
-    vaultName: z.string().optional(),
-    shareId: z.string().optional(),
-    filterType: z.string().optional(),
-    filterState: z.string().optional(),
-    sortBy: z.string().optional(),
-    pageSize: z.number().int().min(1).max(MAX_ITEM_LIST_PAGE_SIZE).optional(),
-    cursor: z.string().optional(),
+    query: z.string().min(1).max(255).describe("Search query string"),
+    field: z.literal("title").default("title").describe("Field to search (currently title only)"),
+    match: z
+      .enum(["contains", "prefix", "exact"])
+      .default("contains")
+      .describe("Match strategy for the query"),
+    caseSensitive: z.boolean().default(false).describe("Whether the search is case-sensitive"),
+    vaultName: z.string().max(255).optional().describe("Limit search to a specific vault by name"),
+    shareId: z.string().max(100).optional().describe("Limit search to a specific share by ID"),
+    filterType: z
+      .string()
+      .max(50)
+      .optional()
+      .describe("Filter by item type (e.g. login, note, alias)"),
+    filterState: z
+      .string()
+      .max(50)
+      .optional()
+      .describe("Filter by item state (e.g. active, trashed)"),
+    sortBy: z
+      .string()
+      .max(50)
+      .optional()
+      .describe("Sort order (e.g. createTime, modifyTime, title)"),
+    pageSize: z
+      .number()
+      .int()
+      .min(1)
+      .max(MAX_ITEM_LIST_PAGE_SIZE)
+      .optional()
+      .describe("Number of items per page (1-250, default 100)"),
+    cursor: z
+      .string()
+      .max(20)
+      .optional()
+      .describe("Pagination cursor from a previous response's nextCursor"),
   })
   .refine((input) => !(input.vaultName && input.shareId), {
     message: "Provide only one of vaultName or shareId.",
   });
 
 export const createLoginItemInputSchema = z.object({
-  shareId: z.string().optional(),
-  vaultName: z.string().optional(),
-  title: z.string(),
-  username: z.string().optional(),
-  email: z.string().optional(),
-  password: z.string().optional(),
-  url: z.string().optional(),
-  generatePassword: z.string().optional(),
-  output: z.enum(["json", "human"]).default("json"),
-  confirm: z.boolean().optional(),
+  shareId: z.string().max(100).optional().describe("Share ID for the new item"),
+  vaultName: z.string().max(255).optional().describe("Vault name for the new item"),
+  title: z.string().max(255).describe("Title for the new login item"),
+  username: z.string().max(255).optional().describe("Username for the login"),
+  email: z.string().max(255).optional().describe("Email for the login"),
+  password: z.string().max(1024).optional().describe("Password for the login"),
+  url: z.string().max(1024).optional().describe("URL for the login"),
+  generatePassword: z
+    .string()
+    .max(100)
+    .optional()
+    .describe('Set to "true" to auto-generate, or pass generator options'),
+  output: z.enum(["json", "human"]).default("json").describe("Output format"),
+  confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
 });
 
 export const createItemFromTemplateInputSchema = z.object({
-  itemType: z.string(),
-  shareId: z.string().optional(),
-  vaultName: z.string().optional(),
-  templateJson: z.string(),
-  output: z.enum(["json", "human"]).default("json"),
-  confirm: z.boolean().optional(),
+  itemType: z.string().max(50).describe("Item type (e.g. login, note, alias, creditCard)"),
+  shareId: z.string().max(100).optional().describe("Share ID for the new item"),
+  vaultName: z.string().max(255).optional().describe("Vault name for the new item"),
+  templateJson: z.string().max(65536).describe("JSON template content for the new item"),
+  output: z.enum(["json", "human"]).default("json").describe("Output format"),
+  confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
 });
 
 export const updateItemInputSchema = z.object({
-  shareId: z.string().optional(),
-  vaultName: z.string().optional(),
-  itemId: z.string().optional(),
-  itemTitle: z.string().optional(),
-  fields: z.array(z.string()).min(1),
-  confirm: z.boolean().optional(),
+  shareId: z.string().max(100).optional().describe("Share ID containing the item"),
+  vaultName: z.string().max(255).optional().describe("Vault name containing the item"),
+  itemId: z.string().max(100).optional().describe("Item ID to update"),
+  itemTitle: z.string().max(255).optional().describe("Item title to update"),
+  fields: z.array(z.string().max(1024)).min(1).describe("Fields to update (key=value pairs)"),
+  confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
 });
 
 export const deleteItemInputSchema = z.object({
-  shareId: z.string(),
-  itemId: z.string(),
-  confirm: z.boolean().optional(),
+  shareId: z.string().max(100).describe("Share ID containing the item to delete"),
+  itemId: z.string().max(100).describe("Item ID to delete"),
+  confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
 });
 
 export type ListItemsInput = z.infer<typeof listItemsInputSchema>;
