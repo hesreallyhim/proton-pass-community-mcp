@@ -21,6 +21,7 @@ import {
   updateItemHandler,
   viewItemHandler,
   viewUserInfoHandler,
+  listSharesHandler,
   createVaultHandler,
   deleteVaultHandler,
   listVaultsHandler,
@@ -270,6 +271,26 @@ describe("read-only handlers", () => {
 
     expect(runner).toHaveBeenCalledWith(["vault", "list", "--output", "json"]);
     expect(result.content[0].text).toContain('"vaults": 1');
+  });
+
+  it("listSharesHandler supports vault/item filters and output format", async () => {
+    const runner = makeRunner({ stdout: '{"shares":[]}', stderr: "" });
+    const result = await listSharesHandler(runner, { onlyVaults: true, output: "json" });
+
+    expect(runner).toHaveBeenCalledWith(["share", "list", "--output", "json", "--vaults"]);
+    expect(result.content[0].text).toContain('"shares"');
+  });
+
+  it("listSharesHandler rejects conflicting selectors", async () => {
+    const runner = makeRunner({ stdout: "", stderr: "" });
+
+    await expect(
+      listSharesHandler(runner, {
+        onlyItems: true,
+        onlyVaults: true,
+        output: "json",
+      }),
+    ).rejects.toThrow("onlyItems and onlyVaults are mutually exclusive");
   });
 
   it("listItemsHandler rejects conflicting selectors", async () => {
@@ -895,6 +916,7 @@ describe("server setup", () => {
     await tools.check_status.handler();
     await tools.view_user_info.handler({ output: "json" });
     await tools.list_vaults.handler({ output: "json" });
+    await tools.list_shares.handler({ output: "json" });
     await tools.list_items.handler({ shareId: "s1", output: "json" });
     await tools.search_items.handler({
       query: "GitHub",
@@ -928,7 +950,7 @@ describe("server setup", () => {
     });
     await tools.delete_item.handler({ shareId: "s1", itemId: "i1", confirm: true });
 
-    expect(runner).toHaveBeenCalledTimes(15);
+    expect(runner).toHaveBeenCalledTimes(16);
   });
 
   it("registered tool handlers return standardized auth error payloads", async () => {

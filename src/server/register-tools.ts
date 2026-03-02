@@ -24,6 +24,7 @@ import {
   viewUserInfoHandler,
   viewUserInfoInputSchema,
 } from "../tools/session.js";
+import { listSharesHandler, listSharesInputSchema } from "../tools/share.js";
 import {
   createVaultHandler,
   createVaultInputSchema,
@@ -69,6 +70,15 @@ export function registerTools(server: McpServer, passCli: PassCliRunner) {
       inputSchema: listVaultsInputSchema,
     },
     withAuthErrorHandling(async (input) => listVaultsHandler(passCli, input)),
+  );
+
+  server.registerTool(
+    "list_shares",
+    {
+      description: "List shares accessible to the current authenticated user.",
+      inputSchema: listSharesInputSchema,
+    },
+    withAuthErrorHandling(async (input) => listSharesHandler(passCli, input)),
   );
 
   server.registerTool(
