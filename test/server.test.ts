@@ -17,6 +17,7 @@ import {
   createLoginItemHandler,
   deleteItemHandler,
   listItemsHandler,
+  searchItemsHandler,
   updateItemHandler,
   viewItemHandler,
   viewUserInfoHandler,
@@ -435,6 +436,95 @@ describe("read-only handlers", () => {
     ).rejects.toThrow('Pagination is supported only with {"output":"json"}');
   });
 
+  it("searchItemsHandler filters by title and returns paged item refs", async () => {
+    const payload = [
+      { id: "i-1", share_id: "s1", content: { title: "GitHub" } },
+      { id: "i-2", share_id: "s1", content: { title: "GitLab" } },
+      { id: "i-3", share_id: "s1", content: { title: "Jira" } },
+      { id: "i-4", share_id: "s1", content: { password: "secret" } },
+    ];
+    const runner = makeRunner({ stdout: JSON.stringify(payload), stderr: "" });
+
+    const result = await searchItemsHandler(runner, {
+      query: "git",
+      field: "title",
+      match: "contains",
+      caseSensitive: false,
+      shareId: "s1",
+      pageSize: 1,
+      cursor: "1",
+    });
+    const structured = (result as any).structuredContent;
+
+    expect(runner).toHaveBeenCalledWith(["item", "list", "--share-id", "s1", "--output", "json"]);
+    expect(structured.total).toBe(2);
+    expect(structured.returned).toBe(1);
+    expect(structured.nextCursor).toBeNull();
+    expect(structured.queryMeta).toEqual({
+      field: "title",
+      match: "contains",
+      caseSensitive: false,
+    });
+    expect(structured.items[0]).toMatchObject({
+      id: "i-2",
+      title: "GitLab",
+      display_title: "GitLab",
+      uri: "pass://s1/i-2",
+    });
+    expect(structured.items[0].password).toBeUndefined();
+  });
+
+  it("searchItemsHandler supports exact case-sensitive matching and passthrough filters", async () => {
+    const payload = [
+      { id: "i-1", share_id: "s1", content: { title: "GitHub" } },
+      { id: "i-2", share_id: "s1", content: { title: "github" } },
+    ];
+    const runner = makeRunner({ stdout: JSON.stringify({ items: payload }), stderr: "" });
+
+    const result = await searchItemsHandler(runner, {
+      query: "GitHub",
+      field: "title",
+      match: "exact",
+      caseSensitive: true,
+      vaultName: "Work",
+      filterType: "login",
+      filterState: "active",
+      sortBy: "modify_time",
+    });
+    const structured = (result as any).structuredContent;
+
+    expect(runner).toHaveBeenCalledWith([
+      "item",
+      "list",
+      "Work",
+      "--filter-type",
+      "login",
+      "--filter-state",
+      "active",
+      "--sort-by",
+      "modify_time",
+      "--output",
+      "json",
+    ]);
+    expect(structured.total).toBe(1);
+    expect(structured.items[0].id).toBe("i-1");
+  });
+
+  it("searchItemsHandler rejects conflicting selectors", async () => {
+    const runner = makeRunner({ stdout: "[]", stderr: "" });
+
+    await expect(
+      searchItemsHandler(runner, {
+        query: "x",
+        field: "title",
+        match: "contains",
+        caseSensitive: false,
+        shareId: "s1",
+        vaultName: "Work",
+      }),
+    ).rejects.toThrow("Provide only one of vaultName or shareId");
+  });
+
   it("viewItemHandler validates selector combinations", async () => {
     const runner = makeRunner();
 
@@ -806,6 +896,13 @@ describe("server setup", () => {
     await tools.view_user_info.handler({ output: "json" });
     await tools.list_vaults.handler({ output: "json" });
     await tools.list_items.handler({ shareId: "s1", output: "json" });
+    await tools.search_items.handler({
+      query: "GitHub",
+      field: "title",
+      match: "contains",
+      caseSensitive: false,
+      shareId: "s1",
+    });
     await tools.view_item.handler({ uri: "pass://Work/GitHub/password", output: "json" });
     await tools.create_vault.handler({ name: "Vault", confirm: true });
     await tools.update_vault.handler({ shareId: "s1", newName: "Renamed", confirm: true });
@@ -831,7 +928,7 @@ describe("server setup", () => {
     });
     await tools.delete_item.handler({ shareId: "s1", itemId: "i1", confirm: true });
 
-    expect(runner).toHaveBeenCalledTimes(14);
+    expect(runner).toHaveBeenCalledTimes(15);
   });
 
   it("registered tool handlers return standardized auth error payloads", async () => {
