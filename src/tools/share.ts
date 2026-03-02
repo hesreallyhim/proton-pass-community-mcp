@@ -4,9 +4,9 @@ import { asJsonTextOrRaw, asTextContent } from "../pass-cli/output.js";
 import type { PassCliRunner } from "../pass-cli/runner.js";
 
 export const listSharesInputSchema = z.object({
-  onlyItems: z.boolean().optional(),
-  onlyVaults: z.boolean().optional(),
-  output: z.enum(["json", "human"]).default("json"),
+  onlyItems: z.boolean().optional().describe("Return only item shares"),
+  onlyVaults: z.boolean().optional().describe("Return only vault shares"),
+  output: z.enum(["json", "human"]).default("json").describe("Output format"),
 });
 
 export type ListSharesInput = z.infer<typeof listSharesInputSchema>;

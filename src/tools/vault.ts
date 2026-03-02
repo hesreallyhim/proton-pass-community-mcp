@@ -5,25 +5,25 @@ import type { PassCliRunner } from "../pass-cli/runner.js";
 import { requireWriteGate } from "./write-gate.js";
 
 export const listVaultsInputSchema = z.object({
-  output: z.enum(["json", "human"]).default("json"),
+  output: z.enum(["json", "human"]).default("json").describe("Output format"),
 });
 
 export const createVaultInputSchema = z.object({
-  name: z.string(),
-  confirm: z.boolean().optional(),
+  name: z.string().max(255).describe("Name for the new vault"),
+  confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
 });
 
 export const updateVaultInputSchema = z.object({
-  shareId: z.string().optional(),
-  vaultName: z.string().optional(),
-  newName: z.string(),
-  confirm: z.boolean().optional(),
+  shareId: z.string().max(100).optional().describe("Share ID of the vault to update"),
+  vaultName: z.string().max(255).optional().describe("Name of the vault to update"),
+  newName: z.string().max(255).describe("New name for the vault"),
+  confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
 });
 
 export const deleteVaultInputSchema = z.object({
-  shareId: z.string().optional(),
-  vaultName: z.string().optional(),
-  confirm: z.boolean().optional(),
+  shareId: z.string().max(100).optional().describe("Share ID of the vault to delete"),
+  vaultName: z.string().max(255).optional().describe("Name of the vault to delete"),
+  confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
 });
 
 export type ListVaultsInput = z.infer<typeof listVaultsInputSchema>;
