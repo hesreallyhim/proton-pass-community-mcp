@@ -6,11 +6,12 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
+  pull-requests: write
 
 jobs:
   watch-upstream:
-    name: Watch upstream version and SHA
+    name: Watch upstream latest version tag
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -21,7 +22,8 @@ jobs:
         with:
           node-version: 24
 
-      - name: Compare tracked metadata with upstream
+      - name: Compare tracked metadata with upstream latest version tag
+        id: watch
         shell: bash
         run: |
           set +e
@@ -29,7 +31,36 @@ jobs:
           code=$?
           cat /tmp/pass-cli-upstream-report.json
           if [ "$code" -eq 2 ]; then
-            echo "::error title=Upstream changed::pass-cli upstream SHA/version changed. Review and update docs/upstream/PASS_CLI_SOURCE_METADATA.json after triage."
-            exit 1
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            node -e '
+              const fs = require("node:fs");
+              const report = JSON.parse(fs.readFileSync("/tmp/pass-cli-upstream-report.json", "utf8"));
+              fs.appendFileSync(process.env.GITHUB_OUTPUT, `version=${report.observed.latest_known_version}\n`);
+              fs.appendFileSync(process.env.GITHUB_OUTPUT, `published_date=${report.observed.latest_known_version_published_date}\n`);
+              fs.appendFileSync(process.env.GITHUB_OUTPUT, `tag_api_url=${report.observed.latest_tag_api_url ?? ""}\n`);
+            '
+            exit 0
           fi
+          echo "changed=false" >> "$GITHUB_OUTPUT"
           exit "$code"
+
+      - name: Sync tracked metadata to observed latest release
+        if: steps.watch.outputs.changed == 'true'
+        run: npm run check:upstream:pass-cli -- --sync-metadata --report /tmp/pass-cli-upstream-report-sync.json
+
+      - name: Open PR for metadata update
+        if: steps.watch.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: "chore: track pass-cli v${{ steps.watch.outputs.version }}"
+          title: "chore: track pass-cli v${{ steps.watch.outputs.version }}"
+          branch: "chore/upstream-pass-cli-release-watch"
+          delete-branch: true
+          body: |
+            Automated update from upstream watch workflow.
+
+            - Latest pass-cli version tag: `${{ steps.watch.outputs.version }}`
+            - Published date: `${{ steps.watch.outputs.published_date }}`
+            - Tag API URL: ${{ steps.watch.outputs.tag_api_url }}
+
+            This PR only updates tracked upstream metadata. It does not classify behavioral drift.
