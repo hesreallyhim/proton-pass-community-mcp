@@ -1,11 +1,11 @@
 ---
 name: skill-wrapper-protocol
-description: Canonical protocol for model-side skill behavior when orchestrating proton-pass-mcp tools in chat sessions.
+description: Canonical protocol for model-side skill behavior when orchestrating proton-pass-community-mcp tools in chat sessions.
 ---
 
 # Proton Pass MCP Skill Wrapper
 
-Use this skill as a thin protocol layer around the `proton-pass-mcp` MCP server.
+Use this skill as a thin protocol layer around the `proton-pass-community-mcp` MCP server.
 
 ## Purpose
 

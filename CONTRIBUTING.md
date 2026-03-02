@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for contributing to `proton-pass-mcp`.
+Thanks for contributing to `proton-pass-community-mcp`.
 
 ## Development Setup
 

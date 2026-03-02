@@ -1,6 +1,8 @@
-# proton-pass-mcp
+# proton-pass-community-mcp
 
-`proton-pass-mcp` is a minimal MCP server that wraps selected `pass-cli` commands from Proton Pass.
+`proton-pass-community-mcp` is a minimal MCP server that wraps selected `pass-cli` commands from Proton Pass.
+
+Independent community project. Not affiliated with or endorsed by Proton AG.
 
 It is designed as a thin integration layer:
 
