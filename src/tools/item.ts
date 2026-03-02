@@ -7,6 +7,20 @@ import { requireWriteGate } from "./write-gate.js";
 const DEFAULT_ITEM_LIST_PAGE_SIZE = 100;
 const MAX_ITEM_LIST_PAGE_SIZE = 250;
 
+type JsonRecord = Record<string, unknown>;
+
+export type ItemRef = {
+  id: string;
+  share_id: string | null;
+  vault_id: string | null;
+  title: string | null;
+  display_title: string;
+  state: string | null;
+  create_time: string | null;
+  modify_time: string | null;
+  uri: string | null;
+};
+
 function parseCursor(cursor?: string): number {
   if (!cursor) return 0;
   if (!/^\d+$/.test(cursor)) {
@@ -20,10 +34,126 @@ function parseCursor(cursor?: string): number {
   return parsed;
 }
 
+function asRecord(value: unknown): JsonRecord | null {
+  if (value && typeof value === "object" && !Array.isArray(value)) {
+    return value as JsonRecord;
+  }
+  return null;
+}
+
+function asNonEmptyString(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+function firstString(record: JsonRecord, keys: string[]): string | null {
+  for (const key of keys) {
+    const value = asNonEmptyString(record[key]);
+    if (value) return value;
+  }
+  return null;
+}
+
+function firstNestedString(
+  record: JsonRecord,
+  objectKeys: string[],
+  valueKeys: string[],
+): string | null {
+  for (const objectKey of objectKeys) {
+    const nested = asRecord(record[objectKey]);
+    if (!nested) continue;
+    const value = firstString(nested, valueKeys);
+    if (value) return value;
+  }
+  return null;
+}
+
+function parsePassUri(uri: string | null): { shareId: string | null; itemId: string | null } {
+  if (!uri) return { shareId: null, itemId: null };
+  const normalized = uri.trim();
+  if (!normalized.startsWith("pass://")) {
+    return { shareId: null, itemId: null };
+  }
+
+  const segments = normalized
+    .slice("pass://".length)
+    .split("/")
+    .map((segment) => segment.trim())
+    .filter(Boolean);
+
+  if (segments.length < 2) return { shareId: null, itemId: null };
+  return {
+    shareId: segments[0] ?? null,
+    itemId: segments[1] ?? null,
+  };
+}
+
+function shortId(value: string): string {
+  return value.length <= 8 ? value : value.slice(0, 8);
+}
+
+function toItemRef(rawItem: unknown, index: number): ItemRef {
+  const item = asRecord(rawItem);
+  if (!item) {
+    const fallbackId = `item-${index + 1}`;
+    return {
+      id: fallbackId,
+      share_id: null,
+      vault_id: null,
+      title: null,
+      display_title: `[untitled:${shortId(fallbackId)}]`,
+      state: null,
+      create_time: null,
+      modify_time: null,
+      uri: null,
+    };
+  }
+
+  const existingUri = firstString(item, ["uri"]);
+  const parsedUri = parsePassUri(existingUri);
+  const id =
+    firstString(item, ["id", "item_id", "itemId"]) ?? parsedUri.itemId ?? `item-${index + 1}`;
+  const shareId =
+    firstString(item, ["share_id", "shareId"]) ??
+    firstNestedString(item, ["share"], ["id", "share_id", "shareId"]) ??
+    parsedUri.shareId;
+  const vaultId =
+    firstString(item, ["vault_id", "vaultId"]) ??
+    firstNestedString(item, ["vault"], ["id", "vault_id", "vaultId"]);
+  const title = firstNestedString(item, ["content"], ["title"]) ?? firstString(item, ["title"]);
+
+  const displayTitle = title ?? `[untitled:${shortId(id)}]`;
+  const derivedUri = shareId ? `pass://${shareId}/${id}` : existingUri;
+
+  return {
+    id,
+    share_id: shareId,
+    vault_id: vaultId,
+    title,
+    display_title: displayTitle,
+    state: firstString(item, ["state"]),
+    create_time: firstString(item, ["create_time", "createTime", "created_at", "createdAt"]),
+    modify_time: firstString(item, ["modify_time", "modifyTime", "updated_at", "updatedAt"]),
+    uri: derivedUri ?? null,
+  };
+}
+
+function extractRawItemList(parsed: unknown): unknown[] | null {
+  if (Array.isArray(parsed)) return parsed;
+  const parsedObj = asRecord(parsed);
+  if (!parsedObj) return null;
+  const items = parsedObj.items;
+  return Array.isArray(items) ? items : null;
+}
+
 export const listItemsInputSchema = z
   .object({
     vaultName: z.string().optional(),
     shareId: z.string().optional(),
+    filterType: z.string().optional(),
+    filterState: z.string().optional(),
+    sortBy: z.string().optional(),
     pageSize: z.number().int().min(1).max(MAX_ITEM_LIST_PAGE_SIZE).optional(),
     cursor: z.string().optional(),
     output: z.enum(["json", "human"]).default("json"),
@@ -95,7 +225,7 @@ export type DeleteItemInput = z.infer<typeof deleteItemInputSchema>;
 
 export async function listItemsHandler(
   passCli: PassCliRunner,
-  { vaultName, shareId, pageSize, cursor, output }: ListItemsInput,
+  { vaultName, shareId, filterType, filterState, sortBy, pageSize, cursor, output }: ListItemsInput,
 ) {
   if (!vaultName && !shareId) {
     throw new Error("Provide exactly one of vaultName or shareId.");
@@ -105,9 +235,13 @@ export async function listItemsHandler(
     throw new Error('Pagination is supported only with {"output":"json"}.');
   }
 
-  const args = ["item", "list", "--output", output];
-  if (shareId) args.splice(2, 0, "--share-id", shareId);
-  else if (vaultName) args.splice(2, 0, vaultName);
+  const args = ["item", "list"];
+  if (shareId) args.push("--share-id", shareId);
+  else if (vaultName) args.push(vaultName);
+  if (filterType) args.push("--filter-type", filterType);
+  if (filterState) args.push("--filter-state", filterState);
+  if (sortBy) args.push("--sort-by", sortBy);
+  args.push("--output", output);
 
   const { stdout } = await passCli(args);
   if (output !== "json") {
@@ -121,22 +255,24 @@ export async function listItemsHandler(
     return asTextContent(asJsonTextOrRaw(stdout));
   }
 
-  if (!Array.isArray(parsed)) {
+  const rawItems = extractRawItemList(parsed);
+  if (!rawItems) {
     return asTextContent(asJsonTextOrRaw(stdout));
   }
+  const refs = rawItems.map((item, index) => toItemRef(item, index));
 
   const start = parseCursor(cursor);
   const size = pageSize ?? DEFAULT_ITEM_LIST_PAGE_SIZE;
   const end = start + size;
-  const items = parsed.slice(start, end);
-  const nextCursor = end < parsed.length ? String(end) : undefined;
+  const items = refs.slice(start, end);
+  const nextCursor = end < refs.length ? String(end) : null;
 
   const structuredContent = {
     items,
     pageSize: size,
     cursor: String(start),
     returned: items.length,
-    total: parsed.length,
+    total: refs.length,
     nextCursor,
   };
 
