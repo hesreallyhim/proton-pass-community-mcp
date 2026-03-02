@@ -423,7 +423,7 @@ describe("read-only handlers", () => {
       shareId: "s1",
       filterType: "login",
       filterState: "active",
-      sortBy: "modify_time",
+      sortBy: "created-desc",
       output: "json",
     });
     await listItemsHandler(runner, { vaultName: "Work", output: "human" });
@@ -438,7 +438,7 @@ describe("read-only handlers", () => {
       "--filter-state",
       "active",
       "--sort-by",
-      "modify_time",
+      "created-desc",
       "--output",
       "json",
     ]);
@@ -474,6 +474,7 @@ describe("read-only handlers", () => {
       id: "item-1",
       share_id: "share-1",
       vault_id: "vault-1",
+      type: null,
       title: "Title 1",
       display_title: "Title 1",
       state: "active",
@@ -518,8 +519,8 @@ describe("read-only handlers", () => {
           item_id: "i-1",
           share: { id: "share-1" },
           vault: { id: "vault-1" },
-          createdAt: "2026-01-01T00:00:00Z",
-          updatedAt: "2026-01-02T00:00:00Z",
+          create_time: "2026-01-01T00:00:00Z",
+          modify_time: "2026-01-02T00:00:00Z",
           content: {},
         },
       ],
@@ -533,6 +534,7 @@ describe("read-only handlers", () => {
       id: "i-1",
       share_id: "share-1",
       vault_id: "vault-1",
+      type: null,
       title: null,
       display_title: "[untitled:i-1]",
       state: null,
@@ -540,6 +542,86 @@ describe("read-only handlers", () => {
       modify_time: "2026-01-02T00:00:00Z",
       uri: "pass://share-1/i-1",
     });
+  });
+
+  it("listItemsHandler extracts normalized item type from content.content.<Type>", async () => {
+    const payload = [
+      {
+        id: "i-login",
+        share_id: "s1",
+        content: { title: "GitHub", content: { Login: { username: "u", password: "secret" } } },
+      },
+      {
+        id: "i-credit",
+        share_id: "s1",
+        content: { title: "Card", content: { CreditCard: { number: "4111..." } } },
+      },
+      {
+        id: "i-ssh",
+        share_id: "s1",
+        content: { title: "Key", content: { SSHKey: { private_key: "..." } } },
+      },
+    ];
+
+    const runner = makeRunner({ stdout: JSON.stringify(payload), stderr: "" });
+    const result = await listItemsHandler(runner, { shareId: "s1", output: "json" });
+    const items = (result as any).structuredContent.items;
+
+    expect(items[0].type).toBe("login");
+    expect(items[1].type).toBe("credit-card");
+    expect(items[2].type).toBe("ssh-key");
+    expect(items[0].password).toBeUndefined();
+  });
+
+  it("listItemsHandler ignores camelCase metadata keys in item list payload", async () => {
+    const payload = [
+      {
+        id: "i-camel",
+        shareId: "s-camel",
+        vaultId: "v-camel",
+        createTime: "2026-01-01T00:00:00Z",
+        modifyTime: "2026-01-02T00:00:00Z",
+        state: "Active",
+        content: { title: "Camel Case Item", content: { Login: { password: "secret" } } },
+      },
+    ];
+
+    const runner = makeRunner({ stdout: JSON.stringify(payload), stderr: "" });
+    const result = await listItemsHandler(runner, { shareId: "s1", output: "json" });
+    const [item] = (result as any).structuredContent.items;
+
+    expect(item).toEqual({
+      id: "i-camel",
+      share_id: null,
+      vault_id: null,
+      type: "login",
+      title: "Camel Case Item",
+      display_title: "Camel Case Item",
+      state: "Active",
+      create_time: null,
+      modify_time: null,
+      uri: null,
+    });
+    expect(item.password).toBeUndefined();
+  });
+
+  it("listItemsHandler normalizes unknown typed content keys to kebab-case", async () => {
+    const payload = [
+      {
+        id: "i-unknown-type",
+        share_id: "s1",
+        content: {
+          title: "Unknown Type",
+          content: { MyCustomType: { opaque: "value" } },
+        },
+      },
+    ];
+
+    const runner = makeRunner({ stdout: JSON.stringify(payload), stderr: "" });
+    const result = await listItemsHandler(runner, { shareId: "s1", output: "json" });
+    const [item] = (result as any).structuredContent.items;
+
+    expect(item.type).toBe("my-custom-type");
   });
 
   it("listItemsHandler rejects invalid cursor values", async () => {
@@ -619,7 +701,7 @@ describe("read-only handlers", () => {
       vaultName: "Work",
       filterType: "login",
       filterState: "active",
-      sortBy: "modify_time",
+      sortBy: "created-desc",
     });
     const structured = (result as any).structuredContent;
 
@@ -631,7 +713,7 @@ describe("read-only handlers", () => {
       "--filter-state",
       "active",
       "--sort-by",
-      "modify_time",
+      "created-desc",
       "--output",
       "json",
       "--",

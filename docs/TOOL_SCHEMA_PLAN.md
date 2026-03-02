@@ -46,6 +46,41 @@ Title fallback policy:
 1. Use `content.title` when non-empty.
 2. Otherwise set `title: null` and `display_title: "[untitled:<short-id>]"`.
 
+Raw upstream shape reference (anonymized sample from `pass-cli item list --output json`):
+
+```json
+{
+  "id": "itm_9f2a1c7e",
+  "share_id": "shr_7d4b2e11",
+  "vault_id": "vlt_4c6f8a90",
+  "content": {
+    "title": "Example Login Entry",
+    "note": "Autosaved from redacted origin",
+    "item_uuid": "uuid_3b5d7f91",
+    "content": {
+      "Login": {
+        "email": "user+sample@example.invalid",
+        "username": "example_user",
+        "password": "REDACTED_SECRET",
+        "urls": ["https://example.invalid/login"],
+        "totp_uri": "",
+        "passkeys": []
+      }
+    },
+    "extra_fields": []
+  },
+  "state": "Active",
+  "flags": [],
+  "create_time": "2026-01-10T12:34:56Z",
+  "modify_time": "2026-01-12T08:15:30Z"
+}
+```
+
+Notes:
+
+1. `content.content.<Type>` (for example `Login`) is used to derive `ItemRef.type` (normalized to filter token format, for example `login`).
+2. Nested secret-bearing fields (passwords, TOTP URIs, passkeys, notes) must not be surfaced in `ItemRef`.
+
 ### `CursorPage<T>`
 
 ```json
