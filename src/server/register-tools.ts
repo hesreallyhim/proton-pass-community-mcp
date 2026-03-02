@@ -10,6 +10,8 @@ import {
   deleteItemInputSchema,
   listItemsHandler,
   listItemsInputSchema,
+  searchItemsHandler,
+  searchItemsInputSchema,
   updateItemHandler,
   updateItemInputSchema,
   viewItemHandler,
@@ -86,6 +88,15 @@ export function registerTools(server: McpServer, passCli: PassCliRunner) {
       inputSchema: viewItemInputSchema,
     },
     withAuthErrorHandling(async (input) => viewItemHandler(passCli, input)),
+  );
+
+  server.registerTool(
+    "search_items",
+    {
+      description: "Search items by title with MCP pagination support for JSON output.",
+      inputSchema: searchItemsInputSchema,
+    },
+    withAuthErrorHandling(async (input) => searchItemsHandler(passCli, input)),
   );
 
   server.registerTool(

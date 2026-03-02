@@ -179,6 +179,24 @@ export const viewItemInputSchema = z.object({
   output: z.enum(["json", "human"]).default("json"),
 });
 
+export const searchItemsInputSchema = z
+  .object({
+    query: z.string().min(1),
+    field: z.literal("title").default("title"),
+    match: z.enum(["contains", "prefix", "exact"]).default("contains"),
+    caseSensitive: z.boolean().default(false),
+    vaultName: z.string().optional(),
+    shareId: z.string().optional(),
+    filterType: z.string().optional(),
+    filterState: z.string().optional(),
+    sortBy: z.string().optional(),
+    pageSize: z.number().int().min(1).max(MAX_ITEM_LIST_PAGE_SIZE).optional(),
+    cursor: z.string().optional(),
+  })
+  .refine((input) => !(input.vaultName && input.shareId), {
+    message: "Provide only one of vaultName or shareId.",
+  });
+
 export const createLoginItemInputSchema = z.object({
   shareId: z.string().optional(),
   vaultName: z.string().optional(),
@@ -218,6 +236,7 @@ export const deleteItemInputSchema = z.object({
 
 export type ListItemsInput = z.infer<typeof listItemsInputSchema>;
 export type ViewItemInput = z.infer<typeof viewItemInputSchema>;
+export type SearchItemsInput = z.infer<typeof searchItemsInputSchema>;
 export type CreateLoginItemInput = z.infer<typeof createLoginItemInputSchema>;
 export type CreateItemFromTemplateInput = z.infer<typeof createItemFromTemplateInputSchema>;
 export type UpdateItemInput = z.infer<typeof updateItemInputSchema>;
@@ -274,6 +293,104 @@ export async function listItemsHandler(
     returned: items.length,
     total: refs.length,
     nextCursor,
+  };
+
+  return {
+    content: [{ type: "text" as const, text: JSON.stringify(structuredContent, null, 2) }],
+    structuredContent,
+  };
+}
+
+function matchesQuery({
+  query,
+  candidate,
+  match,
+  caseSensitive,
+}: {
+  query: string;
+  candidate: string;
+  match: "contains" | "prefix" | "exact";
+  caseSensitive: boolean;
+}): boolean {
+  const left = caseSensitive ? candidate : candidate.toLowerCase();
+  const right = caseSensitive ? query : query.toLowerCase();
+
+  if (match === "exact") return left === right;
+  if (match === "prefix") return left.startsWith(right);
+  return left.includes(right);
+}
+
+export async function searchItemsHandler(
+  passCli: PassCliRunner,
+  {
+    query,
+    field,
+    match,
+    caseSensitive,
+    vaultName,
+    shareId,
+    filterType,
+    filterState,
+    sortBy,
+    pageSize,
+    cursor,
+  }: SearchItemsInput,
+) {
+  if (vaultName && shareId) {
+    throw new Error("Provide only one of vaultName or shareId.");
+  }
+
+  const args = ["item", "list"];
+  if (shareId) args.push("--share-id", shareId);
+  else if (vaultName) args.push(vaultName);
+  if (filterType) args.push("--filter-type", filterType);
+  if (filterState) args.push("--filter-state", filterState);
+  if (sortBy) args.push("--sort-by", sortBy);
+  args.push("--output", "json");
+
+  const { stdout } = await passCli(args);
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(stdout);
+  } catch {
+    return asTextContent(asJsonTextOrRaw(stdout));
+  }
+
+  const rawItems = extractRawItemList(parsed);
+  if (!rawItems) {
+    return asTextContent(asJsonTextOrRaw(stdout));
+  }
+  const refs = rawItems.map((item, index) => toItemRef(item, index));
+  const filtered = refs.filter((item) =>
+    item.title
+      ? matchesQuery({
+          query,
+          candidate: item.title,
+          match,
+          caseSensitive,
+        })
+      : false,
+  );
+
+  const start = parseCursor(cursor);
+  const size = pageSize ?? DEFAULT_ITEM_LIST_PAGE_SIZE;
+  const end = start + size;
+  const items = filtered.slice(start, end);
+  const nextCursor = end < filtered.length ? String(end) : null;
+
+  const structuredContent = {
+    items,
+    pageSize: size,
+    cursor: String(start),
+    returned: items.length,
+    total: filtered.length,
+    nextCursor,
+    queryMeta: {
+      field,
+      match,
+      caseSensitive,
+    },
   };
 
   return {
