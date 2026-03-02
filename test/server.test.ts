@@ -904,7 +904,6 @@ describe("server setup", () => {
   });
 
   it("registered tool handlers are invocable from internal tool registry", async () => {
-    process.env.ALLOW_WRITE = "1";
     const runner = makeRunner({ stdout: '{"ok":true}', stderr: "" });
     const server = createServer({ runPassCli: runner });
     const tools = (server as any)._registeredTools as Record<
@@ -926,31 +925,16 @@ describe("server setup", () => {
       shareId: "s1",
     });
     await tools.view_item.handler({ uri: "pass://Work/GitHub/password", output: "json" });
-    await tools.create_vault.handler({ name: "Vault", confirm: true });
-    await tools.update_vault.handler({ shareId: "s1", newName: "Renamed", confirm: true });
-    await tools.delete_vault.handler({ shareId: "s1", confirm: true });
-    await tools.create_login_item.handler({
-      shareId: "s1",
-      title: "GitHub",
-      output: "json",
-      confirm: true,
-    });
-    await tools.create_item_from_template.handler({
-      itemType: "login",
-      shareId: "s1",
-      templateJson: "{}",
-      output: "json",
-      confirm: true,
-    });
-    await tools.update_item.handler({
-      shareId: "s1",
-      itemId: "i1",
-      fields: ["password=abc"],
-      confirm: true,
-    });
-    await tools.delete_item.handler({ shareId: "s1", itemId: "i1", confirm: true });
 
-    expect(runner).toHaveBeenCalledTimes(16);
+    expect(tools.create_vault).toBeUndefined();
+    expect(tools.update_vault).toBeUndefined();
+    expect(tools.delete_vault).toBeUndefined();
+    expect(tools.create_login_item).toBeUndefined();
+    expect(tools.create_item_from_template).toBeUndefined();
+    expect(tools.update_item).toBeUndefined();
+    expect(tools.delete_item).toBeUndefined();
+
+    expect(runner).toHaveBeenCalledTimes(9);
   });
 
   it("registered tool handlers return standardized auth error payloads", async () => {
