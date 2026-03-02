@@ -257,6 +257,53 @@ describe("read-only handlers", () => {
     expect(runner).toHaveBeenCalledTimes(2);
   });
 
+  it("checkPassConnectivity returns generic error for non-auth failures", async () => {
+    const runner = makeRunner(async () => {
+      throw new Error("connection refused");
+    });
+    const result = await checkPassConnectivity(runner);
+
+    expect(result.status).toBe("error");
+    expect(result.message).toBe("connection refused");
+    expect(result.authErrorCode).toBeUndefined();
+    expect(result.authManagedByUser).toBeUndefined();
+  });
+
+  it("checkStatusHandler enriches structuredContent with auth error fields", async () => {
+    const runner = makeRunner(async (args) => {
+      if (args[0] === "--version") return { stdout: "1.5.2 (abc123)", stderr: "" };
+      throw new PassCliAuthError("AUTH_EXPIRED");
+    });
+
+    const result = (await checkStatusHandler(runner)) as any;
+    expect(result.isError).toBe(true);
+    expect(result.structuredContent.overall_status).toBe("error");
+    expect(result.structuredContent.error_code).toBe("AUTH_EXPIRED");
+    expect(result.structuredContent.auth_managed_by_user).toBe(true);
+    expect(result.structuredContent.retryable).toBeDefined();
+  });
+
+  it("checkStatusHandler reports warn when version is unknown but connectivity ok", async () => {
+    const runner = makeRunner(async (args) => {
+      if (args[0] === "--version") return { stdout: "not-a-version", stderr: "" };
+      if (args[0] === "test") return { stdout: "ok", stderr: "" };
+      return { stdout: "", stderr: "" };
+    });
+
+    const result = (await checkStatusHandler(runner)) as any;
+    expect(result.isError).toBeUndefined();
+    expect(result.structuredContent.overall_status).toBe("warn");
+    expect(result.structuredContent.version.compatibilityStatus).toBe("unknown");
+    expect(result.structuredContent.connectivity.status).toBe("ok");
+  });
+
+  it("parseSemver handles edge cases", () => {
+    expect(parseSemver("0.0.0")).toEqual({ major: 0, minor: 0, patch: 0 });
+    expect(parseSemver("999999999999999999.0.0")).toBeNull();
+    expect(parseSemver("1.5")).toBeNull();
+    expect(parseSemver("")).toBeNull();
+  });
+
   it("viewUserInfoHandler forwards output format", async () => {
     const runner = makeRunner({ stdout: '{"email":"user@proton.me"}', stderr: "" });
     const result = await viewUserInfoHandler(runner, { output: "json" });
@@ -333,7 +380,7 @@ describe("read-only handlers", () => {
       "--output",
       "json",
     ]);
-    expect(runner).toHaveBeenNthCalledWith(2, ["item", "list", "Work", "--output", "human"]);
+    expect(runner).toHaveBeenNthCalledWith(2, ["item", "list", "--output", "human", "--", "Work"]);
   });
 
   it("listItemsHandler paginates json output by default with item refs only", async () => {
@@ -517,7 +564,6 @@ describe("read-only handlers", () => {
     expect(runner).toHaveBeenCalledWith([
       "item",
       "list",
-      "Work",
       "--filter-type",
       "login",
       "--filter-state",
@@ -526,6 +572,8 @@ describe("read-only handlers", () => {
       "modify_time",
       "--output",
       "json",
+      "--",
+      "Work",
     ]);
     expect(structured.total).toBe(1);
     expect(structured.items[0].id).toBe("i-1");
@@ -601,6 +649,7 @@ describe("read-only handlers", () => {
       "view",
       "--output",
       "json",
+      "--",
       "pass://Work/GitHub/password",
     ]);
 
