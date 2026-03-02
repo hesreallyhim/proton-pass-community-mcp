@@ -130,6 +130,7 @@ npm run dev -- --allow-version-drift
 - This is not an official Proton project.
 - This project currently targets Proton Pass via `pass-cli` only.
 - See [ROADMAP.md](./ROADMAP.md) for planned features.
+- In addition to the MCP server, there is an agent [skill file](./skills/pass-cli-mcp/SKILL.md) that is intended to be integrated with this MCP - however, it is currently only a draft.
 - Developer runtime configuration and validation workflows are documented in [CONTRIBUTING.md](./CONTRIBUTING.md).
 - See [CONTRIBUTING.md](./CONTRIBUTING.md) if you're interested in contributing to this project. Contributors are highly welcome at this stage.
 
