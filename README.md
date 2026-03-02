@@ -5,38 +5,59 @@
 It is designed as a thin integration layer:
 
 - typed tool inputs with `zod`
-- explicit write gating (`ALLOW_WRITE=1` + `"confirm": true`)
 - stdio transport for MCP clients
 
-## Current Tool Surface
+## Release 0.1 Tool Surface
 
-| Tool                        | Purpose                                           |
-| --------------------------- | ------------------------------------------------- |
-| `view_session_info`         | Session/account status from `pass-cli info`       |
-| `view_user_info`            | User account details from `pass-cli user info`    |
-| `check_status`              | Session/API preflight + CLI version compatibility |
-| `list_vaults`               | List vaults                                       |
-| `list_items`                | List items by vault name or share ID              |
-| `view_item`                 | View item by URI or selectors                     |
-| `create_vault`              | Create vault (write)                              |
-| `update_vault`              | Rename vault (write)                              |
-| `delete_vault`              | Delete vault (write)                              |
-| `create_login_item`         | Create login item (write)                         |
-| `create_item_from_template` | Create item from JSON template (write)            |
-| `update_item`               | Update item fields (write)                        |
-| `delete_item`               | Delete item (write)                               |
+Release 0.1 exposes read-oriented tools only:
 
-## `list_items` Pagination
+| Tool                | Purpose                                           |
+| ------------------- | ------------------------------------------------- |
+| `view_session_info` | Session/account status from `pass-cli info`       |
+| `view_user_info`    | User account details from `pass-cli user info`    |
+| `check_status`      | Session/API preflight + CLI version compatibility |
+| `list_vaults`       | List vaults                                       |
+| `list_shares`       | List shares                                       |
+| `list_items`        | List items by vault name or share ID              |
+| `search_items`      | Search items by title                             |
+| `view_item`         | View item by URI or selectors                     |
 
-`pass-cli item list` does not expose native paging flags, so this server paginates JSON output in-process.
+Mutative handlers remain in the codebase for future releases but are not registered by default in 0.1.
+
+## Item Discovery Contract
+
+`list_items` and `search_items` return token-efficient `ItemRef` objects in `structuredContent.items`:
+
+```json
+{
+  "id": "string",
+  "share_id": "string | null",
+  "vault_id": "string | null",
+  "title": "string | null",
+  "display_title": "string",
+  "state": "string | null",
+  "create_time": "string | null",
+  "modify_time": "string | null",
+  "uri": "string | null"
+}
+```
+
+`list_items` and `search_items` both support MCP pagination:
 
 - Input fields:
   - `pageSize` (optional, `1..250`, default `100` for JSON output)
   - `cursor` (optional non-negative integer string offset, for example `"100"`)
 - Behavior:
-  - Pagination is supported only with `{"output":"json"}`.
-  - Response includes `structuredContent` with `items`, `pageSize`, `cursor`, `returned`, `total`, and `nextCursor`.
-  - Use `nextCursor` in a follow-up `list_items` call to fetch the next page.
+  - Response includes `items`, `pageSize`, `cursor`, `returned`, `total`, and `nextCursor`.
+  - Use `nextCursor` in a follow-up call to fetch the next page.
+
+`list_items` also forwards `filterType`, `filterState`, and `sortBy` to `pass-cli item list`.
+
+`search_items` semantics:
+
+- title-only search (`field: "title"`)
+- matching modes: `contains`, `prefix`, `exact`
+- optional `caseSensitive`
 
 ## Requirements
 
@@ -52,16 +73,7 @@ npm run build
 npm run dev
 ```
 
-## Safety Model
-
-Write tools are blocked unless:
-
-1. `ALLOW_WRITE=1` is set in the server environment
-2. the tool call includes `"confirm": true`
-
-This protects against accidental destructive calls.
-
-Authentication handling:
+## Authentication Model
 
 1. Authentication is user-managed outside MCP with `pass-cli login`.
 2. On auth failure, tools return standardized `AUTH_*` errors and a retry instruction.
@@ -77,13 +89,11 @@ Authentication handling:
 
 - `PASS_CLI_BIN`: override CLI binary path/name (default `pass-cli`)
 - `PASS_CLI_PINNED_VERSION`: override pinned compatibility baseline for `check_status` (default `1.5.2`)
-- `ALLOW_WRITE`: enable write tools when set to `1`
 
 ## Validation / QA
 
 ```bash
 npm run check
-npm run mcp:inspect:smoke
 ```
 
 ## Notes

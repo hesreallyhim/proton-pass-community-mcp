@@ -25,7 +25,7 @@ This project is intentionally small, so the roadmap focuses on high-leverage add
 - `password score` (`pass-cli password score`)
 - `totp generate` (`pass-cli totp generate`)
 - `invite list/accept/reject`
-- `share list`
+- `share list` [USER: INCLUDED IN V0.1]
 - `item trash/untrash`
 
 2. Add MCP resources for read-heavy workflows.

@@ -1,0 +1,9 @@
+{
+  "upstream_repo": "https://github.com/protonpass/pass-cli",
+  "upstream_repo_head_sha": "f573061d896b2f3e5b96f253f979e4595e4e3760",
+  "latest_known_version": "1.5.2",
+  "latest_known_version_source": "https://raw.githubusercontent.com/protonpass/pass-cli/main/CHANGELOG.md",
+  "latest_known_version_published_date": "2026-02-23",
+  "last_checked_utc": "2026-03-01T00:00:00Z",
+  "cache_policy": "Upstream docs may be fetched into docs/upstream/pass-cli/ for local analysis only; directory is git-ignored."
+}

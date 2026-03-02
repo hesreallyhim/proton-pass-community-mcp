@@ -133,3 +133,6 @@ temp/
 # PERSONAL
 
 INTERNAL
+
+# Upstream docs cache (fetched on demand; not committed)
+docs/upstream/pass-cli/
