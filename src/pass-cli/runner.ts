@@ -18,6 +18,13 @@ type ExecFileAsyncLike = (
   },
 ) => Promise<{ stdout?: string | Buffer; stderr?: string | Buffer }>;
 
+const MAX_ERROR_OUTPUT_LENGTH = 500;
+
+export function sanitizeCliOutput(text: string, maxLen = MAX_ERROR_OUTPUT_LENGTH): string {
+  const trimmed = text.trim();
+  if (trimmed.length <= maxLen) return trimmed;
+  return trimmed.slice(0, maxLen) + `\n... (truncated, ${trimmed.length - maxLen} chars omitted)`;
+}
 export function createRunPassCli(
   execFileImpl: ExecFileAsyncLike = execFileAsync as ExecFileAsyncLike,
 ) {
@@ -42,9 +49,9 @@ export function createRunPassCli(
         throw new PassCliAuthError(authCode, stderr || stdout || message);
       }
       throw new Error(
-        `pass-cli failed (code=${code ?? "unknown"}): ${message}\n` +
-          (stderr ? `stderr:\n${stderr}\n` : "") +
-          (stdout ? `stdout:\n${stdout}\n` : ""),
+        `pass-cli failed (code=${code ?? "unknown"}): ${sanitizeCliOutput(message)}\n` +
+          (stderr ? `stderr:\n${sanitizeCliOutput(stderr)}\n` : "") +
+          (stdout ? `stdout:\n${sanitizeCliOutput(stdout)}\n` : ""),
         { cause: e },
       );
     }

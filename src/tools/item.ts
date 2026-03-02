@@ -307,11 +307,11 @@ export async function listItemsHandler(
 
   const args = ["item", "list"];
   if (shareId) args.push("--share-id", shareId);
-  else if (vaultName) args.push(vaultName);
   if (filterType) args.push("--filter-type", filterType);
   if (filterState) args.push("--filter-state", filterState);
   if (sortBy) args.push("--sort-by", sortBy);
   args.push("--output", output);
+  if (vaultName) args.push("--", vaultName);
 
   const { stdout } = await passCli(args);
   if (output !== "json") {
@@ -393,11 +393,11 @@ export async function searchItemsHandler(
 
   const args = ["item", "list"];
   if (shareId) args.push("--share-id", shareId);
-  else if (vaultName) args.push(vaultName);
   if (filterType) args.push("--filter-type", filterType);
   if (filterState) args.push("--filter-state", filterState);
   if (sortBy) args.push("--sort-by", sortBy);
   args.push("--output", "json");
+  if (vaultName) args.push("--", vaultName);
 
   const { stdout } = await passCli(args);
 
@@ -468,7 +468,7 @@ export async function viewItemHandler(passCli: PassCliRunner, input: ViewItemInp
   const args: string[] = ["item", "view"];
 
   if (usingUri) {
-    args.push("--output", output, uri);
+    args.push("--output", output, "--", uri);
   } else {
     if (shareId) args.push("--share-id", shareId);
     else args.push("--vault-name", vaultName!);
