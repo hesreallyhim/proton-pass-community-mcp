@@ -209,7 +209,7 @@ describe("helpers", () => {
   it("logErr writes to stderr with server prefix", () => {
     const stderrSpy = vi.spyOn(process.stderr, "write").mockReturnValue(true);
     logErr("started");
-    expect(stderrSpy).toHaveBeenCalledWith("[proton-pass-mcp] started\n");
+    expect(stderrSpy).toHaveBeenCalledWith("[proton-pass-community-mcp] started\n");
   });
 });
 

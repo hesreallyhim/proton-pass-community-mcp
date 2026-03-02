@@ -20,7 +20,7 @@ export * from "./tools/write-gate.js";
 export function createServer(deps: { runPassCli?: PassCliRunner } = {}) {
   const passCli = deps.runPassCli ?? runPassCli;
   const server = new McpServer({
-    name: "proton-pass-cli",
+    name: "proton-pass-community-mcp",
     version: "0.0.1",
   });
 

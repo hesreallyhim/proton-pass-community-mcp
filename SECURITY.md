@@ -4,10 +4,11 @@
 
 Please do not open public issues for suspected security vulnerabilities.
 
-Use one of these paths instead:
+Instead:
 
-1. Open a private GitHub security advisory for this repository.
-2. Contact a maintainer privately through repository profile contact channels.
+- Open a private GitHub security advisory for this repository.
+
+Security concerns will be treated with urgency due to the sensitive nature of the library.
 
 ## Report Expectations
 
@@ -20,5 +21,5 @@ Include:
 
 ## Scope Notes
 
-1. `proton-pass-mcp` is an MCP wrapper around `pass-cli`; vulnerabilities in upstream Proton services/clients should also be reported to Proton through their official channels.
+1. `proton-pass-community-mcp` is an MCP wrapper around `pass-cli`; vulnerabilities in upstream Proton services/clients should also be reported to Proton through their official channels.
 2. Do not include real credentials, vault contents, OTP values, or private keys in reports.

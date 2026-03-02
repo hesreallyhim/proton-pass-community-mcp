@@ -1,13 +1,13 @@
 ---
 name: release-0-1-plan
-description: Canonical product and engineering plan for proton-pass-mcp release 0.1 scope and acceptance criteria.
+description: Canonical product and engineering plan for proton-pass-community-mcp release 0.1 scope and acceptance criteria.
 ---
 
 # Release 0.1 Plan (First Public Release)
 
 ## Goal
 
-Ship a safe, useful first release of `proton-pass-mcp` focused on read-oriented credential discovery and retrieval, so we can validate real model usage patterns before expanding write/mutative tooling.
+Ship a safe, useful first release of `proton-pass-community-mcp` focused on read-oriented credential discovery and retrieval, so we can validate real model usage patterns before expanding write/mutative tooling.
 
 ## Scope
 

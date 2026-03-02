@@ -1,6 +1,6 @@
 ---
 name: backlog
-description: Canonical backlog of open, non-release-bound work items for proton-pass-mcp.
+description: Canonical backlog of open, non-release-bound work items for proton-pass-community-mcp.
 ---
 
 # Backlog

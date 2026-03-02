@@ -1,13 +1,13 @@
 ---
 name: tool-schema-plan
-description: Canonical specification and phased roadmap for proton-pass-mcp tool contracts and naming conventions.
+description: Canonical specification and phased roadmap for proton-pass-community-mcp tool contracts and naming conventions.
 ---
 
 # MCP Tool Schema Plan
 
 ## Intent
 
-This document defines the planned MCP tool surface for `proton-pass-mcp` with two goals:
+This document defines the planned MCP tool surface for `proton-pass-community-mcp` with two goals:
 
 1. Expose the full `pass-cli` command surface (command parity).
 2. Add MCP-native tools/contracts where raw CLI output is not LLM-efficient.
