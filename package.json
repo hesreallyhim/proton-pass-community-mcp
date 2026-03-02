@@ -1,8 +1,26 @@
 {
   "name": "proton-pass-community-mcp",
   "version": "0.0.1",
-  "private": true,
+  "description": "Community MCP server wrapping Proton Pass CLI (read-only)",
+  "license": "GPL-3.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hesreallyhim/proton-pass-community-mcp.git"
+  },
+  "keywords": [
+    "mcp",
+    "proton-pass",
+    "pass-cli",
+    "password-manager",
+    "model-context-protocol"
+  ],
   "type": "module",
+  "bin": {
+    "proton-pass-community-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "dev": "tsx src/index.ts",
     "build": "tsc -p tsconfig.json",

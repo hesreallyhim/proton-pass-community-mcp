@@ -43,10 +43,39 @@ async function main() {
 
   const toolNames = new Set(toolsList.tools.map((tool) => tool.name));
 
-  assert(toolNames.has("view_session_info"), "Expected view_session_info tool to be registered");
-  assert(toolNames.has("check_status"), "Expected check_status tool to be registered");
-  assert(toolNames.has("view_item"), "Expected view_item tool to be registered");
-  assert(toolNames.has("delete_item"), "Expected delete_item tool to be registered");
+  // Verify all v0.1 read-only tools are registered
+  const expectedTools = [
+    "view_session_info",
+    "view_user_info",
+    "check_status",
+    "list_vaults",
+    "list_shares",
+    "list_items",
+    "search_items",
+    "view_item",
+  ];
+  for (const tool of expectedTools) {
+    assert(toolNames.has(tool), `Expected ${tool} tool to be registered`);
+  }
+
+  // Verify mutative tools are NOT registered in v0.1
+  const excludedTools = [
+    "create_vault",
+    "update_vault",
+    "delete_vault",
+    "create_login_item",
+    "create_item_from_template",
+    "update_item",
+    "delete_item",
+  ];
+  for (const tool of excludedTools) {
+    assert(!toolNames.has(tool), `Expected ${tool} to NOT be registered in v0.1`);
+  }
+
+  assert(
+    toolNames.size === expectedTools.length,
+    `Expected exactly ${expectedTools.length} tools, got ${toolNames.size}`,
+  );
 
   const passInfoResult = await runInspector(
     [

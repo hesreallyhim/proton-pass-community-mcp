@@ -1,9 +1,18 @@
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 
 import { logErr } from "./pass-cli/log.js";
 import { runPassCli, type PassCliRunner } from "./pass-cli/runner.js";
 import { registerTools } from "./server/register-tools.js";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const pkg = JSON.parse(readFileSync(join(__dirname, "..", "package.json"), "utf8")) as {
+  version: string;
+};
 
 export * from "./pass-cli/errors.js";
 export * from "./pass-cli/log.js";
@@ -21,7 +30,7 @@ export function createServer(deps: { runPassCli?: PassCliRunner } = {}) {
   const passCli = deps.runPassCli ?? runPassCli;
   const server = new McpServer({
     name: "proton-pass-community-mcp",
-    version: "0.0.1",
+    version: pkg.version,
   });
 
   registerTools(server, passCli);
