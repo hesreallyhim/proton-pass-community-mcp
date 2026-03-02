@@ -1,4 +1,9 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
+import {
+  parseAllowVersionDriftEnv,
+  parseStartupCliFlags,
+  resolveAllowVersionDrift,
+} from "../src/cli-flags.js";
 
 import {
   asJsonTextOrRaw,
@@ -34,7 +39,6 @@ import {
 
 const originalAllowWrite = process.env.ALLOW_WRITE;
 const originalPassCliBin = process.env.PASS_CLI_BIN;
-const originalPinnedVersion = process.env.PASS_CLI_PINNED_VERSION;
 
 afterEach(() => {
   if (originalAllowWrite === undefined) delete process.env.ALLOW_WRITE;
@@ -42,9 +46,6 @@ afterEach(() => {
 
   if (originalPassCliBin === undefined) delete process.env.PASS_CLI_BIN;
   else process.env.PASS_CLI_BIN = originalPassCliBin;
-
-  if (originalPinnedVersion === undefined) delete process.env.PASS_CLI_PINNED_VERSION;
-  else process.env.PASS_CLI_PINNED_VERSION = originalPinnedVersion;
 
   vi.restoreAllMocks();
 });
@@ -92,25 +93,71 @@ describe("helpers", () => {
         { major: 1, minor: 5, patch: 9 },
         { major: 1, minor: 5, patch: 2 },
       ),
-    ).toMatchObject({ compatibilityStatus: "warn" });
+    ).toMatchObject({ compatibilityStatus: "compatible" });
     expect(
       evaluatePassCliCompatibility(
         { major: 1, minor: 6, patch: 0 },
         { major: 1, minor: 5, patch: 2 },
       ),
-    ).toMatchObject({ compatibilityStatus: "warn" });
+    ).toMatchObject({ compatibilityStatus: "compatible" });
     expect(
       evaluatePassCliCompatibility(
         { major: 1, minor: 4, patch: 9 },
         { major: 1, minor: 5, patch: 2 },
       ),
-    ).toMatchObject({ compatibilityStatus: "error" });
+    ).toMatchObject({ compatibilityStatus: "possibly_incompatible" });
     expect(
       evaluatePassCliCompatibility(
         { major: 2, minor: 0, patch: 0 },
         { major: 1, minor: 5, patch: 2 },
       ),
-    ).toMatchObject({ compatibilityStatus: "error" });
+    ).toMatchObject({ compatibilityStatus: "possibly_incompatible" });
+    expect(
+      evaluatePassCliCompatibility(
+        { major: 2, minor: 0, patch: 0 },
+        { major: 1, minor: 5, patch: 2 },
+        { allowVersionDrift: true },
+      ),
+    ).toMatchObject({ compatibilityStatus: "compatible" });
+  });
+
+  it("parses startup CLI flags for version drift behavior", () => {
+    expect(parseStartupCliFlags([])).toEqual({});
+    expect(parseStartupCliFlags(["--allow-version-drift"])).toEqual({ allowVersionDrift: true });
+    expect(parseStartupCliFlags(["--allow-version-drift=false"])).toEqual({
+      allowVersionDrift: false,
+    });
+    expect(() => parseStartupCliFlags(["--allow-version-drift=maybe"])).toThrow(
+      'Invalid value for --allow-version-drift: "maybe" (expected true/false).',
+    );
+  });
+
+  it("parses allow-version-drift env values", () => {
+    expect(parseAllowVersionDriftEnv(undefined)).toBeUndefined();
+    expect(parseAllowVersionDriftEnv("true")).toBe(true);
+    expect(parseAllowVersionDriftEnv("1")).toBe(true);
+    expect(parseAllowVersionDriftEnv("false")).toBe(false);
+    expect(parseAllowVersionDriftEnv("0")).toBe(false);
+    expect(() => parseAllowVersionDriftEnv("maybe")).toThrow(
+      'Invalid value for PASS_CLI_ALLOW_VERSION_DRIFT: "maybe" (expected true/false).',
+    );
+  });
+
+  it("resolves allow-version-drift with flag precedence over env", () => {
+    expect(resolveAllowVersionDrift({}, {} as NodeJS.ProcessEnv)).toBe(false);
+    expect(
+      resolveAllowVersionDrift({}, { PASS_CLI_ALLOW_VERSION_DRIFT: "true" } as NodeJS.ProcessEnv),
+    ).toBe(true);
+    expect(
+      resolveAllowVersionDrift({ allowVersionDrift: false }, {
+        PASS_CLI_ALLOW_VERSION_DRIFT: "true",
+      } as NodeJS.ProcessEnv),
+    ).toBe(false);
+    expect(
+      resolveAllowVersionDrift({ allowVersionDrift: true }, {
+        PASS_CLI_ALLOW_VERSION_DRIFT: "false",
+      } as NodeJS.ProcessEnv),
+    ).toBe(true);
   });
 
   it("enforces write gate by env and confirmation", () => {
@@ -227,8 +274,9 @@ describe("read-only handlers", () => {
     const result = await checkPassCliVersion(runner);
 
     expect(runner).toHaveBeenCalledWith(["--version"]);
+    expect(result.baselineVersion).toBe("1.5.2");
     expect(result.detectedVersion).toBe("1.5.9");
-    expect(result.compatibilityStatus).toBe("warn");
+    expect(result.compatibilityStatus).toBe("compatible");
   });
 
   it("checkPassConnectivity normalizes auth failures", async () => {
@@ -252,7 +300,7 @@ describe("read-only handlers", () => {
     const result = (await checkStatusHandler(runner)) as any;
     expect(result.isError).toBeUndefined();
     expect(result.structuredContent.overall_status).toBe("ok");
-    expect(result.structuredContent.version.compatibilityStatus).toBe("ok");
+    expect(result.structuredContent.version.compatibilityStatus).toBe("equal");
     expect(result.structuredContent.connectivity.status).toBe("ok");
     expect(runner).toHaveBeenCalledTimes(2);
   });
@@ -283,7 +331,7 @@ describe("read-only handlers", () => {
     expect(result.structuredContent.retryable).toBeDefined();
   });
 
-  it("checkStatusHandler reports warn when version is unknown but connectivity ok", async () => {
+  it("checkStatusHandler reports warn when version is not parseable but connectivity ok", async () => {
     const runner = makeRunner(async (args) => {
       if (args[0] === "--version") return { stdout: "not-a-version", stderr: "" };
       if (args[0] === "test") return { stdout: "ok", stderr: "" };
@@ -293,8 +341,22 @@ describe("read-only handlers", () => {
     const result = (await checkStatusHandler(runner)) as any;
     expect(result.isError).toBeUndefined();
     expect(result.structuredContent.overall_status).toBe("warn");
-    expect(result.structuredContent.version.compatibilityStatus).toBe("unknown");
+    expect(result.structuredContent.version.compatibilityStatus).toBe("possibly_incompatible");
     expect(result.structuredContent.connectivity.status).toBe("ok");
+  });
+
+  it("checkStatusHandler allows local version drift override", async () => {
+    const runner = makeRunner(async (args) => {
+      if (args[0] === "--version") return { stdout: "0.9.0", stderr: "" };
+      if (args[0] === "test") return { stdout: "ok", stderr: "" };
+      return { stdout: "", stderr: "" };
+    });
+
+    const result = (await checkStatusHandler(runner, { allowVersionDrift: true })) as any;
+    expect(result.isError).toBeUndefined();
+    expect(result.structuredContent.overall_status).toBe("ok");
+    expect(result.structuredContent.version.compatibilityStatus).toBe("compatible");
+    expect(result.structuredContent.version.allowVersionDrift).toBe(true);
   });
 
   it("parseSemver handles edge cases", () => {

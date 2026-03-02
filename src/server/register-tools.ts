@@ -2,6 +2,7 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 
 import { withAuthErrorHandling } from "../pass-cli/errors.js";
 import type { PassCliRunner } from "../pass-cli/runner.js";
+import type { PassCliVersionPolicy } from "../pass-cli/version.js";
 import { checkStatusHandler } from "../tools/check-status.js";
 import {
   listItemsHandler,
@@ -19,7 +20,11 @@ import {
 import { listSharesHandler, listSharesInputSchema } from "../tools/share.js";
 import { listVaultsHandler, listVaultsInputSchema } from "../tools/vault.js";
 
-export function registerTools(server: McpServer, passCli: PassCliRunner) {
+export function registerTools(
+  server: McpServer,
+  passCli: PassCliRunner,
+  versionPolicy: PassCliVersionPolicy = {},
+) {
   server.registerTool(
     "view_session_info",
     {
@@ -34,7 +39,7 @@ export function registerTools(server: McpServer, passCli: PassCliRunner) {
       description:
         "Run preflight checks for connectivity/authentication and CLI version compatibility.",
     },
-    async () => checkStatusHandler(passCli),
+    async () => checkStatusHandler(passCli, versionPolicy),
   );
 
   server.registerTool(

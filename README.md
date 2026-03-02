@@ -1,34 +1,32 @@
 # proton-pass-community-mcp
 
-`proton-pass-community-mcp` is a minimal MCP server that wraps selected `pass-cli` commands from Proton Pass.
+`proton-pass-community-mcp` is an MCP server that wraps selected commands from the Proton Pass CLI (`pass-cli`).
 
-Independent community project. Not affiliated with or endorsed by Proton AG.
+It is an independent community project. It is not affiliated with or endorsed by Proton AG.
 
 It is designed as a thin integration layer:
 
 - typed tool inputs with `zod`
 - stdio transport for MCP clients
 
-## Release 0.1 Tool Surface
+## Available Tools
 
-Release 0.1 exposes read-oriented tools only:
+As this project is in its initial stages, it exposes the following read-only tools:
 
-| Tool                | Purpose                                           |
-| ------------------- | ------------------------------------------------- |
-| `view_session_info` | Session/account status from `pass-cli info`       |
-| `view_user_info`    | User account details from `pass-cli user info`    |
-| `check_status`      | Session/API preflight + CLI version compatibility |
-| `list_vaults`       | List vaults                                       |
-| `list_shares`       | List shares                                       |
-| `list_items`        | List items by vault name or share ID              |
-| `search_items`      | Search items by title                             |
-| `view_item`         | View item by URI or selectors                     |
-
-Mutative handlers remain in the codebase for future releases but are not registered by default in 0.1.
+| Tool                | Purpose                                          |
+| ------------------- | ------------------------------------------------ |
+| `view_session_info` | Session/account status from `pass-cli info`      |
+| `view_user_info`    | User account details from `pass-cli user info`   |
+| `check_status`      | Check user authentication status and CLI version |
+| `list_vaults`       | List vaults                                      |
+| `list_shares`       | List shares                                      |
+| `list_items`        | List vault or share items, omitting contents     |
+| `search_items`      | Search items by title                            |
+| `view_item`         | View item by URI or selectors                    |
 
 ## Item Discovery Contract
 
-`list_items` and `search_items` return token-efficient `ItemRef` objects in `structuredContent.items`:
+`list_items` and `search_items` return token-efficient `ItemRef` objects:
 
 ```json
 {
@@ -43,6 +41,8 @@ Mutative handlers remain in the codebase for future releases but are not registe
   "uri": "string | null"
 }
 ```
+
+These operations do not contain the full contents or secrets of any items, thus preventing unnecessary leakage of sensitive data from the CLI to the host application or the LLM.
 
 `list_items` and `search_items` both support MCP pagination:
 
@@ -63,9 +63,14 @@ Mutative handlers remain in the codebase for future releases but are not registe
 
 ## Requirements
 
+> [!NOTE]
+> Currently, the server expects the user to handle authentication. If it's not able to authenticate, it will simply prompt the user to authenticate using one of the `pass-cli` methods.
+
 - Node.js `24` (`.nvmrc`)
 - `pass-cli` installed and authenticated
 - MCP client capable of stdio transport
+
+### 📌 Current Baseline Version of `pass-cli` used in development: v1.5.2
 
 ## Run Locally
 
@@ -75,27 +80,63 @@ npm run build
 npm run dev
 ```
 
+## MCP Client Configuration
+
+Example MCP server config using command-line args:
+
+```json
+{
+  "mcpServers": {
+    "proton-pass-community-mcp": {
+      "command": "node",
+      "args": ["/absolute/path/to/proton-pass-community-mcp/dist/index.js", "--allow-version-drift"]
+    }
+  }
+}
+```
+
+Example MCP server config using environment overrides:
+
+```json
+{
+  "mcpServers": {
+    "proton-pass": {
+      "command": "node",
+      "args": ["/absolute/path/to/proton-pass-community-mcp/dist/index.js"],
+      "env": {
+        "PASS_CLI_BIN": "pass-cli",
+        "PASS_CLI_ALLOW_VERSION_DRIFT": "true"
+      }
+    }
+  }
+}
+```
+
 ## Authentication Model
 
 1. Authentication is user-managed outside MCP with `pass-cli login`.
 2. On auth failure, tools return standardized `AUTH_*` errors and a retry instruction.
 3. The MCP server does not collect credentials, OTP codes, or private keys.
 4. Use `check_status` once as a session preflight (not per tool call); rely on `AUTH_*` fallback errors if the session later expires.
-5. `check_status` enforces CLI compatibility against pinned `pass-cli` `1.5.2` by default:
-   - patch mismatch: warn
-   - higher minor (same major): warn
-   - lower minor (same major): error
-   - major mismatch: error
+5. `check_status` compares your local CLI version against the development baseline and reports a version assessment for LLMs:
+   - `equal`: exact semver match
+   - `compatible`: semver differs but appears compatible by policy
+   - `possibly_incompatible`: semver indicates potential drift, or version parsing/execution prevented a strict comparison
+6. Version assessments are advisory. `check_status` is marked as an MCP error only when connectivity/authentication fails.
 
-## Environment Variables
+## Startup Flags
 
-- `PASS_CLI_BIN`: override CLI binary path/name (default `pass-cli`)
-- `PASS_CLI_PINNED_VERSION`: override pinned compatibility baseline for `check_status` (default `1.5.2`)
+- `--allow-version-drift`: treat semver mismatch/version-parse uncertainty as compatible for `check_status`
 
-## Validation / QA
+Equivalent environment variable:
+
+- `PASS_CLI_ALLOW_VERSION_DRIFT=true|false` (accepted truthy values: `true`, `1`, `yes`, `on`; falsy: `false`, `0`, `no`, `off`)
+- If both are set, the CLI flag takes precedence.
+
+Example:
 
 ```bash
-npm run check
+npm run dev -- --allow-version-drift
 ```
 
 ## Notes
@@ -103,3 +144,9 @@ npm run check
 - This is not an official Proton project.
 - This project currently targets Proton Pass via `pass-cli` only.
 - See [ROADMAP.md](./ROADMAP.md) for planned features.
+- Developer runtime configuration and validation workflows are documented in [CONTRIBUTING.md](./CONTRIBUTING.md).
+- See [CONTRIBUTING.md](./CONTRIBUTING.md) if you're interested in contributing to this project. Contributors are highly welcome at this stage.
+
+LICENSE
+
+GPL-3 &copy; 2026 Really Him
