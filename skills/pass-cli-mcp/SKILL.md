@@ -1,6 +1,8 @@
 ---
-name: skill-wrapper-protocol
+name: pass-cli-mcp
 description: Canonical protocol for model-side skill behavior when orchestrating proton-pass-community-mcp tools in chat sessions.
+metadata:
+  status: draft
 ---
 
 # Proton Pass MCP Skill Wrapper

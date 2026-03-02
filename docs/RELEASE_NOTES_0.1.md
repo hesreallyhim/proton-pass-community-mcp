@@ -2,7 +2,7 @@
 
 ## Summary
 
-Release 0.1 establishes a read-focused MCP surface for Proton Pass discovery and retrieval workflows.
+Release 0.1.0 establishes a read-focused MCP surface for Proton Pass discovery and retrieval workflows.
 
 ## Included Tools
 
@@ -26,10 +26,9 @@ Release 0.1 establishes a read-focused MCP surface for Proton Pass discovery and
 ## Scope Boundary
 
 1. Mutative tool handlers are retained in the codebase for future releases.
-2. Mutative tools are not registered in the default 0.1 MCP tool surface.
+2. Mutative tools are not registered in the default 0.1.0 MCP tool surface.
 
-## Non-Goals for 0.1
+## Non-Goals for 0.1.0
 
-1. Integration and smoke test gating in CI.
 2. Write/mutation operations.
 3. Advanced operational helpers (`run`, `inject`, `ssh-agent`, attachment workflows).
