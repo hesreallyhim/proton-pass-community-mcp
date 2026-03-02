@@ -2,17 +2,58 @@ import { z } from "zod";
 
 import { asJsonTextOrRaw, asTextContent, joinStdoutStderr } from "../pass-cli/output.js";
 import type { PassCliRunner } from "../pass-cli/runner.js";
+import {
+  asRecord,
+  extractItemType,
+  firstNestedString,
+  firstString,
+  parsePassUri,
+  shortId,
+} from "./item-utils.js";
 import { requireWriteGate } from "./write-gate.js";
 
 const DEFAULT_ITEM_LIST_PAGE_SIZE = 100;
 const MAX_ITEM_LIST_PAGE_SIZE = 250;
-
-type JsonRecord = Record<string, unknown>;
+const ITEM_FILTER_TYPES = [
+  "note",
+  "login",
+  "alias",
+  "credit-card",
+  "identity",
+  "ssh-key",
+  "wifi",
+  "custom",
+] as const;
+const ITEM_FILTER_STATES = ["active", "trashed"] as const;
+const ITEM_SORT_OPTIONS = [
+  "alphabetic-asc",
+  "alphabetic-desc",
+  "created-asc",
+  "created-desc",
+] as const;
+const VAULT_NAME_SCOPE_DESCRIPTION =
+  "Vault name scope. Provide exactly one of vaultName or shareId.";
+const SHARE_ID_SCOPE_DESCRIPTION = "Share ID scope. Provide exactly one of shareId or vaultName.";
+const FILTER_TYPE_DESCRIPTION =
+  "Filter items by type. Allowed values: note, login, alias, credit-card, identity, ssh-key, wifi, custom.";
+const FILTER_STATE_DESCRIPTION =
+  'Filter items by state. Allowed values: active, trashed. Use "active" to exclude trashed items.';
+const SORT_BY_DESCRIPTION =
+  "Sort items. Allowed values: alphabetic-asc, alphabetic-desc, created-asc, created-desc.";
+const PAGE_SIZE_DESCRIPTION = "Number of items per page (1-250, default 100)";
+const CURSOR_DESCRIPTION = "Pagination cursor from a previous response's nextCursor";
+const SEARCH_QUERY_DESCRIPTION = "Search query string";
+const SEARCH_FIELD_DESCRIPTION = "Field to search (currently title only)";
+const SEARCH_MATCH_DESCRIPTION = "Match strategy for the query";
+const SEARCH_CASE_SENSITIVE_DESCRIPTION = "Whether the search is case-sensitive";
+const SEARCH_VAULT_SCOPE_DESCRIPTION = "Limit search to a specific vault by name";
+const SEARCH_SHARE_SCOPE_DESCRIPTION = "Limit search to a specific share by ID";
 
 export type ItemRef = {
   id: string;
   share_id: string | null;
   vault_id: string | null;
+  type: string | null;
   title: string | null;
   display_title: string;
   state: string | null;
@@ -34,73 +75,16 @@ function parseCursor(cursor?: string): number {
   return parsed;
 }
 
-function asRecord(value: unknown): JsonRecord | null {
-  if (value && typeof value === "object" && !Array.isArray(value)) {
-    return value as JsonRecord;
-  }
-  return null;
-}
-
-function asNonEmptyString(value: unknown): string | null {
-  if (typeof value !== "string") return null;
-  const trimmed = value.trim();
-  return trimmed.length > 0 ? trimmed : null;
-}
-
-function firstString(record: JsonRecord, keys: string[]): string | null {
-  for (const key of keys) {
-    const value = asNonEmptyString(record[key]);
-    if (value) return value;
-  }
-  return null;
-}
-
-function firstNestedString(
-  record: JsonRecord,
-  objectKeys: string[],
-  valueKeys: string[],
-): string | null {
-  for (const objectKey of objectKeys) {
-    const nested = asRecord(record[objectKey]);
-    if (!nested) continue;
-    const value = firstString(nested, valueKeys);
-    if (value) return value;
-  }
-  return null;
-}
-
-function parsePassUri(uri: string | null): { shareId: string | null; itemId: string | null } {
-  if (!uri) return { shareId: null, itemId: null };
-  const normalized = uri.trim();
-  if (!normalized.startsWith("pass://")) {
-    return { shareId: null, itemId: null };
-  }
-
-  const segments = normalized
-    .slice("pass://".length)
-    .split("/")
-    .map((segment) => segment.trim())
-    .filter(Boolean);
-
-  if (segments.length < 2) return { shareId: null, itemId: null };
-  return {
-    shareId: segments[0] ?? null,
-    itemId: segments[1] ?? null,
-  };
-}
-
-function shortId(value: string): string {
-  return value.length <= 8 ? value : value.slice(0, 8);
-}
-
 function toItemRef(rawItem: unknown, index: number): ItemRef {
   const item = asRecord(rawItem);
   if (!item) {
+    // Preserve pagination/reference behavior even when one entry is malformed.
     const fallbackId = `item-${index + 1}`;
     return {
       id: fallbackId,
       share_id: null,
       vault_id: null,
+      type: null,
       title: null,
       display_title: `[untitled:${shortId(fallbackId)}]`,
       state: null,
@@ -112,16 +96,16 @@ function toItemRef(rawItem: unknown, index: number): ItemRef {
 
   const existingUri = firstString(item, ["uri"]);
   const parsedUri = parsePassUri(existingUri);
-  const id =
-    firstString(item, ["id", "item_id", "itemId"]) ?? parsedUri.itemId ?? `item-${index + 1}`;
+  // Item list JSON is interpreted as snake_case-first (see ADR-002).
+  const id = firstString(item, ["id", "item_id"]) ?? parsedUri.itemId ?? `item-${index + 1}`;
   const shareId =
-    firstString(item, ["share_id", "shareId"]) ??
-    firstNestedString(item, ["share"], ["id", "share_id", "shareId"]) ??
+    firstString(item, ["share_id"]) ??
+    firstNestedString(item, ["share"], ["id", "share_id"]) ??
     parsedUri.shareId;
   const vaultId =
-    firstString(item, ["vault_id", "vaultId"]) ??
-    firstNestedString(item, ["vault"], ["id", "vault_id", "vaultId"]);
+    firstString(item, ["vault_id"]) ?? firstNestedString(item, ["vault"], ["id", "vault_id"]);
   const title = firstNestedString(item, ["content"], ["title"]) ?? firstString(item, ["title"]);
+  const type = extractItemType(item);
 
   const displayTitle = title ?? `[untitled:${shortId(id)}]`;
   const derivedUri = shareId ? `pass://${shareId}/${id}` : existingUri;
@@ -130,11 +114,12 @@ function toItemRef(rawItem: unknown, index: number): ItemRef {
     id,
     share_id: shareId,
     vault_id: vaultId,
+    type,
     title,
     display_title: displayTitle,
     state: firstString(item, ["state"]),
-    create_time: firstString(item, ["create_time", "createTime", "created_at", "createdAt"]),
-    modify_time: firstString(item, ["modify_time", "modifyTime", "updated_at", "updatedAt"]),
+    create_time: firstString(item, ["create_time", "created_at"]),
+    modify_time: firstString(item, ["modify_time", "updated_at"]),
     uri: derivedUri ?? null,
   };
 }
@@ -149,35 +134,19 @@ function extractRawItemList(parsed: unknown): unknown[] | null {
 
 export const listItemsInputSchema = z
   .object({
-    vaultName: z.string().max(255).optional().describe("Vault name to list items from"),
-    shareId: z.string().max(100).optional().describe("Share ID to list items from"),
-    filterType: z
-      .string()
-      .max(50)
-      .optional()
-      .describe("Filter by item type (e.g. login, note, alias)"),
-    filterState: z
-      .string()
-      .max(50)
-      .optional()
-      .describe("Filter by item state (e.g. active, trashed)"),
-    sortBy: z
-      .string()
-      .max(50)
-      .optional()
-      .describe("Sort order (e.g. createTime, modifyTime, title)"),
+    vaultName: z.string().max(255).optional().describe(VAULT_NAME_SCOPE_DESCRIPTION),
+    shareId: z.string().max(100).optional().describe(SHARE_ID_SCOPE_DESCRIPTION),
+    filterType: z.enum(ITEM_FILTER_TYPES).optional().describe(FILTER_TYPE_DESCRIPTION),
+    filterState: z.enum(ITEM_FILTER_STATES).optional().describe(FILTER_STATE_DESCRIPTION),
+    sortBy: z.enum(ITEM_SORT_OPTIONS).optional().describe(SORT_BY_DESCRIPTION),
     pageSize: z
       .number()
       .int()
       .min(1)
       .max(MAX_ITEM_LIST_PAGE_SIZE)
       .optional()
-      .describe("Number of items per page (1-250, default 100)"),
-    cursor: z
-      .string()
-      .max(20)
-      .optional()
-      .describe("Pagination cursor from a previous response's nextCursor"),
+      .describe(PAGE_SIZE_DESCRIPTION),
+    cursor: z.string().max(20).optional().describe(CURSOR_DESCRIPTION),
     output: z.enum(["json", "human"]).default("json").describe("Output format"),
   })
   .refine(
@@ -203,42 +172,26 @@ export const viewItemInputSchema = z.object({
 
 export const searchItemsInputSchema = z
   .object({
-    query: z.string().min(1).max(255).describe("Search query string"),
-    field: z.literal("title").default("title").describe("Field to search (currently title only)"),
+    query: z.string().min(1).max(255).describe(SEARCH_QUERY_DESCRIPTION),
+    field: z.literal("title").default("title").describe(SEARCH_FIELD_DESCRIPTION),
     match: z
       .enum(["contains", "prefix", "exact"])
       .default("contains")
-      .describe("Match strategy for the query"),
-    caseSensitive: z.boolean().default(false).describe("Whether the search is case-sensitive"),
-    vaultName: z.string().max(255).optional().describe("Limit search to a specific vault by name"),
-    shareId: z.string().max(100).optional().describe("Limit search to a specific share by ID"),
-    filterType: z
-      .string()
-      .max(50)
-      .optional()
-      .describe("Filter by item type (e.g. login, note, alias)"),
-    filterState: z
-      .string()
-      .max(50)
-      .optional()
-      .describe("Filter by item state (e.g. active, trashed)"),
-    sortBy: z
-      .string()
-      .max(50)
-      .optional()
-      .describe("Sort order (e.g. createTime, modifyTime, title)"),
+      .describe(SEARCH_MATCH_DESCRIPTION),
+    caseSensitive: z.boolean().default(false).describe(SEARCH_CASE_SENSITIVE_DESCRIPTION),
+    vaultName: z.string().max(255).optional().describe(SEARCH_VAULT_SCOPE_DESCRIPTION),
+    shareId: z.string().max(100).optional().describe(SEARCH_SHARE_SCOPE_DESCRIPTION),
+    filterType: z.enum(ITEM_FILTER_TYPES).optional().describe(FILTER_TYPE_DESCRIPTION),
+    filterState: z.enum(ITEM_FILTER_STATES).optional().describe(FILTER_STATE_DESCRIPTION),
+    sortBy: z.enum(ITEM_SORT_OPTIONS).optional().describe(SORT_BY_DESCRIPTION),
     pageSize: z
       .number()
       .int()
       .min(1)
       .max(MAX_ITEM_LIST_PAGE_SIZE)
       .optional()
-      .describe("Number of items per page (1-250, default 100)"),
-    cursor: z
-      .string()
-      .max(20)
-      .optional()
-      .describe("Pagination cursor from a previous response's nextCursor"),
+      .describe(PAGE_SIZE_DESCRIPTION),
+    cursor: z.string().max(20).optional().describe(CURSOR_DESCRIPTION),
   })
   .refine((input) => !(input.vaultName && input.shareId), {
     message: "Provide only one of vaultName or shareId.",

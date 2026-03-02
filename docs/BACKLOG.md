@@ -25,3 +25,10 @@ description: Canonical backlog of open, non-release-bound work items for proton-
 - Compare `MCP`, `skill`, and `connector` approaches for this project.
 - Define evaluation criteria (security boundaries, UX friction, portability, maintenance cost, ecosystem support).
 - Decide primary integration model and document rationale, with fallback/interop plan if needed.
+
+4. Refactor and harden item-list JSON normalization (`toItemRef`) for maintainability.
+
+- Split extraction into smaller, named helpers (identity, scope, type, title, timestamps, URI derivation).
+- Add fixture-based shape tests using anonymized upstream snapshots to detect drift early.
+- Document supported raw-field paths and fallback precedence in one place.
+- Keep secret-bearing nested content out of `ItemRef` while preserving stable reference metadata.
