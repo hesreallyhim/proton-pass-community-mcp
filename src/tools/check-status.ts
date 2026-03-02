@@ -41,7 +41,7 @@ export async function checkPassConnectivity(
   }
 }
 
-export async function passCheckStatusHandler(passCli: PassCliRunner) {
+export async function checkStatusHandler(passCli: PassCliRunner) {
   const [version, connectivity] = await Promise.all([
     checkPassCliVersion(passCli),
     checkPassConnectivity(passCli),

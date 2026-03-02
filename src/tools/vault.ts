@@ -4,41 +4,41 @@ import { asJsonTextOrRaw, asTextContent, joinStdoutStderr } from "../pass-cli/ou
 import type { PassCliRunner } from "../pass-cli/runner.js";
 import { requireWriteGate } from "./write-gate.js";
 
-export const passVaultListInputSchema = z.object({
+export const listVaultsInputSchema = z.object({
   output: z.enum(["json", "human"]).default("json"),
 });
 
-export const passVaultCreateInputSchema = z.object({
+export const createVaultInputSchema = z.object({
   name: z.string(),
   confirm: z.boolean().optional(),
 });
 
-export const passVaultUpdateInputSchema = z.object({
+export const updateVaultInputSchema = z.object({
   shareId: z.string().optional(),
   vaultName: z.string().optional(),
   newName: z.string(),
   confirm: z.boolean().optional(),
 });
 
-export const passVaultDeleteInputSchema = z.object({
+export const deleteVaultInputSchema = z.object({
   shareId: z.string().optional(),
   vaultName: z.string().optional(),
   confirm: z.boolean().optional(),
 });
 
-export type PassVaultListInput = z.infer<typeof passVaultListInputSchema>;
-export type PassVaultCreateInput = z.infer<typeof passVaultCreateInputSchema>;
-export type PassVaultUpdateInput = z.infer<typeof passVaultUpdateInputSchema>;
-export type PassVaultDeleteInput = z.infer<typeof passVaultDeleteInputSchema>;
+export type ListVaultsInput = z.infer<typeof listVaultsInputSchema>;
+export type CreateVaultInput = z.infer<typeof createVaultInputSchema>;
+export type UpdateVaultInput = z.infer<typeof updateVaultInputSchema>;
+export type DeleteVaultInput = z.infer<typeof deleteVaultInputSchema>;
 
-export async function passVaultListHandler(passCli: PassCliRunner, { output }: PassVaultListInput) {
+export async function listVaultsHandler(passCli: PassCliRunner, { output }: ListVaultsInput) {
   const { stdout } = await passCli(["vault", "list", "--output", output]);
   return asTextContent(asJsonTextOrRaw(stdout));
 }
 
-export async function passVaultCreateHandler(
+export async function createVaultHandler(
   passCli: PassCliRunner,
-  { name, confirm }: PassVaultCreateInput,
+  { name, confirm }: CreateVaultInput,
 ) {
   requireWriteGate(confirm);
   const { stdout, stderr } = await passCli(["vault", "create", "--name", name]);
@@ -46,9 +46,9 @@ export async function passVaultCreateHandler(
   return asTextContent(out || "OK");
 }
 
-export async function passVaultUpdateHandler(
+export async function updateVaultHandler(
   passCli: PassCliRunner,
-  { shareId, vaultName, newName, confirm }: PassVaultUpdateInput,
+  { shareId, vaultName, newName, confirm }: UpdateVaultInput,
 ) {
   requireWriteGate(confirm);
   if (!!shareId === !!vaultName) throw new Error("Provide exactly one of shareId or vaultName.");
@@ -61,9 +61,9 @@ export async function passVaultUpdateHandler(
   return asTextContent(out || "OK");
 }
 
-export async function passVaultDeleteHandler(
+export async function deleteVaultHandler(
   passCli: PassCliRunner,
-  { shareId, vaultName, confirm }: PassVaultDeleteInput,
+  { shareId, vaultName, confirm }: DeleteVaultInput,
 ) {
   requireWriteGate(confirm);
   if (!!shareId === !!vaultName) throw new Error("Provide exactly one of shareId or vaultName.");
