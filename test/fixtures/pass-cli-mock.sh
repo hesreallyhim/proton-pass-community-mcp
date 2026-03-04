@@ -24,6 +24,21 @@ if [[ "$cmd1" == "vault" && "$cmd2" == "list" ]]; then
   exit 0
 fi
 
+if [[ "$cmd1" == "vault" && "$cmd2" == "member" ]]; then
+  printf '{"members":[{"id":"member-1","role":"manager"}]}'
+  exit 0
+fi
+
+if [[ "$cmd1" == "invite" && "$cmd2" == "list" ]]; then
+  printf '{"invites":[{"id":"invite-1","type":"vault"}]}'
+  exit 0
+fi
+
+if [[ "$cmd1" == "settings" && "$cmd2" == "view" ]]; then
+  printf 'Default vault: (none)\nDefault format: human\n'
+  exit 0
+fi
+
 if [[ "$cmd1" == "item" && "$cmd2" == "list" ]]; then
   printf '[]'
   exit 0

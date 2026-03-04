@@ -12,13 +12,20 @@ import {
   viewItemHandler,
   viewItemInputSchema,
 } from "../tools/item.js";
+import { listInvitesHandler, listInvitesInputSchema } from "../tools/invite.js";
 import {
   viewSessionInfoHandler,
   viewUserInfoHandler,
   viewUserInfoInputSchema,
 } from "../tools/session.js";
+import { viewSettingsHandler } from "../tools/settings.js";
 import { listSharesHandler, listSharesInputSchema } from "../tools/share.js";
-import { listVaultsHandler, listVaultsInputSchema } from "../tools/vault.js";
+import {
+  listVaultMembersHandler,
+  listVaultMembersInputSchema,
+  listVaultsHandler,
+  listVaultsInputSchema,
+} from "../tools/vault.js";
 
 export function registerTools(
   server: McpServer,
@@ -67,6 +74,32 @@ export function registerTools(
       inputSchema: listSharesInputSchema,
     },
     withAuthErrorHandling(async (input) => listSharesHandler(passCli, input)),
+  );
+
+  server.registerTool(
+    "list_invites",
+    {
+      description: "List pending invitations accessible to the current authenticated user.",
+      inputSchema: listInvitesInputSchema,
+    },
+    withAuthErrorHandling(async (input) => listInvitesHandler(passCli, input)),
+  );
+
+  server.registerTool(
+    "view_settings",
+    {
+      description: "View current Proton Pass CLI settings.",
+    },
+    withAuthErrorHandling(async () => viewSettingsHandler(passCli)),
+  );
+
+  server.registerTool(
+    "list_vault_members",
+    {
+      description: "List members for a vault by share ID or vault name.",
+      inputSchema: listVaultMembersInputSchema,
+    },
+    withAuthErrorHandling(async (input) => listVaultMembersHandler(passCli, input)),
   );
 
   server.registerTool(

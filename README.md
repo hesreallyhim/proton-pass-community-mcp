@@ -15,16 +15,19 @@ It is designed as a thin integration layer:
 
 As this project is in its initial stages, it exposes the following read-only tools:
 
-| Tool                | Purpose                                          |
-| ------------------- | ------------------------------------------------ |
-| `view_session_info` | Session/account status from `pass-cli info`      |
-| `view_user_info`    | User account details from `pass-cli user info`   |
-| `check_status`      | Check user authentication status and CLI version |
-| `list_vaults`       | List vaults                                      |
-| `list_shares`       | List shares                                      |
-| `list_items`        | List vault or share items, omitting contents     |
-| `search_items`      | Search items by title                            |
-| `view_item`         | View item by URI or selectors                    |
+| Tool                 | Purpose                                          |
+| -------------------- | ------------------------------------------------ |
+| `view_session_info`  | Session/account status from `pass-cli info`      |
+| `view_user_info`     | User account details from `pass-cli user info`   |
+| `check_status`       | Check user authentication status and CLI version |
+| `list_vaults`        | List vaults                                      |
+| `list_shares`        | List shares                                      |
+| `list_invites`       | List pending invitations                         |
+| `view_settings`      | View current Proton Pass CLI settings            |
+| `list_vault_members` | List members of a specific vault                 |
+| `list_items`         | List vault or share items, omitting contents     |
+| `search_items`       | Search items by title                            |
+| `view_item`          | View item by URI or selectors                    |
 
 The `search_items` operation is additional functionality that is not provided by the base CLI.
 
