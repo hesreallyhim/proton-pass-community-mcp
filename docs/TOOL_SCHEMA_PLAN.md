@@ -97,6 +97,38 @@ Notes:
 
 Cursor is an offset string (`"0"`, `"100"`, ...).
 
+### `InviteRef` (canonical invitation list object)
+
+```json
+{
+  "id": "string",
+  "type": "string | null",
+  "target_name": "string | null",
+  "inviter": "string | null",
+  "role": "string | null",
+  "state": "string | null",
+  "create_time": "string | null"
+}
+```
+
+Notes:
+
+1. Treat invitation tokens as sensitive capabilities and do not expose them in list payloads.
+2. Include only stable metadata needed for triage and follow-up selection.
+
+### `VaultMemberRef` (canonical vault-member list object)
+
+```json
+{
+  "id": "string",
+  "username": "string | null",
+  "email": "string | null",
+  "role": "string | null",
+  "state": "string | null",
+  "create_time": "string | null"
+}
+```
+
 ## Item Discovery Contract
 
 ### `list_items` (planned v2 behavior)
@@ -136,6 +168,44 @@ Notes:
 1. Search is explicitly title-based for v1.
 2. If title is missing, item is still returned as a ref but cannot match title query except by empty/exact edge cases.
 
+## Incremental Read Contracts (Pre-Write Track)
+
+### `list_invites`
+
+Input:
+
+1. `pageSize`, `cursor`.
+
+Output:
+
+1. `structuredContent: CursorPage<InviteRef>`.
+2. Reference-only invite metadata (no raw invite token material in list payloads).
+3. When structured parsing is unavailable, return best-effort normalized text in `content`.
+
+### `list_vault_members`
+
+Input:
+
+1. Scope selector: exactly one of `shareId` or `vaultName`.
+2. `pageSize`, `cursor`.
+
+Output:
+
+1. `structuredContent: CursorPage<VaultMemberRef>`.
+2. `scope` object echoing the selector used (`shareId` or `vaultName`).
+3. When structured parsing is unavailable, return best-effort normalized text in `content`.
+
+### `view_settings`
+
+Input:
+
+1. none.
+
+Output:
+
+1. `structuredContent` with parsed settings when machine-readable shape is derivable.
+2. `content` remains present for debugging/interoperability.
+
 ## Planned Tool Inventory
 
 Status key:
@@ -160,17 +230,17 @@ Status key:
 
 ### Vault Tools
 
-| Tool                  | Source                         | Status      | Input Summary                                              | Output Summary       |
-| --------------------- | ------------------------------ | ----------- | ---------------------------------------------------------- | -------------------- |
-| `list_vaults`         | `pass-cli vault list`          | Implemented | `output?`                                                  | Vault list           |
-| `create_vault`        | `pass-cli vault create`        | Implemented | `name`, `confirm`                                          | Created vault status |
-| `update_vault`        | `pass-cli vault update`        | Implemented | `shareId \| vaultName`, `newName`, `confirm`               | Update status        |
-| `delete_vault`        | `pass-cli vault delete`        | Implemented | `shareId \| vaultName`, `confirm`                          | Delete status        |
-| `vault_share`         | `pass-cli vault share`         | Planned     | `shareId \| vaultName`, `email`, `role?`, `confirm`        | Share result         |
-| `vault_transfer`      | `pass-cli vault transfer`      | Planned     | `shareId \| vaultName`, `memberShareId`, `confirm`         | Transfer result      |
-| `vault_member_list`   | `pass-cli vault member list`   | Planned     | `shareId \| vaultName`, `output?`                          | Member list          |
-| `vault_member_update` | `pass-cli vault member update` | Planned     | `shareId \| vaultName`, `memberShareId`, `role`, `confirm` | Update status        |
-| `vault_member_remove` | `pass-cli vault member remove` | Planned     | `shareId \| vaultName`, `memberShareId`, `confirm`         | Remove status        |
+| Tool                  | Source                         | Status      | Input Summary                                              | Output Summary               |
+| --------------------- | ------------------------------ | ----------- | ---------------------------------------------------------- | ---------------------------- |
+| `list_vaults`         | `pass-cli vault list`          | Implemented | `output?`                                                  | Vault list                   |
+| `create_vault`        | `pass-cli vault create`        | Implemented | `name`, `confirm`                                          | Created vault status         |
+| `update_vault`        | `pass-cli vault update`        | Implemented | `shareId \| vaultName`, `newName`, `confirm`               | Update status                |
+| `delete_vault`        | `pass-cli vault delete`        | Implemented | `shareId \| vaultName`, `confirm`                          | Delete status                |
+| `vault_share`         | `pass-cli vault share`         | Planned     | `shareId \| vaultName`, `email`, `role?`, `confirm`        | Share result                 |
+| `vault_transfer`      | `pass-cli vault transfer`      | Planned     | `shareId \| vaultName`, `memberShareId`, `confirm`         | Transfer result              |
+| `list_vault_members`  | `pass-cli vault member list`   | Implemented | `shareId \| vaultName`, `pageSize?`, `cursor?`             | `CursorPage<VaultMemberRef>` |
+| `vault_member_update` | `pass-cli vault member update` | Planned     | `shareId \| vaultName`, `memberShareId`, `role`, `confirm` | Update status                |
+| `vault_member_remove` | `pass-cli vault member remove` | Planned     | `shareId \| vaultName`, `memberShareId`, `confirm`         | Remove status                |
 
 ### Item Discovery and Read
 
@@ -218,24 +288,24 @@ Status key:
 
 ### Share, Invite, Password, TOTP, User, Settings, SSH Agent
 
-| Tool                            | Source                                   | Status  | Input Summary                          | Output Summary            |
-| ------------------------------- | ---------------------------------------- | ------- | -------------------------------------- | ------------------------- |
-| `list_shares`                   | `pass-cli share list`                    | Planned | `onlyItems?`, `onlyVaults?`, `output?` | Shares list               |
-| `invite_list`                   | `pass-cli invite list`                   | Planned | `output?`                              | Invite list               |
-| `invite_accept`                 | `pass-cli invite accept`                 | Planned | `inviteId`, `confirm`                  | Accept status             |
-| `invite_reject`                 | `pass-cli invite reject`                 | Planned | `inviteId`, `confirm`                  | Reject status             |
-| `password_generate_random`      | `pass-cli password generate random`      | Planned | generation flags, `output?`            | Password value/metadata   |
-| `password_generate_passphrase`  | `pass-cli password generate passphrase`  | Planned | generation flags, `output?`            | Passphrase value/metadata |
-| `password_score`                | `pass-cli password score`                | Planned | `password`, `output?`                  | Strength report           |
-| `totp_generate`                 | `pass-cli totp generate`                 | Planned | `secretOrUri`, `output?`               | TOTP value                |
-| `settings_view`                 | `pass-cli settings view`                 | Planned | none                                   | Settings object           |
-| `settings_set_default_vault`    | `pass-cli settings set default-vault`    | Planned | `vaultName \| shareId`, `confirm`      | Set status                |
-| `settings_set_default_format`   | `pass-cli settings set default-format`   | Planned | `format`, `confirm`                    | Set status                |
-| `settings_unset_default_vault`  | `pass-cli settings unset default-vault`  | Planned | `confirm`                              | Unset status              |
-| `settings_unset_default_format` | `pass-cli settings unset default-format` | Planned | `confirm`                              | Unset status              |
-| `ssh_agent_start`               | `pass-cli ssh-agent start`               | Planned | CLI flags passthrough, `confirm`       | Agent status              |
-| `ssh_agent_load`                | `pass-cli ssh-agent load`                | Planned | CLI flags passthrough, `confirm`       | Load status               |
-| `ssh_agent_debug`               | `pass-cli ssh-agent debug`               | Planned | selectors, `output?`                   | Debug report              |
+| Tool                            | Source                                   | Status      | Input Summary                          | Output Summary            |
+| ------------------------------- | ---------------------------------------- | ----------- | -------------------------------------- | ------------------------- |
+| `list_shares`                   | `pass-cli share list`                    | Implemented | `onlyItems?`, `onlyVaults?`, `output?` | Shares list               |
+| `list_invites`                  | `pass-cli invite list`                   | Implemented | `pageSize?`, `cursor?`                 | `CursorPage<InviteRef>`   |
+| `invite_accept`                 | `pass-cli invite accept`                 | Planned     | `inviteId`, `confirm`                  | Accept status             |
+| `invite_reject`                 | `pass-cli invite reject`                 | Planned     | `inviteId`, `confirm`                  | Reject status             |
+| `generate_random_password`      | `pass-cli password generate random`      | Planned     | generation flags                       | Password value/metadata   |
+| `generate_passphrase`           | `pass-cli password generate passphrase`  | Planned     | generation flags                       | Passphrase value/metadata |
+| `score_password`                | `pass-cli password score`                | Planned     | `password`                             | Strength report           |
+| `totp_generate`                 | `pass-cli totp generate`                 | Planned     | `secretOrUri`, `output?`               | TOTP value                |
+| `view_settings`                 | `pass-cli settings view`                 | Implemented | none                                   | Settings object           |
+| `settings_set_default_vault`    | `pass-cli settings set default-vault`    | Planned     | `vaultName \| shareId`, `confirm`      | Set status                |
+| `settings_set_default_format`   | `pass-cli settings set default-format`   | Planned     | `format`, `confirm`                    | Set status                |
+| `settings_unset_default_vault`  | `pass-cli settings unset default-vault`  | Planned     | `confirm`                              | Unset status              |
+| `settings_unset_default_format` | `pass-cli settings unset default-format` | Planned     | `confirm`                              | Unset status              |
+| `ssh_agent_start`               | `pass-cli ssh-agent start`               | Planned     | CLI flags passthrough, `confirm`       | Agent status              |
+| `ssh_agent_load`                | `pass-cli ssh-agent load`                | Planned     | CLI flags passthrough, `confirm`       | Load status               |
+| `ssh_agent_debug`               | `pass-cli ssh-agent debug`               | Planned     | selectors, `output?`                   | Debug report              |
 
 ## Phased Delivery
 
@@ -260,4 +330,4 @@ Status key:
 1. Compatibility strategy for `list_items` response change:
    Option A: break to ref-only now.
    Option B: transition with `includeRawItem`.
-2. Whether to split non-JSON outputs into dedicated `*_human` tools or keep `output` enum on all parity wrappers.
+2. If a CLI command has no documented JSON mode, what minimum parsed structure should MCP provide by default.

@@ -25,10 +25,13 @@ import {
   searchItemsHandler,
   updateItemHandler,
   viewItemHandler,
+  viewSettingsHandler,
   viewUserInfoHandler,
+  listInvitesHandler,
   listSharesHandler,
   createVaultHandler,
   deleteVaultHandler,
+  listVaultMembersHandler,
   listVaultsHandler,
   updateVaultHandler,
   requireWriteGate,
@@ -400,6 +403,179 @@ describe("read-only handlers", () => {
         output: "json",
       }),
     ).rejects.toThrow("onlyItems and onlyVaults are mutually exclusive");
+  });
+
+  it("viewSettingsHandler returns parsed structuredContent from JSON output", async () => {
+    const runner = makeRunner({
+      stdout: '{"default_vault":"shr_123","default_format":"json"}',
+      stderr: "",
+    });
+
+    const result = (await viewSettingsHandler(runner)) as any;
+
+    expect(runner).toHaveBeenCalledWith(["settings", "view"]);
+    expect(result.structuredContent).toEqual({
+      settings: { default_vault: "shr_123", default_format: "json" },
+    });
+  });
+
+  it("viewSettingsHandler parses key-value text output", async () => {
+    const runner = makeRunner({
+      stdout: "Default vault: shr_abc\nDefault format: human\n",
+      stderr: "",
+    });
+
+    const result = (await viewSettingsHandler(runner)) as any;
+
+    expect(result.structuredContent).toEqual({
+      settings: {
+        default_vault: "shr_abc",
+        default_format: "human",
+      },
+      rawText: "Default vault: shr_abc\nDefault format: human",
+    });
+  });
+
+  it("listInvitesHandler paginates and normalizes invite refs", async () => {
+    const payload = {
+      invites: [
+        {
+          invite_id: "inv-1",
+          invite_type: "vault",
+          resource_name: "Team Vault",
+          inviter_email: "owner@example.com",
+          role: "viewer",
+          status: "pending",
+          create_time: "2026-03-01T00:00:00Z",
+          token: "sensitive-token-value",
+        },
+        {
+          id: "inv-2",
+          type: "item",
+          name: "GitHub",
+        },
+      ],
+    };
+
+    const runner = makeRunner({ stdout: JSON.stringify(payload), stderr: "" });
+    const result = (await listInvitesHandler(runner, {
+      pageSize: 1,
+      cursor: "1",
+    })) as any;
+    const structured = result.structuredContent;
+
+    expect(runner).toHaveBeenCalledWith(["invite", "list", "--output", "json"]);
+    expect(structured.cursor).toBe("1");
+    expect(structured.pageSize).toBe(1);
+    expect(structured.total).toBe(2);
+    expect(structured.returned).toBe(1);
+    expect(structured.nextCursor).toBeNull();
+    expect(structured.items[0]).toEqual({
+      id: "inv-2",
+      type: "item",
+      target_name: "GitHub",
+      inviter: null,
+      role: null,
+      state: null,
+      create_time: null,
+    });
+    expect(structured.items[0].token).toBeUndefined();
+  });
+
+  it("listInvitesHandler rejects invalid cursor", async () => {
+    const runner = makeRunner({ stdout: '{"invites":[]}', stderr: "" });
+
+    await expect(
+      listInvitesHandler(runner, {
+        cursor: "abc",
+      }),
+    ).rejects.toThrow("Invalid cursor");
+  });
+
+  it("listInvitesHandler falls back to text for non-json output", async () => {
+    const runner = makeRunner({ stdout: "not-json", stderr: "" });
+
+    const result = await listInvitesHandler(runner, {});
+    expect(result).toEqual({ content: [{ type: "text", text: "not-json" }] });
+  });
+
+  it("listInvitesHandler does not expose raw invite token as an identifier", async () => {
+    const runner = makeRunner({
+      stdout: '{"invites":[{"token":"sensitive-token-value"}]}',
+      stderr: "",
+    });
+
+    const result = (await listInvitesHandler(runner, {})) as any;
+    expect(result.structuredContent.items[0].id).toBe("invite-1");
+  });
+
+  it("listVaultMembersHandler validates selector exclusivity and paginates refs", async () => {
+    const payload = {
+      members: [
+        {
+          member_share_id: "mem-1",
+          username: "alice",
+          email: "alice@example.com",
+          role: "manager",
+          state: "active",
+          create_time: "2026-03-01T00:00:00Z",
+        },
+        {
+          id: "mem-2",
+          name: "bob",
+          user_email: "bob@example.com",
+          share_role: "viewer",
+        },
+      ],
+    };
+
+    const runner = makeRunner({ stdout: JSON.stringify(payload), stderr: "" });
+
+    await expect(
+      listVaultMembersHandler(runner, {
+        shareId: "s1",
+        vaultName: "Work",
+      }),
+    ).rejects.toThrow("Provide exactly one of shareId or vaultName");
+
+    const result = (await listVaultMembersHandler(runner, {
+      shareId: "s1",
+      pageSize: 1,
+      cursor: "1",
+    })) as any;
+    const structured = result.structuredContent;
+
+    expect(runner).toHaveBeenCalledWith([
+      "vault",
+      "member",
+      "list",
+      "--share-id",
+      "s1",
+      "--output",
+      "json",
+    ]);
+    expect(structured.scope).toEqual({ shareId: "s1" });
+    expect(structured.pageSize).toBe(1);
+    expect(structured.total).toBe(2);
+    expect(structured.returned).toBe(1);
+    expect(structured.nextCursor).toBeNull();
+    expect(structured.items[0]).toEqual({
+      id: "mem-2",
+      username: "bob",
+      email: "bob@example.com",
+      role: "viewer",
+      state: null,
+      create_time: null,
+    });
+  });
+
+  it("listVaultMembersHandler falls back to text for non-json output", async () => {
+    const runner = makeRunner({ stdout: "not-json", stderr: "" });
+
+    const result = await listVaultMembersHandler(runner, {
+      shareId: "s1",
+    });
+    expect(result).toEqual({ content: [{ type: "text", text: "not-json" }] });
   });
 
   it("listItemsHandler rejects conflicting selectors", async () => {
@@ -1097,7 +1273,21 @@ describe("server setup", () => {
   });
 
   it("registered tool handlers are invocable from internal tool registry", async () => {
-    const runner = makeRunner({ stdout: '{"ok":true}', stderr: "" });
+    const runner = makeRunner(async (args) => {
+      if (args[0] === "vault" && args[1] === "member") {
+        return { stdout: '{"members":[]}', stderr: "" };
+      }
+      if (args[0] === "invite" && args[1] === "list") {
+        return { stdout: '{"invites":[]}', stderr: "" };
+      }
+      if (args[0] === "settings" && args[1] === "view") {
+        return { stdout: "Default vault: (none)\nDefault format: human", stderr: "" };
+      }
+      if (args[0] === "item" && args[1] === "list") {
+        return { stdout: "[]", stderr: "" };
+      }
+      return { stdout: '{"ok":true}', stderr: "" };
+    });
     const server = createServer({ runPassCli: runner });
     const tools = (server as any)._registeredTools as Record<
       string,
@@ -1107,8 +1297,11 @@ describe("server setup", () => {
     await tools.view_session_info.handler();
     await tools.check_status.handler();
     await tools.view_user_info.handler({ output: "json" });
+    await tools.view_settings.handler();
     await tools.list_vaults.handler({ output: "json" });
+    await tools.list_vault_members.handler({ shareId: "s1" });
     await tools.list_shares.handler({ output: "json" });
+    await tools.list_invites.handler({});
     await tools.list_items.handler({ shareId: "s1", output: "json" });
     await tools.search_items.handler({
       query: "GitHub",
@@ -1127,7 +1320,7 @@ describe("server setup", () => {
     expect(tools.update_item).toBeUndefined();
     expect(tools.delete_item).toBeUndefined();
 
-    expect(runner).toHaveBeenCalledTimes(9);
+    expect(runner).toHaveBeenCalledTimes(12);
   });
 
   it("registered tool handlers return standardized auth error payloads", async () => {
