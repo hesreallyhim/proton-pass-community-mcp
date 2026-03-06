@@ -366,6 +366,26 @@ export const createIdentityItemInputSchema = z.object({
   confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
 });
 
+export const moveItemInputSchema = z
+  .object({
+    fromShareId: z.string().max(100).optional().describe("Source share ID"),
+    fromVaultName: z.string().max(255).optional().describe("Source vault name"),
+    toShareId: z.string().max(100).optional().describe("Destination share ID"),
+    toVaultName: z.string().max(255).optional().describe("Destination vault name"),
+    itemId: z.string().max(100).optional().describe("Item ID to move"),
+    itemTitle: z.string().max(255).optional().describe("Item title to move"),
+    confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+  })
+  .refine((input) => Boolean(input.fromShareId) !== Boolean(input.fromVaultName), {
+    message: "Provide exactly one of fromShareId or fromVaultName.",
+  })
+  .refine((input) => Boolean(input.toShareId) !== Boolean(input.toVaultName), {
+    message: "Provide exactly one of toShareId or toVaultName.",
+  })
+  .refine((input) => Boolean(input.itemId) !== Boolean(input.itemTitle), {
+    message: "Provide exactly one of itemId or itemTitle.",
+  });
+
 export const updateItemInputSchema = z.object({
   shareId: z.string().max(100).optional().describe("Share ID containing the item"),
   vaultName: z.string().max(255).optional().describe("Vault name containing the item"),
@@ -374,6 +394,36 @@ export const updateItemInputSchema = z.object({
   fields: z.array(z.string().max(1024)).min(1).describe("Fields to update (key=value pairs)"),
   confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
 });
+
+export const trashItemInputSchema = z
+  .object({
+    shareId: z.string().max(100).optional().describe("Share ID containing the item"),
+    vaultName: z.string().max(255).optional().describe("Vault name containing the item"),
+    itemId: z.string().max(100).optional().describe("Item ID to trash"),
+    itemTitle: z.string().max(255).optional().describe("Item title to trash"),
+    confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+  })
+  .refine((input) => !(input.shareId && input.vaultName), {
+    message: "Provide only one of shareId or vaultName.",
+  })
+  .refine((input) => Boolean(input.itemId) !== Boolean(input.itemTitle), {
+    message: "Provide exactly one of itemId or itemTitle.",
+  });
+
+export const untrashItemInputSchema = z
+  .object({
+    shareId: z.string().max(100).optional().describe("Share ID containing the item"),
+    vaultName: z.string().max(255).optional().describe("Vault name containing the item"),
+    itemId: z.string().max(100).optional().describe("Item ID to restore"),
+    itemTitle: z.string().max(255).optional().describe("Item title to restore"),
+    confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+  })
+  .refine((input) => !(input.shareId && input.vaultName), {
+    message: "Provide only one of shareId or vaultName.",
+  })
+  .refine((input) => Boolean(input.itemId) !== Boolean(input.itemTitle), {
+    message: "Provide exactly one of itemId or itemTitle.",
+  });
 
 export const deleteItemInputSchema = z.object({
   shareId: z.string().max(100).describe("Share ID containing the item to delete"),
@@ -420,7 +470,10 @@ export type CreateCreditCardItemInput = z.infer<typeof createCreditCardItemInput
 export type CreateWifiItemInput = z.infer<typeof createWifiItemInputSchema>;
 export type CreateCustomItemInput = z.infer<typeof createCustomItemInputSchema>;
 export type CreateIdentityItemInput = z.infer<typeof createIdentityItemInputSchema>;
+export type MoveItemInput = z.infer<typeof moveItemInputSchema>;
 export type UpdateItemInput = z.infer<typeof updateItemInputSchema>;
+export type TrashItemInput = z.infer<typeof trashItemInputSchema>;
+export type UntrashItemInput = z.infer<typeof untrashItemInputSchema>;
 export type DeleteItemInput = z.infer<typeof deleteItemInputSchema>;
 export type ShareItemInput = z.infer<typeof shareItemInputSchema>;
 export type CreateItemAliasInput = z.infer<typeof createItemAliasInputSchema>;
@@ -792,6 +845,42 @@ export async function createIdentityItemHandler(
   return asTextContent(asJsonTextOrRaw(out));
 }
 
+export async function moveItemHandler(passCli: PassCliRunner, input: MoveItemInput) {
+  requireWriteGate(input.confirm);
+
+  const hasFromShareId = Boolean(input.fromShareId);
+  const hasFromVaultName = Boolean(input.fromVaultName);
+  if (hasFromShareId === hasFromVaultName) {
+    throw new Error("Provide exactly one of fromShareId or fromVaultName.");
+  }
+
+  const hasToShareId = Boolean(input.toShareId);
+  const hasToVaultName = Boolean(input.toVaultName);
+  if (hasToShareId === hasToVaultName) {
+    throw new Error("Provide exactly one of toShareId or toVaultName.");
+  }
+
+  const hasItemId = Boolean(input.itemId);
+  const hasItemTitle = Boolean(input.itemTitle);
+  if (hasItemId === hasItemTitle) {
+    throw new Error("Provide exactly one of itemId or itemTitle.");
+  }
+
+  const args = ["item", "move"];
+  if (input.fromShareId) args.push("--from-share-id", input.fromShareId);
+  else args.push("--from-vault-name", input.fromVaultName!);
+
+  if (input.itemId) args.push("--item-id", input.itemId);
+  else args.push("--item-title", input.itemTitle!);
+
+  if (input.toShareId) args.push("--to-share-id", input.toShareId);
+  else args.push("--to-vault-name", input.toVaultName!);
+
+  const { stdout, stderr } = await passCli(args);
+  const out = joinStdoutStderr(stdout, stderr);
+  return asTextContent(out || "OK");
+}
+
 export async function updateItemHandler(
   passCli: PassCliRunner,
   { shareId, vaultName, itemId, itemTitle, fields, confirm }: UpdateItemInput,
@@ -809,6 +898,48 @@ export async function updateItemHandler(
   else args.push("--item-title", itemTitle!);
 
   for (const field of fields) args.push("--field", field);
+
+  const { stdout, stderr } = await passCli(args);
+  const out = joinStdoutStderr(stdout, stderr);
+  return asTextContent(out || "OK");
+}
+
+export async function trashItemHandler(
+  passCli: PassCliRunner,
+  { shareId, vaultName, itemId, itemTitle, confirm }: TrashItemInput,
+) {
+  requireWriteGate(confirm);
+  if (shareId && vaultName) throw new Error("Provide only one of shareId or vaultName.");
+  if (itemId && itemTitle) throw new Error("Provide only one of itemId or itemTitle.");
+  if (!itemId && !itemTitle) throw new Error("Provide itemId or itemTitle.");
+
+  const args: string[] = ["item", "trash"];
+  if (shareId) args.push("--share-id", shareId);
+  else if (vaultName) args.push("--vault-name", vaultName);
+
+  if (itemId) args.push("--item-id", itemId);
+  else args.push("--item-title", itemTitle!);
+
+  const { stdout, stderr } = await passCli(args);
+  const out = joinStdoutStderr(stdout, stderr);
+  return asTextContent(out || "OK");
+}
+
+export async function untrashItemHandler(
+  passCli: PassCliRunner,
+  { shareId, vaultName, itemId, itemTitle, confirm }: UntrashItemInput,
+) {
+  requireWriteGate(confirm);
+  if (shareId && vaultName) throw new Error("Provide only one of shareId or vaultName.");
+  if (itemId && itemTitle) throw new Error("Provide only one of itemId or itemTitle.");
+  if (!itemId && !itemTitle) throw new Error("Provide itemId or itemTitle.");
+
+  const args: string[] = ["item", "untrash"];
+  if (shareId) args.push("--share-id", shareId);
+  else if (vaultName) args.push("--vault-name", vaultName);
+
+  if (itemId) args.push("--item-id", itemId);
+  else args.push("--item-title", itemTitle!);
 
   const { stdout, stderr } = await passCli(args);
   const out = joinStdoutStderr(stdout, stderr);

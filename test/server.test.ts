@@ -26,7 +26,10 @@ import {
   createIdentityItemHandler,
   createItemAliasHandler,
   createLoginItemHandler,
+  moveItemHandler,
   createNoteItemHandler,
+  trashItemHandler,
+  untrashItemHandler,
   createWifiItemHandler,
   deleteItemHandler,
   itemTotpHandler,
@@ -1558,6 +1561,69 @@ describe("write handlers", () => {
     );
   });
 
+  it("move/trash/untrash handlers validate selectors and build command arguments", async () => {
+    process.env.ALLOW_WRITE = "1";
+    const runner = makeRunner({ stdout: "ok", stderr: "" });
+
+    await expect(
+      moveItemHandler(runner, {
+        fromShareId: "from-share",
+        fromVaultName: "From Vault",
+        toShareId: "to-share",
+        itemId: "item-1",
+        confirm: true,
+      }),
+    ).rejects.toThrow("Provide exactly one of fromShareId or fromVaultName");
+
+    await moveItemHandler(runner, {
+      fromShareId: "from-share",
+      toVaultName: "To Vault",
+      itemTitle: "GitHub",
+      confirm: true,
+    });
+
+    await trashItemHandler(runner, {
+      shareId: "s1",
+      itemId: "i1",
+      confirm: true,
+    });
+
+    await untrashItemHandler(runner, {
+      vaultName: "Work",
+      itemTitle: "GitHub",
+      confirm: true,
+    });
+
+    expect(runner).toHaveBeenNthCalledWith(1, [
+      "item",
+      "move",
+      "--from-share-id",
+      "from-share",
+      "--item-title",
+      "GitHub",
+      "--to-vault-name",
+      "To Vault",
+    ]);
+
+    expect(runner).toHaveBeenNthCalledWith(2, [
+      "item",
+      "trash",
+      "--share-id",
+      "s1",
+      "--item-id",
+      "i1",
+    ]);
+
+    expect(runner).toHaveBeenNthCalledWith(3, [
+      "item",
+      "untrash",
+      "--vault-name",
+      "Work",
+      "--item-title",
+      "GitHub",
+    ]);
+  });
+
   it("updateItemHandler validates selectors and builds field arguments", async () => {
     process.env.ALLOW_WRITE = "1";
     const runner = makeRunner({ stdout: "", stderr: "updated" });
@@ -2010,10 +2076,26 @@ describe("server setup", () => {
       },
       confirm: true,
     });
+    await tools.move_item.handler({
+      fromShareId: "s1",
+      itemId: "i1",
+      toVaultName: "Sandbox",
+      confirm: true,
+    });
     await tools.update_item.handler({
       shareId: "s1",
       itemId: "i1",
       fields: ["password=updated"],
+      confirm: true,
+    });
+    await tools.trash_item.handler({
+      shareId: "s1",
+      itemId: "i1",
+      confirm: true,
+    });
+    await tools.untrash_item.handler({
+      shareId: "s1",
+      itemId: "i1",
       confirm: true,
     });
     await tools.delete_item.handler({
@@ -2059,12 +2141,15 @@ describe("server setup", () => {
     expect(tools.create_wifi_item).toBeDefined();
     expect(tools.create_custom_item).toBeDefined();
     expect(tools.create_identity_item).toBeDefined();
+    expect(tools.move_item).toBeDefined();
     expect(tools.update_item).toBeDefined();
+    expect(tools.trash_item).toBeDefined();
+    expect(tools.untrash_item).toBeDefined();
     expect(tools.delete_item).toBeDefined();
     expect(tools.share_item).toBeDefined();
     expect(tools.create_item_alias).toBeDefined();
 
-    expect(runner).toHaveBeenCalledTimes(40);
+    expect(runner).toHaveBeenCalledTimes(43);
   });
 
   it("registered tool handlers return standardized auth error payloads", async () => {
