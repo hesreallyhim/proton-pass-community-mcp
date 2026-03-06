@@ -268,48 +268,48 @@ Status key:
 
 ### Item Creation
 
-| Tool                           | Source                                  | Status      | Input Summary                                   | Output Summary |
-| ------------------------------ | --------------------------------------- | ----------- | ----------------------------------------------- | -------------- |
-| `create_login_item`            | `pass-cli item create login`            | Implemented | typed login fields or template mode, `confirm`  | Created item   |
-| `item_create_note`             | `pass-cli item create note`             | Planned     | note fields or template mode, `confirm`         | Created item   |
-| `item_create_credit_card`      | `pass-cli item create credit-card`      | Planned     | card fields or template mode, `confirm`         | Created item   |
-| `item_create_wifi`             | `pass-cli item create wifi`             | Planned     | wifi fields or template mode, `confirm`         | Created item   |
-| `item_create_custom`           | `pass-cli item create custom`           | Planned     | template mode, `confirm`                        | Created item   |
-| `item_create_identity`         | `pass-cli item create identity`         | Planned     | template mode, `confirm`                        | Created item   |
-| `item_create_ssh_key_generate` | `pass-cli item create ssh-key generate` | Planned     | ssh generation fields, `confirm`                | Created item   |
-| `item_create_ssh_key_import`   | `pass-cli item create ssh-key import`   | Planned     | key import fields, `confirm`                    | Created item   |
-| `create_item_from_template`    | MCP wrapper around `--from-template -`  | Implemented | `itemType`, selector, `templateJson`, `confirm` | Created item   |
+| Tool                        | Source                                  | Status                     | Input Summary                                   | Output Summary |
+| --------------------------- | --------------------------------------- | -------------------------- | ----------------------------------------------- | -------------- |
+| `create_login_item`         | `pass-cli item create login`            | Implemented                | typed login fields or template mode, `confirm`  | Created item   |
+| `create_note_item`          | `pass-cli item create note`             | Planned                    | note fields or template mode, `confirm`         | Created item   |
+| `create_credit_card_item`   | `pass-cli item create credit-card`      | Planned                    | card fields or template mode, `confirm`         | Created item   |
+| `create_wifi_item`          | `pass-cli item create wifi`             | Planned                    | wifi fields or template mode, `confirm`         | Created item   |
+| `create_custom_item`        | `pass-cli item create custom`           | Planned                    | template mode, `confirm`                        | Created item   |
+| `create_identity_item`      | `pass-cli item create identity`         | Planned                    | template mode, `confirm`                        | Created item   |
+| `generate_ssh_key_item`     | `pass-cli item create ssh-key generate` | Out of Scope (Out-of-Band) | n/a                                             | n/a            |
+| `import_ssh_key_item`       | `pass-cli item create ssh-key import`   | Out of Scope (Out-of-Band) | n/a                                             | n/a            |
+| `create_item_from_template` | MCP wrapper around `--from-template -`  | Implemented                | `itemType`, selector, `templateJson`, `confirm` | Created item   |
 
 ### Item Alias, Attachment, and Members
 
 | Tool                       | Source                              | Status      | Input Summary                                                | Output Summary       |
 | -------------------------- | ----------------------------------- | ----------- | ------------------------------------------------------------ | -------------------- |
 | `create_item_alias`        | `pass-cli item alias create`        | Implemented | `shareId \| vaultName`, `prefix`, `output?`, `confirm`       | Alias item           |
-| `item_attachment_download` | `pass-cli item attachment download` | Planned     | `shareId`, `itemId`, `attachmentId`, `outputPath`, `confirm` | Download status/path |
-| `item_member_list`         | `pass-cli item member list`         | Planned     | `shareId`, `itemId`, `output?`                               | Member list          |
-| `item_member_update`       | `pass-cli item member update`       | Planned     | `shareId`, `memberShareId`, `role`, `confirm`                | Update status        |
-| `item_member_remove`       | `pass-cli item member remove`       | Planned     | `shareId`, `memberShareId`, `confirm`                        | Remove status        |
+| `download_item_attachment` | `pass-cli item attachment download` | Planned     | `shareId`, `itemId`, `attachmentId`, `outputPath`, `confirm` | Download status/path |
+| `list_item_members`        | `pass-cli item member list`         | Planned     | `shareId`, `itemId`, `output?`                               | Member list          |
+| `update_item_member`       | `pass-cli item member update`       | Planned     | `shareId`, `memberShareId`, `role`, `confirm`                | Update status        |
+| `remove_item_member`       | `pass-cli item member remove`       | Planned     | `shareId`, `memberShareId`, `confirm`                        | Remove status        |
 
 ### Share, Invite, Password, TOTP, User, Settings, SSH Agent
 
-| Tool                       | Source                                   | Status       | Input Summary                          | Output Summary            |
-| -------------------------- | ---------------------------------------- | ------------ | -------------------------------------- | ------------------------- |
-| `list_shares`              | `pass-cli share list`                    | Implemented  | `onlyItems?`, `onlyVaults?`, `output?` | Shares list               |
-| `list_invites`             | `pass-cli invite list`                   | Implemented  | `pageSize?`, `cursor?`                 | `CursorPage<InviteRef>`   |
-| `accept_invite`            | `pass-cli invite accept`                 | Implemented  | `inviteToken`, `confirm`               | Accept status             |
-| `reject_invite`            | `pass-cli invite reject`                 | Implemented  | `inviteToken`, `confirm`               | Reject status             |
-| `generate_random_password` | `pass-cli password generate random`      | Implemented  | generation flags                       | Password value/metadata   |
-| `generate_passphrase`      | `pass-cli password generate passphrase`  | Implemented  | generation flags                       | Passphrase value/metadata |
-| `score_password`           | `pass-cli password score`                | Implemented  | `password`                             | Strength report           |
-| `totp_generate`            | `pass-cli totp generate`                 | Planned      | `secretOrUri`, `output?`               | TOTP value                |
-| `view_settings`            | `pass-cli settings view`                 | Implemented  | none                                   | Settings object           |
-| `set_default_vault`        | `pass-cli settings set default-vault`    | Implemented  | `vaultName \| shareId`, `confirm`      | Set status                |
-| `set_default_format`       | `pass-cli settings set default-format`   | Implemented  | `format`, `confirm`                    | Set status                |
-| `unset_default_vault`      | `pass-cli settings unset default-vault`  | Implemented  | `confirm`                              | Unset status              |
-| `unset_default_format`     | `pass-cli settings unset default-format` | Implemented  | `confirm`                              | Unset status              |
-| `ssh_agent_start`          | `pass-cli ssh-agent start`               | Out-of-SCope | N/A                                    | N/A                       |
-| `ssh_agent_load`           | `pass-cli ssh-agent load`                | Out-of-SCope | N/A                                    | N/A                       |
-| `ssh_agent_debug`          | `pass-cli ssh-agent debug`               | Out-of-SCope | N/A                                    | N/A                       |
+| Tool                       | Source                                   | Status                     | Input Summary                          | Output Summary            |
+| -------------------------- | ---------------------------------------- | -------------------------- | -------------------------------------- | ------------------------- |
+| `list_shares`              | `pass-cli share list`                    | Implemented                | `onlyItems?`, `onlyVaults?`, `output?` | Shares list               |
+| `list_invites`             | `pass-cli invite list`                   | Implemented                | `pageSize?`, `cursor?`                 | `CursorPage<InviteRef>`   |
+| `accept_invite`            | `pass-cli invite accept`                 | Implemented                | `inviteToken`, `confirm`               | Accept status             |
+| `reject_invite`            | `pass-cli invite reject`                 | Implemented                | `inviteToken`, `confirm`               | Reject status             |
+| `generate_random_password` | `pass-cli password generate random`      | Implemented                | generation flags                       | Password value/metadata   |
+| `generate_passphrase`      | `pass-cli password generate passphrase`  | Implemented                | generation flags                       | Passphrase value/metadata |
+| `score_password`           | `pass-cli password score`                | Implemented                | `password`                             | Strength report           |
+| `generate_totp`            | `pass-cli totp generate`                 | Planned                    | `secretOrUri`, `output?`               | TOTP value                |
+| `view_settings`            | `pass-cli settings view`                 | Implemented                | none                                   | Settings object           |
+| `set_default_vault`        | `pass-cli settings set default-vault`    | Implemented                | `vaultName \| shareId`, `confirm`      | Set status                |
+| `set_default_format`       | `pass-cli settings set default-format`   | Implemented                | `format`, `confirm`                    | Set status                |
+| `unset_default_vault`      | `pass-cli settings unset default-vault`  | Implemented                | `confirm`                              | Unset status              |
+| `unset_default_format`     | `pass-cli settings unset default-format` | Implemented                | `confirm`                              | Unset status              |
+| `ssh_agent_start`          | `pass-cli ssh-agent start`               | Out of Scope (Out-of-Band) | n/a                                    | n/a                       |
+| `ssh_agent_load`           | `pass-cli ssh-agent load`                | Out of Scope (Out-of-Band) | n/a                                    | n/a                       |
+| `ssh_agent_debug`          | `pass-cli ssh-agent debug`               | Out of Scope (Out-of-Band) | n/a                                    | n/a                       |
 
 ## Phased Delivery
 
