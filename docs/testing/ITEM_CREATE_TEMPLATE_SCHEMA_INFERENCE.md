@@ -21,6 +21,7 @@ Version/source boundary:
 - CLI version: `Proton Pass CLI 1.5.2 (41cf394)`
 - Snapshot artifact: `docs/testing/item-create-templates.snapshot.json`
 - Probe artifact: `docs/testing/item-create-template-probe.report.json`
+- Additional-properties probe artifact: `docs/testing/item-create-template-additional-properties.report.json`
 - Upstream docs pages:
   - `https://protonpass.github.io/pass-cli/commands/item/`
   - `https://protonpass.github.io/pass-cli/objects/item/`
@@ -35,6 +36,12 @@ Important: these are not authoritative upstream schemas. They are working contra
 3. `title: ""` is accepted by parser and create flow for `login`, `note`, `credit-card`, `custom`, and `identity`.
 4. For `wifi`, creation fails with empty template defaults because `ssid` is empty (`Invalid SSID`, `SSID cannot be empty`).
 5. Template payloads are examples of accepted shape, not guaranteed create-ready values.
+
+Additional-properties findings (March 6, 2026):
+
+6. Unknown top-level properties were accepted for all tested types (`login`, `note`, `credit-card`, `wifi`, `custom`, `identity`).
+7. For `custom`, unknown nested properties in `sections[]` and `fields[]` were also accepted.
+8. Accepted unknown properties are not evidence of persistence. Spot-check `item view --output json` indicates probe-only unknown keys are dropped/ignored rather than stored.
 
 ## Per-Type Inferred Schemas
 
@@ -82,6 +89,7 @@ Evidence:
 1. `omit_title` and `title_null` fail.
 2. Removing null template placeholders succeeds (`omit_all_null_fields`), so `username`/`email`/`password` are optional in template mode.
 3. `urls` omission was not directly probed in this run.
+4. Unknown top-level keys are accepted by parser/create flow but appear ignored on persisted item view.
 
 ### note
 
@@ -106,6 +114,7 @@ Evidence:
 
 1. `omit_title` and `title_null` fail.
 2. Template with `note` removed succeeds (`omit_all_null_fields`).
+3. Unknown top-level keys are accepted by parser/create flow but appear ignored on persisted item view.
 
 ### credit-card
 
@@ -134,6 +143,7 @@ Evidence:
 1. `omit_title` and `title_null` fail.
 2. Removing all null placeholder fields succeeds (`omit_all_null_fields`), indicating optional template fields.
 3. Prior manual check (same date/account) observed `expiration_date` format sensitivity (expected `YYYY-MM` when provided).
+4. Unknown top-level keys are accepted by parser/create flow (persistence not separately verified for this type).
 
 ### wifi
 
@@ -173,6 +183,7 @@ Evidence:
 1. Snapshot baseline (`ssid: ""`) fails create-time validation (`Invalid SSID`).
 2. `omit_title` and `title_null` fail parser validation.
 3. `nullify_string_fields` fails parser validation at first typed string field (`ssid` expected string, not null).
+4. With a valid non-empty `ssid`, unknown top-level keys are accepted by parser/create flow (persistence not separately verified for this type).
 
 ### custom
 
@@ -223,6 +234,7 @@ Evidence:
 1. `omit_title` and `title_null` fail.
 2. Top-level `note` can be `null` (`nullify_string_fields` success).
 3. `sections` omission/shape strictness was not directly probed; nested structure is from `--get-template`.
+4. Unknown top-level and nested keys (`sections[]` and `fields[]`) are accepted by parser/create flow but appear ignored on persisted item view.
 
 ### identity
 
@@ -277,24 +289,30 @@ Evidence:
 1. `omit_title` and `title_null` fail.
 2. Setting all non-title string fields to `null` succeeds.
 3. Omitting specific identity fields was not directly probed, so omission status remains unknown.
+4. Unknown top-level keys are accepted by parser/create flow (persistence not separately verified for this type).
 
 ## Additional Properties and Freeform Fields
 
-Current evidence does **not** prove top-level `additionalProperties` behavior for template payloads.
+Current evidence for template payloads:
 
-What is known:
+1. Unknown top-level keys are accepted for all tested template create types.
+2. Unknown nested keys in `custom.sections[]` and `custom.sections[].fields[]` are accepted.
+3. At least for spot-checked items (`login`, `custom`), unknown keys are ignored/dropped in persisted item content.
+4. Therefore parser acceptance should not be interpreted as schema-backed stored fields.
+
+What is known outside template payload parsing:
 
 1. `item update --field FIELD=VALUE` supports creating custom fields (explicitly documented for login items).
 2. `custom` items provide a structured freeform path via `sections[].fields[]`.
 
 Practical interpretation for MCP contracts:
 
-1. If strictness and model reliability are the priority, keep per-type create schemas explicit and reject unknown top-level keys.
-2. If forward-compatibility experimentation is the priority, allow unknown keys but treat behavior as best-effort and validate against CLI errors.
+1. If strictness and model reliability are the priority, prefer explicit per-type schemas and reject unknown keys (`additionalProperties: false`) at MCP validation layer.
+2. If forward-compatibility experimentation is needed, unknown keys can be accepted as best-effort inputs, but callers must assume they may be silently ignored by CLI.
 
 ## Gaps to Close (If We Want Fully Authoritative Schemas)
 
 1. Probe omission of each non-title field for each type.
-2. Probe unknown top-level keys per type (`additionalProperties` behavior).
+2. Expand persistence checks per type to verify whether any unknown keys are retained for item types beyond the spot-checked `login` and `custom`.
 3. Probe nested `custom.sections/fields` requiredness and enum strictness.
 4. Probe field-format constraints (`email`, `url`, `birthdate`, `security`, etc.) where server-side validation may apply.
