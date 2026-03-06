@@ -8,6 +8,7 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { logErr } from "./pass-cli/log.js";
 import { runPassCli, type PassCliRunner } from "./pass-cli/runner.js";
 import type { PassCliVersionPolicy } from "./pass-cli/version.js";
+import { registerResources } from "./server/register-resources.js";
 import { registerTools } from "./server/register-tools.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -20,6 +21,7 @@ export * from "./pass-cli/log.js";
 export * from "./pass-cli/output.js";
 export * from "./pass-cli/runner.js";
 export * from "./pass-cli/version.js";
+export * from "./resources/item-create-templates.js";
 export * from "./tools/check-status.js";
 export * from "./tools/contents.js";
 export * from "./tools/invite.js";
@@ -40,6 +42,7 @@ export function createServer(
     version: pkg.version,
   });
 
+  registerResources(server);
   registerTools(server, passCli, deps.versionPolicy);
 
   return server;

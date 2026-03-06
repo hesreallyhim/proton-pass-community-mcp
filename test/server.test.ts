@@ -1698,6 +1698,51 @@ describe("server setup", () => {
     expect(server).toBeTruthy();
   });
 
+  it("registers item template resources and serves JSON payloads", async () => {
+    const runner = makeRunner({ stdout: "", stderr: "" });
+    const server = createServer({ runPassCli: runner });
+
+    const resources = (server as any)._registeredResources as Record<
+      string,
+      {
+        readCallback: (uri: URL, extra: unknown) => Promise<{ contents: Array<{ text: string }> }>;
+      }
+    >;
+
+    expect(resources["pass://templates/item-create"]).toBeDefined();
+    expect(resources["pass://templates/item-create/login"]).toBeDefined();
+    expect(resources["pass://templates/item-create/note"]).toBeDefined();
+    expect(resources["pass://templates/item-create/credit-card"]).toBeDefined();
+    expect(resources["pass://templates/item-create/wifi"]).toBeDefined();
+    expect(resources["pass://templates/item-create/custom"]).toBeDefined();
+    expect(resources["pass://templates/item-create/identity"]).toBeDefined();
+
+    const indexResult = await resources["pass://templates/item-create"].readCallback(
+      new URL("pass://templates/item-create"),
+      {},
+    );
+    const indexText = indexResult.contents[0]?.text ?? "";
+    const indexPayload = JSON.parse(indexText) as {
+      template_types: string[];
+      pass_cli_version: string;
+    };
+    expect(indexPayload.template_types).toEqual(
+      expect.arrayContaining(["login", "note", "credit-card", "wifi", "custom", "identity"]),
+    );
+    expect(indexPayload.pass_cli_version).toContain("1.5.2");
+
+    const loginResult = await resources["pass://templates/item-create/login"].readCallback(
+      new URL("pass://templates/item-create/login"),
+      {},
+    );
+    const loginText = loginResult.contents[0]?.text ?? "";
+    const loginPayload = JSON.parse(loginText) as {
+      template?: { title?: string; urls?: unknown[] };
+    };
+    expect(loginPayload.template?.title).toBeDefined();
+    expect(Array.isArray(loginPayload.template?.urls)).toBe(true);
+  });
+
   it("registered tool handlers are invocable from internal tool registry", async () => {
     process.env.ALLOW_WRITE = "1";
     const runner = makeRunner(async (args) => {
