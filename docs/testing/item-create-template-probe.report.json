@@ -1,0 +1,417 @@
+{
+  "generated_at": "2026-03-06T16:03:31.856Z",
+  "pass_cli_version": "Proton Pass CLI 1.5.2 (41cf394)",
+  "share_id": "09pmGPeO8fJwRea9hLkYlpQlCWZ-X1t51Kcfm28LnKsC16qWifIiOD04FEd3kTs2PFN-ILO52JPo_4a1S1F_oA==",
+  "source_snapshot": "docs/testing/item-create-templates.snapshot.json",
+  "delay_ms": 250,
+  "results": {
+    "credit-card": [
+      {
+        "variant": "baseline",
+        "exit_code": 0,
+        "stdout": "Y5wqoEDAaB8Y05nqQQSLCWMOxEQHIwBw3GDuq9WMBso42KssGYqKfQkSF5wI3BApvDFNR3WoJALnUx4y_XfSog==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "omit_title",
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "Error: Error parsing JSON from stdin\n\nCaused by:\n    missing field `title` at line 1 column 112",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "title_null",
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "Error: Error parsing JSON from stdin\n\nCaused by:\n    invalid type: null, expected a string at line 1 column 13",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "title_empty",
+        "exit_code": 0,
+        "stdout": "7GFvFI-ahPL6xCANNC26SqjzV0lWajoKiHlXjMOQxaJh0Btx9ST45oaG9dc83nUDsHa6WjRKb_Soytogc1ebzg==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "omit_all_null_fields",
+        "exit_code": 0,
+        "stdout": "ia76TxfNhaKRqbURow0SinogLB8HQBEiSZp2h_BvK3fvCa3h5k1MAD5rpihBCRbsR_d4tuK1opl02aXtdqmMjQ==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "nullify_string_fields",
+        "exit_code": 0,
+        "stdout": "6UzOBaSW_XB-s3nLV92rmOmxhHW0ArLexpx3C81dX6ofYrCb7fWrLs17sL7py9HdTy1WOf0kotlsaJ8l0owqeA==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      }
+    ],
+    "custom": [
+      {
+        "variant": "baseline",
+        "exit_code": 0,
+        "stdout": "pA90E2cfcn4hbNh_QKOgPSIHvMo49lWwRT10H1v4sRNFG10TiP0Kgtm2GjZaX_JSmD3VS6i112WpARV7EQlXtg==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "omit_title",
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "Error: Error parsing template JSON. Use --get-template to see the expected format\n\nCaused by:\n    missing field `title` at line 1 column 337",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "title_null",
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "Error: Error parsing template JSON. Use --get-template to see the expected format\n\nCaused by:\n    invalid type: null, expected a string at line 1 column 13",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "title_empty",
+        "exit_code": 0,
+        "stdout": "RTDGDP7IyRSLtW7tBhPZTEuy2fgcL9WuAfC3ld5JXM6MG1sb4MZCm_xAmjWkU0UBoAKBFbl7qetJSULmCSg_EA==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "omit_all_null_fields",
+        "exit_code": 0,
+        "stdout": "gdm7xiM9_4xHs-dqZz3DTcDWMU-w6lyILAq6tMbWSF5dVkA5p_DNurAP1CVc6qGenYUiGoBYNWOG9aGn05RAeA==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "nullify_string_fields",
+        "exit_code": 0,
+        "stdout": "iVekoKb_6wKTl3X3y6dtIsv24uf89IsZLn1S2b0-vPqXLnmJd3x0KlC3e8A8kjHOQrbWbBI6Qy2-MFWlv0Aj3w==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      }
+    ],
+    "identity": [
+      {
+        "variant": "baseline",
+        "exit_code": 0,
+        "stdout": "X4mOsXcGCDz9f0I7bHT4z4WmSqqgtia-KSKQFC6A6EN1FMbamBjsu6If035UR_ISaIG34Uu7cw9urmRJMYEYjQ==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "omit_title",
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "Error: Error parsing template JSON. Use --get-template to see the expected format\n\nCaused by:\n    missing field `title` at line 1 column 547",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "title_null",
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "Error: Error parsing template JSON. Use --get-template to see the expected format\n\nCaused by:\n    invalid type: null, expected a string at line 1 column 13",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "title_empty",
+        "exit_code": 0,
+        "stdout": "QMZwoJe8jS9ZvpmYCh9doDwt1zKzw-fouTUIShcOyEaOOP18GHrzm0jylRcb1RBBmM3TzFmlTwYeGswCornN1w==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "omit_all_null_fields",
+        "exit_code": 0,
+        "stdout": "x1i5SmYt1kd5rTuf9t0WSwnq50BaIPIT0SSwc3fX2v5zWuyQY_0Z9xmZID83QZAaV1Q7j_zHkvm6Ult9DVkP4Q==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "nullify_string_fields",
+        "exit_code": 0,
+        "stdout": "7CMB6q-CSdudklDAO9ySYadf3uXZwgafX2R6SABgkIgZOPF6RZYgXO0WDiWmakIInd03IUOtQJUNFsbQjkC4dQ==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      }
+    ],
+    "login": [
+      {
+        "variant": "baseline",
+        "exit_code": 0,
+        "stdout": "wIRFIbOZz0HTJQEeExo92hw1LaFy06bmLc5ykqjtjipS1_Y9BU9QRIKwWN1SV-k4Z3HBKlk2J2lA_2P1QrKAnA==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "omit_title",
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "Error: Error parsing JSON from stdin\n\nCaused by:\n    missing field `title` at line 1 column 56",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "title_null",
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "Error: Error parsing JSON from stdin\n\nCaused by:\n    invalid type: null, expected a string at line 1 column 13",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "title_empty",
+        "exit_code": 0,
+        "stdout": "0QMKLPZa02WQlh8j0pHOTsr7H1JAbtNIuLvDuBhOF9UlgZdL-lHT0WKOAIZJPRKdq08AI3DusVTA4EYwxCX1JA==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "omit_all_null_fields",
+        "exit_code": 0,
+        "stdout": "dLxPgqcBdSKkl0uGIC3LE1rgc3HhuaYwP_v81yTOsuIwaoZ38G51EO6TPd9JsW5UsLAsdsWQp2lPhO-iCrk3yw==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "nullify_string_fields",
+        "exit_code": 0,
+        "stdout": "P-5c_Ye0yAhsc4Kvn7gNF9qZhsX9QutY2nqVRX2gM2gI6UmTtWkkFW8nYY2vcEzDAZBO5lEOvOLYDJd8KxwrhA==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      }
+    ],
+    "note": [
+      {
+        "variant": "baseline",
+        "exit_code": 0,
+        "stdout": "lJe_Yr86eNLjMSBRnzVKanaKmwyv4hO_FPg6lJL3_ZpLIewsI241jL2aMEHElrCg2qZ-dPg8qVm8XM3-DNZTwg==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "omit_title",
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "Error: Error parsing JSON from stdin\n\nCaused by:\n    missing field `title` at line 1 column 13",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "title_null",
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "Error: Error parsing JSON from stdin\n\nCaused by:\n    invalid type: null, expected a string at line 1 column 13",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "title_empty",
+        "exit_code": 0,
+        "stdout": "7uxfvoUaZYgbn2UyLY9iCgcLndowk8Nc6cjVqhtWji92gX9XOFvVVfBmofKzLLyv7qcrnbiph2nVBSkFXhHB4w==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "omit_all_null_fields",
+        "exit_code": 0,
+        "stdout": "urDbwdHZpFOizY8Om9-Hwwj-X8giyYVOPvQ-QfxCE202WT53Zb-haDGKYmOuBbxk2SKDnKrtRBGyBXYI5qWutw==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "nullify_string_fields",
+        "exit_code": 0,
+        "stdout": "Q6Ln6LmtuD92mkZJOfCNV7dm5pQLHIF8VwBVTBH8RGa2CI-HzAEP-MDX-3cdnDh5Jrv1um1w28Vd4JEE8uzh0A==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      }
+    ],
+    "wifi": [
+      {
+        "variant": "baseline",
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "Error: Error creating WiFi item\n\nCaused by:\n    0: Invalid SSID\n    1: SSID cannot be empty",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "omit_title",
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "Error: Error parsing template JSON. Use --get-template to see the expected format\n\nCaused by:\n    missing field `title` at line 1 column 49",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "title_null",
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "Error: Error parsing template JSON. Use --get-template to see the expected format\n\nCaused by:\n    invalid type: null, expected a string at line 1 column 13",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "title_empty",
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "Error: Error creating WiFi item\n\nCaused by:\n    0: Invalid SSID\n    1: SSID cannot be empty",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "omit_all_null_fields",
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "Error: Error creating WiFi item\n\nCaused by:\n    0: Invalid SSID\n    1: SSID cannot be empty",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "nullify_string_fields",
+        "exit_code": 1,
+        "stdout": "",
+        "stderr": "Error: Error parsing template JSON. Use --get-template to see the expected format\n\nCaused by:\n    invalid type: null, expected a string at line 1 column 23",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      }
+    ]
+  }
+}
