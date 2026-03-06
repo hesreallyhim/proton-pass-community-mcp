@@ -49,7 +49,9 @@ As this project is in its initial stages, it exposes the following tools:
 
 The `search_items` operation is additional functionality that is not provided by the base CLI.
 
-Mutative tools require write gate opt-in (`ALLOW_WRITE=1`) and explicit per-call confirmation (`confirm: true`).
+Mutative tools currently require write gate opt-in (`ALLOW_WRITE=1`) and explicit per-call confirmation (`confirm: true`).
+
+Proposed protocol-aligned confirmation policy (elicitation-first with fail-closed fallback) is documented in [docs/TOOL_SCHEMA_PLAN.md](./docs/TOOL_SCHEMA_PLAN.md#write-authorization-and-confirmation-policy-proposal).
 
 ## Item Discovery Contract
 
