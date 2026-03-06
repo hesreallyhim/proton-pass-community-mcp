@@ -196,6 +196,13 @@ Template drift check commands:
 
 1. `npm run pass:dev:template:drift`
 2. `npm run pass:dev:template:snapshot:update` (only when intentionally accepting template changes)
+3. `npm run pass:dev:template:probe` (empirical required/optional/nullability probe; no cleanup by default)
+
+Rate-limit caution for probe runs:
+
+1. Proton Pass CLI docs do not currently publish explicit rate-limit guarantees.
+2. For repeated/large probe runs, add pacing: `node scripts/probe-item-create-template-contract.mjs --run --delay-ms=250`
+3. Enable cleanup only when needed: `node scripts/probe-item-create-template-contract.mjs --run --cleanup`
 
 ## Provider Compatibility Validation (One-Time)
 
