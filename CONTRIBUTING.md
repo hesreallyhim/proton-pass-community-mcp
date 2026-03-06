@@ -33,8 +33,8 @@ Disposable test account workflow:
 - Use `scripts/pass-dev.sh` to run Proton Pass CLI with repo-local session isolation.
 - `scripts/pass-dev.sh` defaults to `PROTON_PASS_KEY_PROVIDER=fs` and avoids keyring/keychain access unless explicitly overridden.
 - Use `scripts/pass-dev-preflight.sh` to assert the authenticated account before integration/destructive testing.
-- Full local + CI workflow is documented in `docs/TEST_ACCOUNT_WORKFLOW.md`.
-- MCP integration auth options and one-time provider validation (`keyring`, `fs`, `env`) are also documented in `docs/TEST_ACCOUNT_WORKFLOW.md`.
+- Full local + CI workflow is documented in `docs/testing/TEST_ACCOUNT_WORKFLOW.md`.
+- MCP integration auth options and one-time provider validation (`keyring`, `fs`, `env`) are also documented in `docs/testing/TEST_ACCOUNT_WORKFLOW.md`.
 
 Precedence:
 

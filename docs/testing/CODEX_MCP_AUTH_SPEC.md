@@ -126,7 +126,7 @@ Auth validation and integration testing should include a deterministic throwaway
 3. optionally reset and rehydrate
 4. produce metadata snapshots for debugging/regression evidence
 
-Detailed planning for this is tracked in `docs/THROWAWAY_DATA_PLAN.md`.
+Detailed planning for this is tracked in `docs/testing/THROWAWAY_DATA_PLAN.md`.
 
 ## Expected Behavior by State
 
@@ -147,6 +147,6 @@ Detailed planning for this is tracked in `docs/THROWAWAY_DATA_PLAN.md`.
 
 ## Source References
 
-1. `docs/TEST_ACCOUNT_WORKFLOW.md`
+1. `docs/testing/TEST_ACCOUNT_WORKFLOW.md`
 2. `.github/workflows/pass-cli-integration-manual.yml`
 3. Proton Pass CLI login/configuration docs (upstream)
