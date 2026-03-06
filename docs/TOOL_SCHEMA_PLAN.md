@@ -19,7 +19,7 @@ Primary optimization target: item discovery (`pass-cli item list`) should return
 1. Tool names use snake_case without provider prefix and prefer natural-language order (for example `list_vaults`, `view_item`).
 2. Write/mutation tools require explicit confirmation (`confirm: true`) and write gate (`ALLOW_WRITE=1`).
 3. Read tools default to structured, token-efficient JSON in `structuredContent`.
-4. `content` text remains present for interoperability/debugging.
+4. When `structuredContent` is returned, also return a `TextContent` serialization of that same JSON object for backwards compatibility/interoperability. This is not a separate human-output mode from the CLI.
 5. Listing/search tools return references, then callers use `view_item` for full content.
 6. Release branches may retain non-release code paths, but only release-scoped tools are registered/exposed by default.
 7. Authentication lifecycle (`pass-cli login`, `pass-cli logout`) remains out-of-band and is not exposed as MCP tools.
