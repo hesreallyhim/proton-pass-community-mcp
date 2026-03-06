@@ -292,24 +292,24 @@ Status key:
 
 ### Share, Invite, Password, TOTP, User, Settings, SSH Agent
 
-| Tool                            | Source                                   | Status      | Input Summary                          | Output Summary            |
-| ------------------------------- | ---------------------------------------- | ----------- | -------------------------------------- | ------------------------- |
-| `list_shares`                   | `pass-cli share list`                    | Implemented | `onlyItems?`, `onlyVaults?`, `output?` | Shares list               |
-| `list_invites`                  | `pass-cli invite list`                   | Implemented | `pageSize?`, `cursor?`                 | `CursorPage<InviteRef>`   |
-| `invite_accept`                 | `pass-cli invite accept`                 | Planned     | `inviteId`, `confirm`                  | Accept status             |
-| `invite_reject`                 | `pass-cli invite reject`                 | Planned     | `inviteId`, `confirm`                  | Reject status             |
-| `generate_random_password`      | `pass-cli password generate random`      | Planned     | generation flags                       | Password value/metadata   |
-| `generate_passphrase`           | `pass-cli password generate passphrase`  | Planned     | generation flags                       | Passphrase value/metadata |
-| `score_password`                | `pass-cli password score`                | Planned     | `password`                             | Strength report           |
-| `totp_generate`                 | `pass-cli totp generate`                 | Planned     | `secretOrUri`, `output?`               | TOTP value                |
-| `view_settings`                 | `pass-cli settings view`                 | Implemented | none                                   | Settings object           |
-| `settings_set_default_vault`    | `pass-cli settings set default-vault`    | Planned     | `vaultName \| shareId`, `confirm`      | Set status                |
-| `settings_set_default_format`   | `pass-cli settings set default-format`   | Planned     | `format`, `confirm`                    | Set status                |
-| `settings_unset_default_vault`  | `pass-cli settings unset default-vault`  | Planned     | `confirm`                              | Unset status              |
-| `settings_unset_default_format` | `pass-cli settings unset default-format` | Planned     | `confirm`                              | Unset status              |
-| `ssh_agent_start`               | `pass-cli ssh-agent start`               | Out-of-SCope     | N/A                                | N/A                      |
-| `ssh_agent_load`                | `pass-cli ssh-agent load`                | Out-of-SCope     | N/A                                | N/A             |
-| `ssh_agent_debug`               | `pass-cli ssh-agent debug`               | Out-of-SCope     | N/A                                 | N/A            |
+| Tool                            | Source                                   | Status       | Input Summary                          | Output Summary            |
+| ------------------------------- | ---------------------------------------- | ------------ | -------------------------------------- | ------------------------- |
+| `list_shares`                   | `pass-cli share list`                    | Implemented  | `onlyItems?`, `onlyVaults?`, `output?` | Shares list               |
+| `list_invites`                  | `pass-cli invite list`                   | Implemented  | `pageSize?`, `cursor?`                 | `CursorPage<InviteRef>`   |
+| `invite_accept`                 | `pass-cli invite accept`                 | Planned      | `inviteId`, `confirm`                  | Accept status             |
+| `invite_reject`                 | `pass-cli invite reject`                 | Planned      | `inviteId`, `confirm`                  | Reject status             |
+| `generate_random_password`      | `pass-cli password generate random`      | Planned      | generation flags                       | Password value/metadata   |
+| `generate_passphrase`           | `pass-cli password generate passphrase`  | Planned      | generation flags                       | Passphrase value/metadata |
+| `score_password`                | `pass-cli password score`                | Planned      | `password`                             | Strength report           |
+| `totp_generate`                 | `pass-cli totp generate`                 | Planned      | `secretOrUri`, `output?`               | TOTP value                |
+| `view_settings`                 | `pass-cli settings view`                 | Implemented  | none                                   | Settings object           |
+| `settings_set_default_vault`    | `pass-cli settings set default-vault`    | Planned      | `vaultName \| shareId`, `confirm`      | Set status                |
+| `settings_set_default_format`   | `pass-cli settings set default-format`   | Planned      | `format`, `confirm`                    | Set status                |
+| `settings_unset_default_vault`  | `pass-cli settings unset default-vault`  | Planned      | `confirm`                              | Unset status              |
+| `settings_unset_default_format` | `pass-cli settings unset default-format` | Planned      | `confirm`                              | Unset status              |
+| `ssh_agent_start`               | `pass-cli ssh-agent start`               | Out-of-SCope | N/A                                    | N/A                       |
+| `ssh_agent_load`                | `pass-cli ssh-agent load`                | Out-of-SCope | N/A                                    | N/A                       |
+| `ssh_agent_debug`               | `pass-cli ssh-agent debug`               | Out-of-SCope | N/A                                    | N/A                       |
 
 ## Phased Delivery
 
