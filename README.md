@@ -31,10 +31,13 @@ As this project is in its initial stages, it exposes the following tools:
 | `search_items`             | Search items by title                            |
 | `view_item`                | View item by URI or selectors                    |
 | `create_vault`             | Create a vault                                   |
+| `update_vault`             | Update a vault name                              |
 | `delete_vault`             | Delete a vault                                   |
+| `vault_share`              | Share a vault with a user                        |
 | `create_login_item`        | Create a login item                              |
 | `update_item`              | Update an item field set                         |
 | `delete_item`              | Delete an item                                   |
+| `item_share`               | Share an item with a user                        |
 | `item_totp`                | Generate item TOTP codes                         |
 | `generate_random_password` | Generate a random password                       |
 | `generate_passphrase`      | Generate a passphrase                            |

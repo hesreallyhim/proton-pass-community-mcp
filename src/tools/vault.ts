@@ -60,6 +60,25 @@ export const deleteVaultInputSchema = z.object({
   confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
 });
 
+export const shareVaultInputSchema = z
+  .object({
+    shareId: z.string().max(100).optional().describe("Share ID of the vault to share"),
+    vaultName: z.string().max(255).optional().describe("Name of the vault to share"),
+    email: z.string().email().max(320).describe("Email of the user to invite"),
+    role: z.enum(VAULT_MEMBER_ROLE_OPTIONS).optional().describe("Role for the invited user"),
+    confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+  })
+  .refine(
+    (input) => {
+      const hasShareId = Boolean(input.shareId);
+      const hasVaultName = Boolean(input.vaultName);
+      return hasShareId !== hasVaultName;
+    },
+    {
+      message: "Provide exactly one of shareId or vaultName.",
+    },
+  );
+
 export const updateVaultMemberInputSchema = z
   .object({
     shareId: z.string().max(100).optional().describe("Share ID of the vault"),
@@ -102,6 +121,7 @@ export type ListVaultMembersInput = z.infer<typeof listVaultMembersInputSchema>;
 export type CreateVaultInput = z.infer<typeof createVaultInputSchema>;
 export type UpdateVaultInput = z.infer<typeof updateVaultInputSchema>;
 export type DeleteVaultInput = z.infer<typeof deleteVaultInputSchema>;
+export type ShareVaultInput = z.infer<typeof shareVaultInputSchema>;
 export type UpdateVaultMemberInput = z.infer<typeof updateVaultMemberInputSchema>;
 export type RemoveVaultMemberInput = z.infer<typeof removeVaultMemberInputSchema>;
 
@@ -249,6 +269,22 @@ export async function updateVaultHandler(
   if (shareId) args.push("--share-id", shareId);
   else args.push("--vault-name", vaultName!);
   args.push("--name", newName);
+  const { stdout, stderr } = await passCli(args);
+  const out = joinStdoutStderr(stdout, stderr);
+  return asTextContent(out || "OK");
+}
+
+export async function shareVaultHandler(
+  passCli: PassCliRunner,
+  { shareId, vaultName, email, role, confirm }: ShareVaultInput,
+) {
+  requireWriteGate(confirm);
+  if (!!shareId === !!vaultName) throw new Error("Provide exactly one of shareId or vaultName.");
+  const args = ["vault", "share"];
+  if (shareId) args.push("--share-id", shareId);
+  else args.push("--vault-name", vaultName!);
+  args.push(email);
+  if (role) args.push("--role", role);
   const { stdout, stderr } = await passCli(args);
   const out = joinStdoutStderr(stdout, stderr);
   return asTextContent(out || "OK");
