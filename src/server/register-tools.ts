@@ -18,8 +18,14 @@ import {
   createLoginItemFromTemplateInputSchema,
   createLoginItemHandler,
   createLoginItemInputSchema,
+  moveItemHandler,
+  moveItemInputSchema,
   createNoteItemHandler,
   createNoteItemInputSchema,
+  trashItemHandler,
+  trashItemInputSchema,
+  untrashItemHandler,
+  untrashItemInputSchema,
   createWifiItemHandler,
   createWifiItemInputSchema,
   deleteItemHandler,
@@ -399,12 +405,39 @@ export function registerTools(
   );
 
   server.registerTool(
+    "move_item",
+    {
+      description: "Move an item from one vault to another.",
+      inputSchema: moveItemInputSchema,
+    },
+    withAuthErrorHandling(async (input) => moveItemHandler(passCli, input)),
+  );
+
+  server.registerTool(
     "update_item",
     {
       description: "Update an item using selectors and field assignments.",
       inputSchema: updateItemInputSchema,
     },
     withAuthErrorHandling(async (input) => updateItemHandler(passCli, input)),
+  );
+
+  server.registerTool(
+    "trash_item",
+    {
+      description: "Move an item to trash by selectors.",
+      inputSchema: trashItemInputSchema,
+    },
+    withAuthErrorHandling(async (input) => trashItemHandler(passCli, input)),
+  );
+
+  server.registerTool(
+    "untrash_item",
+    {
+      description: "Restore an item from trash by selectors.",
+      inputSchema: untrashItemInputSchema,
+    },
+    withAuthErrorHandling(async (input) => untrashItemHandler(passCli, input)),
   );
 
   server.registerTool(
