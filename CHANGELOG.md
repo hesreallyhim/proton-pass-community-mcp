@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/hesreallyhim/proton-pass-community-mcp/compare/v0.1.0...v0.2.0) (2026-03-06)
+
+
+### Features
+
+* **read-tools:** add invites settings and vault member read surface ([1856e56](https://github.com/hesreallyhim/proton-pass-community-mcp/commit/1856e56337dc33ec4ed5a320bcd37990edf60efb))
+
 ## 0.1.0 (2026-03-02)
 
 
