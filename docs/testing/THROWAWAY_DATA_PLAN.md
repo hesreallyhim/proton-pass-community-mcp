@@ -120,7 +120,7 @@ Retention guideline:
 
 1. Use throwaway account only.
 2. Never seed real credentials.
-3. Require preflight email/account checks before any reset/hydrate action.
+3. Require preflight account-identifier checks before any reset/hydrate action.
 4. Keep destructive reset commands opt-in and explicitly named.
 
 ## CI Considerations

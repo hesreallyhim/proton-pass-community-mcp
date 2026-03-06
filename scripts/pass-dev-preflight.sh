@@ -2,17 +2,20 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-EXPECTED_EMAIL="${1:-${PASS_DEV_EXPECTED_EMAIL:-}}"
+EXPECTED_ACCOUNT="${1:-${PASS_DEV_EXPECTED_ACCOUNT:-${PASS_DEV_EXPECTED_EMAIL:-}}}"
 
-if [[ -z "${EXPECTED_EMAIL}" ]]; then
+if [[ -z "${EXPECTED_ACCOUNT}" ]]; then
   cat >&2 <<'EOF'
-Missing expected throwaway account email.
+Missing expected throwaway account identifier.
 
 Usage:
-  scripts/pass-dev-preflight.sh throwaway@proton.me
+  scripts/pass-dev-preflight.sh throwaway-account-id
 
 Or set:
-  PASS_DEV_EXPECTED_EMAIL=throwaway@proton.me
+  PASS_DEV_EXPECTED_ACCOUNT=throwaway-account-id
+
+Legacy fallback:
+  PASS_DEV_EXPECTED_EMAIL=throwaway@example.com
 EOF
   exit 2
 fi
@@ -22,7 +25,7 @@ if ! USER_INFO_JSON="$("${SCRIPT_DIR}/pass-dev.sh" user info --output json)"; th
   exit 3
 fi
 
-ACTUAL_EMAIL="$(
+ACTUAL_ACCOUNT="$(
   printf '%s' "${USER_INFO_JSON}" | node -e '
     const fs = require("node:fs");
     const input = fs.readFileSync(0, "utf8");
@@ -37,7 +40,8 @@ ACTUAL_EMAIL="$(
     function walk(value) {
       if (value === null || value === undefined) return "";
       if (typeof value === "string") {
-        return value.includes("@") ? value : "";
+        const trimmed = value.trim();
+        return trimmed.length > 0 ? trimmed : "";
       }
       if (typeof value !== "object") return "";
       if (visited.has(value)) return "";
@@ -49,6 +53,10 @@ ACTUAL_EMAIL="$(
         "username",
         "Username",
         "accountEmail",
+        "account_email",
+        "user",
+        "login",
+        "name",
       ];
       for (const key of preferredKeys) {
         if (Object.prototype.hasOwnProperty.call(value, key)) {
@@ -64,30 +72,30 @@ ACTUAL_EMAIL="$(
       return "";
     }
 
-    const email = walk(data);
-    if (!email) process.exit(1);
-    process.stdout.write(email);
+    const account = walk(data);
+    if (!account) process.exit(1);
+    process.stdout.write(account);
   '
 )"
 
-if [[ -z "${ACTUAL_EMAIL}" ]]; then
-  echo "Unable to detect account email from 'pass-cli user info --output json'." >&2
+if [[ -z "${ACTUAL_ACCOUNT}" ]]; then
+  echo "Unable to detect account identifier from 'pass-cli user info --output json'." >&2
   exit 4
 fi
 
-if [[ "${ACTUAL_EMAIL,,}" != "${EXPECTED_EMAIL,,}" ]]; then
+if [[ "${ACTUAL_ACCOUNT,,}" != "${EXPECTED_ACCOUNT,,}" ]]; then
   cat >&2 <<EOF
 Refusing to continue: active pass-cli account does not match throwaway target.
 
-Expected: ${EXPECTED_EMAIL}
-Actual:   ${ACTUAL_EMAIL}
+Expected: ${EXPECTED_ACCOUNT}
+Actual:   ${ACTUAL_ACCOUNT}
 
 Run:
   scripts/pass-dev.sh login
 or:
-  scripts/pass-dev.sh login --interactive ${EXPECTED_EMAIL}
+  scripts/pass-dev.sh login --interactive ${EXPECTED_ACCOUNT}
 EOF
   exit 5
 fi
 
-echo "Pass dev preflight OK (${ACTUAL_EMAIL})"
+echo "Pass dev preflight OK (${ACTUAL_ACCOUNT})"

@@ -14,7 +14,7 @@ jobs:
       PROTON_PASS_SESSION_DIR: ${{ runner.temp }}/proton-pass-dev-session
       PROTON_PASS_KEY_PROVIDER: env
       PROTON_PASS_ENCRYPTION_KEY: ${{ secrets.PROTON_PASS_ENCRYPTION_KEY }}
-      PASS_DEV_EXPECTED_EMAIL: ${{ secrets.PROTON_PASS_EXPECTED_EMAIL }}
+      PASS_DEV_EXPECTED_ACCOUNT: ${{ secrets.PROTON_PASS_EXPECTED_ACCOUNT }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
