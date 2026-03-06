@@ -19,6 +19,7 @@ import {
   PassCliAuthError,
   viewSessionInfoHandler,
   createItemFromTemplateHandler,
+  createItemAliasHandler,
   createLoginItemHandler,
   deleteItemHandler,
   itemTotpHandler,
@@ -46,6 +47,7 @@ import {
   listVaultsHandler,
   removeVaultMemberHandler,
   shareVaultHandler,
+  transferVaultHandler,
   updateVaultMemberHandler,
   updateVaultHandler,
   requireWriteGate,
@@ -1231,6 +1233,26 @@ describe("write handlers", () => {
     ]);
   });
 
+  it("transferVaultHandler validates scope and forwards target member share ID", async () => {
+    process.env.ALLOW_WRITE = "1";
+    const runner = makeRunner({ stdout: "transferred", stderr: "" });
+
+    await expect(
+      transferVaultHandler(runner, {
+        memberShareId: "m1",
+        confirm: true,
+      }),
+    ).rejects.toThrow("exactly one");
+
+    await transferVaultHandler(runner, {
+      shareId: "s1",
+      memberShareId: "m1",
+      confirm: true,
+    });
+
+    expect(runner).toHaveBeenCalledWith(["vault", "transfer", "--share-id", "s1", "m1"]);
+  });
+
   it("vault member write handlers validate scope and build command arguments", async () => {
     process.env.ALLOW_WRITE = "1";
     const runner = makeRunner({ stdout: "ok", stderr: "" });
@@ -1526,6 +1548,40 @@ describe("write handlers", () => {
     ]);
   });
 
+  it("createItemAliasHandler validates selectors and passes prefix/output", async () => {
+    process.env.ALLOW_WRITE = "1";
+    const runner = makeRunner({ stdout: '{"alias":"demo"}', stderr: "" });
+
+    await expect(
+      createItemAliasHandler(runner, {
+        shareId: "s1",
+        vaultName: "Work",
+        prefix: "demo",
+        output: "json",
+        confirm: true,
+      }),
+    ).rejects.toThrow("Provide only one of shareId or vaultName");
+
+    await createItemAliasHandler(runner, {
+      vaultName: "Work",
+      prefix: "demo",
+      output: "json",
+      confirm: true,
+    });
+
+    expect(runner).toHaveBeenCalledWith([
+      "item",
+      "alias",
+      "create",
+      "--vault-name",
+      "Work",
+      "--prefix",
+      "demo",
+      "--output",
+      "json",
+    ]);
+  });
+
   it("inviteAcceptHandler and inviteRejectHandler enforce gate and call invite commands", async () => {
     const runner = makeRunner({ stdout: "", stderr: "" });
     process.env.ALLOW_WRITE = "1";
@@ -1651,6 +1707,11 @@ describe("server setup", () => {
       role: "viewer",
       confirm: true,
     });
+    await tools.vault_transfer.handler({
+      shareId: "s1",
+      memberShareId: "m1",
+      confirm: true,
+    });
     await tools.create_vault.handler({ name: "Sandbox", confirm: true });
     await tools.update_vault.handler({ vaultName: "Sandbox", newName: "Sandbox 2", confirm: true });
     await tools.delete_vault.handler({ vaultName: "Sandbox", confirm: true });
@@ -1701,6 +1762,12 @@ describe("server setup", () => {
       role: "editor",
       confirm: true,
     });
+    await tools.create_item_alias.handler({
+      vaultName: "Sandbox",
+      prefix: "demo",
+      output: "json",
+      confirm: true,
+    });
 
     expect(tools.create_vault).toBeDefined();
     expect(tools.update_vault).toBeDefined();
@@ -1717,14 +1784,16 @@ describe("server setup", () => {
     expect(tools.vault_member_update).toBeDefined();
     expect(tools.vault_member_remove).toBeDefined();
     expect(tools.vault_share).toBeDefined();
+    expect(tools.vault_transfer).toBeDefined();
     expect(tools.item_totp).toBeDefined();
     expect(tools.create_login_item).toBeDefined();
     expect(tools.create_item_from_template).toBeDefined();
     expect(tools.update_item).toBeDefined();
     expect(tools.delete_item).toBeDefined();
     expect(tools.item_share).toBeDefined();
+    expect(tools.create_item_alias).toBeDefined();
 
-    expect(runner).toHaveBeenCalledTimes(33);
+    expect(runner).toHaveBeenCalledTimes(35);
   });
 
   it("registered tool handlers return standardized auth error payloads", async () => {

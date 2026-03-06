@@ -34,9 +34,11 @@ As this project is in its initial stages, it exposes the following tools:
 | `update_vault`             | Update a vault name                              |
 | `delete_vault`             | Delete a vault                                   |
 | `vault_share`              | Share a vault with a user                        |
+| `vault_transfer`           | Transfer vault ownership                         |
 | `create_login_item`        | Create a login item                              |
 | `update_item`              | Update an item field set                         |
 | `delete_item`              | Delete an item                                   |
+| `create_item_alias`        | Create an alias item                             |
 | `item_share`               | Share an item with a user                        |
 | `item_totp`                | Generate item TOTP codes                         |
 | `generate_random_password` | Generate a random password                       |

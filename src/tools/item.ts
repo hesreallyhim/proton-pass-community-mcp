@@ -262,6 +262,22 @@ export const shareItemInputSchema = z.object({
   confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
 });
 
+export const createItemAliasInputSchema = z
+  .object({
+    shareId: z.string().max(100).optional().describe("Share ID where alias item will be created"),
+    vaultName: z
+      .string()
+      .max(255)
+      .optional()
+      .describe("Vault name where alias item will be created"),
+    prefix: z.string().min(1).max(255).describe("Alias prefix"),
+    output: z.enum(["json", "human"]).default("json").describe("Output format"),
+    confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+  })
+  .refine((input) => !(input.shareId && input.vaultName), {
+    message: "Provide only one of shareId or vaultName.",
+  });
+
 export type ListItemsInput = z.infer<typeof listItemsInputSchema>;
 export type ViewItemInput = z.infer<typeof viewItemInputSchema>;
 export type ItemTotpInput = z.infer<typeof itemTotpInputSchema>;
@@ -271,6 +287,7 @@ export type CreateItemFromTemplateInput = z.infer<typeof createItemFromTemplateI
 export type UpdateItemInput = z.infer<typeof updateItemInputSchema>;
 export type DeleteItemInput = z.infer<typeof deleteItemInputSchema>;
 export type ShareItemInput = z.infer<typeof shareItemInputSchema>;
+export type CreateItemAliasInput = z.infer<typeof createItemAliasInputSchema>;
 
 export async function listItemsHandler(
   passCli: PassCliRunner,
@@ -594,4 +611,21 @@ export async function shareItemHandler(
   const { stdout, stderr } = await passCli(args);
   const out = joinStdoutStderr(stdout, stderr);
   return asTextContent(out || "OK");
+}
+
+export async function createItemAliasHandler(
+  passCli: PassCliRunner,
+  { shareId, vaultName, prefix, output, confirm }: CreateItemAliasInput,
+) {
+  requireWriteGate(confirm);
+  if (shareId && vaultName) throw new Error("Provide only one of shareId or vaultName.");
+
+  const args = ["item", "alias", "create"];
+  if (shareId) args.push("--share-id", shareId);
+  else if (vaultName) args.push("--vault-name", vaultName);
+  args.push("--prefix", prefix, "--output", output);
+
+  const { stdout, stderr } = await passCli(args);
+  const out = joinStdoutStderr(stdout, stderr);
+  return asTextContent(asJsonTextOrRaw(out));
 }
