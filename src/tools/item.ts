@@ -252,6 +252,16 @@ export const deleteItemInputSchema = z.object({
   confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
 });
 
+const SHARE_ROLE_OPTIONS = ["viewer", "editor", "manager"] as const;
+
+export const shareItemInputSchema = z.object({
+  shareId: z.string().max(100).describe("Share ID containing the item"),
+  itemId: z.string().max(100).describe("Item ID to share"),
+  email: z.string().email().max(320).describe("Email of the user to invite"),
+  role: z.enum(SHARE_ROLE_OPTIONS).optional().describe("Role for the invited user"),
+  confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+});
+
 export type ListItemsInput = z.infer<typeof listItemsInputSchema>;
 export type ViewItemInput = z.infer<typeof viewItemInputSchema>;
 export type ItemTotpInput = z.infer<typeof itemTotpInputSchema>;
@@ -260,6 +270,7 @@ export type CreateLoginItemInput = z.infer<typeof createLoginItemInputSchema>;
 export type CreateItemFromTemplateInput = z.infer<typeof createItemFromTemplateInputSchema>;
 export type UpdateItemInput = z.infer<typeof updateItemInputSchema>;
 export type DeleteItemInput = z.infer<typeof deleteItemInputSchema>;
+export type ShareItemInput = z.infer<typeof shareItemInputSchema>;
 
 export async function listItemsHandler(
   passCli: PassCliRunner,
@@ -569,6 +580,18 @@ export async function deleteItemHandler(
     "--item-id",
     itemId,
   ]);
+  const out = joinStdoutStderr(stdout, stderr);
+  return asTextContent(out || "OK");
+}
+
+export async function shareItemHandler(
+  passCli: PassCliRunner,
+  { shareId, itemId, email, role, confirm }: ShareItemInput,
+) {
+  requireWriteGate(confirm);
+  const args = ["item", "share", "--share-id", shareId, "--item-id", itemId, email];
+  if (role) args.push("--role", role);
+  const { stdout, stderr } = await passCli(args);
   const out = joinStdoutStderr(stdout, stderr);
   return asTextContent(out || "OK");
 }
