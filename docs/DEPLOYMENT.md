@@ -52,6 +52,15 @@ Use this only when bootstrapping a new remote:
 1. `CHANGELOG.md` is managed by Release Please. Do not maintain it manually.
 2. If Release Please proposes an unexpected version, do not merge; fix config first.
 3. Historical release-specific guidance for the initial release is archived at `docs/archived/DEPLOYMENT_0.1.md`.
+4. To force a specific release version, add a commit body footer with `Release-As: X.Y.Z` (case insensitive) on a commit merged to `main`.
+
+Example:
+
+```text
+chore: release 0.2.0
+
+Release-As: 0.2.0
+```
 
 ## Troubleshooting
 
