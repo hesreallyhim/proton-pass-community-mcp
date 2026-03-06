@@ -1,8 +1,9 @@
 import { z } from "zod";
 
-import { asJsonTextOrRaw, asTextContent } from "../pass-cli/output.js";
+import { asJsonTextOrRaw, asTextContent, joinStdoutStderr } from "../pass-cli/output.js";
 import type { PassCliRunner } from "../pass-cli/runner.js";
 import { asRecord, firstString } from "./item-utils.js";
+import { requireWriteGate } from "./write-gate.js";
 
 const DEFAULT_INVITE_PAGE_SIZE = 100;
 const MAX_INVITE_PAGE_SIZE = 250;
@@ -100,7 +101,22 @@ export const listInvitesInputSchema = z
   })
   .default({});
 
+const inviteTokenInput = z.string().min(1).max(4096).describe("Invitation token");
+const confirmInput = z.boolean().optional().describe("Must be true to execute the write operation");
+
+export const inviteAcceptInputSchema = z.object({
+  inviteToken: inviteTokenInput,
+  confirm: confirmInput,
+});
+
+export const inviteRejectInputSchema = z.object({
+  inviteToken: inviteTokenInput,
+  confirm: confirmInput,
+});
+
 export type ListInvitesInput = z.infer<typeof listInvitesInputSchema>;
+export type InviteAcceptInput = z.infer<typeof inviteAcceptInputSchema>;
+export type InviteRejectInput = z.infer<typeof inviteRejectInputSchema>;
 
 export async function listInvitesHandler(
   passCli: PassCliRunner,
@@ -140,4 +156,24 @@ export async function listInvitesHandler(
     content: [{ type: "text" as const, text: JSON.stringify(structuredContent, null, 2) }],
     structuredContent,
   };
+}
+
+export async function inviteAcceptHandler(
+  passCli: PassCliRunner,
+  { inviteToken, confirm }: InviteAcceptInput,
+) {
+  requireWriteGate(confirm);
+  const { stdout, stderr } = await passCli(["invite", "accept", "--invite-token", inviteToken]);
+  const out = joinStdoutStderr(stdout, stderr);
+  return asTextContent(out || "OK");
+}
+
+export async function inviteRejectHandler(
+  passCli: PassCliRunner,
+  { inviteToken, confirm }: InviteRejectInput,
+) {
+  requireWriteGate(confirm);
+  const { stdout, stderr } = await passCli(["invite", "reject", "--invite-token", inviteToken]);
+  const out = joinStdoutStderr(stdout, stderr);
+  return asTextContent(out || "OK");
 }
