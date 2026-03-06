@@ -1,29 +1,27 @@
 ---
-name: deployment-runbook
-description: Generic deployment and release runbook for this repository using PR-first flow and Release Please.
+name: deployment-runbook-0.1
+description: Archived deployment runbook snapshot for the initial v0.1.0 release flow.
 ---
 
 # Deployment Runbook
 
 ## Scope
 
-This runbook covers ongoing release operations for this repository:
+This runbook covers:
 
-1. PR-first integration to `main`
-2. Automated release PRs via Release Please
-3. Tag/release verification after merge
+1. Pushing this project to a fresh GitHub remote
+2. Releasing `v0.1.0` with Release Please
 
 ## Prerequisites
 
 1. Clean local branch with intended release commits
 2. Local checks passing (`npm run check`)
+3. Empty GitHub repository created (no initialized files)
 
 ## One-Time Remote Setup
 
-Use this only when bootstrapping a new remote:
-
 1. Set the new remote URL as `origin`.
-2. Push initial branch(es) and establish `main`.
+2. Push your release branch to `main` on the new remote.
 3. Verify `main` is the default branch in GitHub.
 
 ## Required GitHub Settings
@@ -38,12 +36,12 @@ Use this only when bootstrapping a new remote:
 2. Wait for CI workflow (`.github/workflows/ci.yml`) on `main` to pass.
 3. Wait for Release Please workflow (`.github/workflows/release-please.yml`) to open a release PR.
 4. Review the Release Please PR:
-   - expected semver bump for current scope
+   - expected version is `0.1.0`
    - changelog content matches intended scope
    - package metadata changes are correct
 5. Merge the Release Please PR.
 6. Verify release outputs:
-   - expected git tag for the released version
+   - git tag `v0.1.0`
    - GitHub Release created
    - `CHANGELOG.md` and version bump committed to `main`
 
@@ -51,7 +49,6 @@ Use this only when bootstrapping a new remote:
 
 1. `CHANGELOG.md` is managed by Release Please. Do not maintain it manually.
 2. If Release Please proposes an unexpected version, do not merge; fix config first.
-3. Historical release-specific guidance for the initial release is archived at `docs/archived/DEPLOYMENT_0.1.md`.
 
 ## Troubleshooting
 
