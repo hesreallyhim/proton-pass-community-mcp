@@ -25,6 +25,8 @@ As this project is in its initial stages, it exposes the following tools:
 | `list_invites`             | List pending invitations                         |
 | `view_settings`            | View current Proton Pass CLI settings            |
 | `list_vault_members`       | List members of a specific vault                 |
+| `vault_member_update`      | Update a vault member role                       |
+| `vault_member_remove`      | Remove a vault member                            |
 | `list_items`               | List vault or share items, omitting contents     |
 | `search_items`             | Search items by title                            |
 | `view_item`                | View item by URI or selectors                    |

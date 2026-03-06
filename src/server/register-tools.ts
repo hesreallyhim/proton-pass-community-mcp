@@ -64,6 +64,10 @@ import {
   listVaultMembersInputSchema,
   listVaultsHandler,
   listVaultsInputSchema,
+  removeVaultMemberHandler,
+  removeVaultMemberInputSchema,
+  updateVaultMemberHandler,
+  updateVaultMemberInputSchema,
   updateVaultHandler,
   updateVaultInputSchema,
 } from "../tools/vault.js";
@@ -249,6 +253,24 @@ export function registerTools(
       inputSchema: listVaultMembersInputSchema,
     },
     withAuthErrorHandling(async (input) => listVaultMembersHandler(passCli, input)),
+  );
+
+  server.registerTool(
+    "vault_member_update",
+    {
+      description: "Update a vault member role.",
+      inputSchema: updateVaultMemberInputSchema,
+    },
+    withAuthErrorHandling(async (input) => updateVaultMemberHandler(passCli, input)),
+  );
+
+  server.registerTool(
+    "vault_member_remove",
+    {
+      description: "Remove a member from a vault.",
+      inputSchema: removeVaultMemberInputSchema,
+    },
+    withAuthErrorHandling(async (input) => removeVaultMemberHandler(passCli, input)),
   );
 
   server.registerTool(

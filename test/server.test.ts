@@ -43,6 +43,8 @@ import {
   deleteVaultHandler,
   listVaultMembersHandler,
   listVaultsHandler,
+  removeVaultMemberHandler,
+  updateVaultMemberHandler,
   updateVaultHandler,
   requireWriteGate,
   startServer,
@@ -1184,6 +1186,54 @@ describe("write handlers", () => {
     expect(runner).toHaveBeenNthCalledWith(2, ["vault", "delete", "--vault-name", "Work"]);
   });
 
+  it("vault member write handlers validate scope and build command arguments", async () => {
+    process.env.ALLOW_WRITE = "1";
+    const runner = makeRunner({ stdout: "ok", stderr: "" });
+
+    await expect(
+      updateVaultMemberHandler(runner, {
+        memberShareId: "m1",
+        role: "editor",
+        confirm: true,
+      }),
+    ).rejects.toThrow("exactly one");
+
+    await updateVaultMemberHandler(runner, {
+      shareId: "s1",
+      memberShareId: "m1",
+      role: "manager",
+      confirm: true,
+    });
+
+    await removeVaultMemberHandler(runner, {
+      vaultName: "Work",
+      memberShareId: "m2",
+      confirm: true,
+    });
+
+    expect(runner).toHaveBeenNthCalledWith(1, [
+      "vault",
+      "member",
+      "update",
+      "--share-id",
+      "s1",
+      "--member-share-id",
+      "m1",
+      "--role",
+      "manager",
+    ]);
+
+    expect(runner).toHaveBeenNthCalledWith(2, [
+      "vault",
+      "member",
+      "remove",
+      "--vault-name",
+      "Work",
+      "--member-share-id",
+      "m2",
+    ]);
+  });
+
   it("createLoginItemHandler handles selector conflicts and generate-password modes", async () => {
     process.env.ALLOW_WRITE = "1";
     const runner = makeRunner({ stdout: '{"id":"1"}', stderr: "" });
@@ -1499,6 +1549,17 @@ describe("server setup", () => {
     await tools.score_password.handler({ password: "MySecureP@ssw0rd", output: "json" });
     await tools.list_vaults.handler({ output: "json" });
     await tools.list_vault_members.handler({ shareId: "s1" });
+    await tools.vault_member_update.handler({
+      shareId: "s1",
+      memberShareId: "m1",
+      role: "editor",
+      confirm: true,
+    });
+    await tools.vault_member_remove.handler({
+      shareId: "s1",
+      memberShareId: "m1",
+      confirm: true,
+    });
     await tools.create_vault.handler({ name: "Sandbox", confirm: true });
     await tools.update_vault.handler({ vaultName: "Sandbox", newName: "Sandbox 2", confirm: true });
     await tools.delete_vault.handler({ vaultName: "Sandbox", confirm: true });
@@ -1555,13 +1616,15 @@ describe("server setup", () => {
     expect(tools.generate_random_password).toBeDefined();
     expect(tools.generate_passphrase).toBeDefined();
     expect(tools.score_password).toBeDefined();
+    expect(tools.vault_member_update).toBeDefined();
+    expect(tools.vault_member_remove).toBeDefined();
     expect(tools.item_totp).toBeDefined();
     expect(tools.create_login_item).toBeDefined();
     expect(tools.create_item_from_template).toBeDefined();
     expect(tools.update_item).toBeDefined();
     expect(tools.delete_item).toBeDefined();
 
-    expect(runner).toHaveBeenCalledTimes(29);
+    expect(runner).toHaveBeenCalledTimes(31);
   });
 
   it("registered tool handlers return standardized auth error payloads", async () => {
