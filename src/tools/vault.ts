@@ -45,6 +45,8 @@ export const createVaultInputSchema = z.object({
   confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
 });
 
+const VAULT_MEMBER_ROLE_OPTIONS = ["viewer", "editor", "manager"] as const;
+
 export const updateVaultInputSchema = z.object({
   shareId: z.string().max(100).optional().describe("Share ID of the vault to update"),
   vaultName: z.string().max(255).optional().describe("Name of the vault to update"),
@@ -58,11 +60,50 @@ export const deleteVaultInputSchema = z.object({
   confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
 });
 
+export const updateVaultMemberInputSchema = z
+  .object({
+    shareId: z.string().max(100).optional().describe("Share ID of the vault"),
+    vaultName: z.string().max(255).optional().describe("Name of the vault"),
+    memberShareId: z.string().max(100).describe("Member share ID to update"),
+    role: z.enum(VAULT_MEMBER_ROLE_OPTIONS).describe("Role to assign"),
+    confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+  })
+  .refine(
+    (input) => {
+      const hasShareId = Boolean(input.shareId);
+      const hasVaultName = Boolean(input.vaultName);
+      return hasShareId !== hasVaultName;
+    },
+    {
+      message: "Provide exactly one of shareId or vaultName.",
+    },
+  );
+
+export const removeVaultMemberInputSchema = z
+  .object({
+    shareId: z.string().max(100).optional().describe("Share ID of the vault"),
+    vaultName: z.string().max(255).optional().describe("Name of the vault"),
+    memberShareId: z.string().max(100).describe("Member share ID to remove"),
+    confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+  })
+  .refine(
+    (input) => {
+      const hasShareId = Boolean(input.shareId);
+      const hasVaultName = Boolean(input.vaultName);
+      return hasShareId !== hasVaultName;
+    },
+    {
+      message: "Provide exactly one of shareId or vaultName.",
+    },
+  );
+
 export type ListVaultsInput = z.infer<typeof listVaultsInputSchema>;
 export type ListVaultMembersInput = z.infer<typeof listVaultMembersInputSchema>;
 export type CreateVaultInput = z.infer<typeof createVaultInputSchema>;
 export type UpdateVaultInput = z.infer<typeof updateVaultInputSchema>;
 export type DeleteVaultInput = z.infer<typeof deleteVaultInputSchema>;
+export type UpdateVaultMemberInput = z.infer<typeof updateVaultMemberInputSchema>;
+export type RemoveVaultMemberInput = z.infer<typeof removeVaultMemberInputSchema>;
 
 export type VaultMemberRef = {
   id: string;
@@ -222,6 +263,36 @@ export async function deleteVaultHandler(
   const args = ["vault", "delete"];
   if (shareId) args.push("--share-id", shareId);
   else args.push("--vault-name", vaultName!);
+  const { stdout, stderr } = await passCli(args);
+  const out = joinStdoutStderr(stdout, stderr);
+  return asTextContent(out || "OK");
+}
+
+export async function updateVaultMemberHandler(
+  passCli: PassCliRunner,
+  { shareId, vaultName, memberShareId, role, confirm }: UpdateVaultMemberInput,
+) {
+  requireWriteGate(confirm);
+  if (!!shareId === !!vaultName) throw new Error("Provide exactly one of shareId or vaultName.");
+  const args = ["vault", "member", "update"];
+  if (shareId) args.push("--share-id", shareId);
+  else args.push("--vault-name", vaultName!);
+  args.push("--member-share-id", memberShareId, "--role", role);
+  const { stdout, stderr } = await passCli(args);
+  const out = joinStdoutStderr(stdout, stderr);
+  return asTextContent(out || "OK");
+}
+
+export async function removeVaultMemberHandler(
+  passCli: PassCliRunner,
+  { shareId, vaultName, memberShareId, confirm }: RemoveVaultMemberInput,
+) {
+  requireWriteGate(confirm);
+  if (!!shareId === !!vaultName) throw new Error("Provide exactly one of shareId or vaultName.");
+  const args = ["vault", "member", "remove"];
+  if (shareId) args.push("--share-id", shareId);
+  else args.push("--vault-name", vaultName!);
+  args.push("--member-share-id", memberShareId);
   const { stdout, stderr } = await passCli(args);
   const out = joinStdoutStderr(stdout, stderr);
   return asTextContent(out || "OK");
