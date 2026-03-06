@@ -49,6 +49,7 @@ import {
   inviteRejectHandler,
   listInvitesHandler,
   listSharesHandler,
+  supportHandler,
   createVaultHandler,
   deleteVaultHandler,
   listVaultMembersHandler,
@@ -60,6 +61,7 @@ import {
   updateVaultHandler,
   requireWriteGate,
   startServer,
+  generateTotpHandler,
   type PassCliResult,
   type PassCliRunner,
 } from "../src/server.js";
@@ -294,6 +296,14 @@ describe("read-only handlers", () => {
 
     expect(runner).toHaveBeenCalledWith(["info"]);
     expect(result).toEqual({ content: [{ type: "text", text: "hello" }] });
+  });
+
+  it("supportHandler returns support output", async () => {
+    const runner = makeRunner({ stdout: "Reach to us if you need help\n", stderr: "" });
+    const result = await supportHandler(runner);
+
+    expect(runner).toHaveBeenCalledWith(["support"]);
+    expect(result).toEqual({ content: [{ type: "text", text: "Reach to us if you need help" }] });
   });
 
   it("checkPassCliVersion parses and evaluates compatibility", async () => {
@@ -1126,6 +1136,23 @@ describe("read-only handlers", () => {
     expect(scoreResult).toEqual({
       content: [{ type: "text", text: '{\n  "password_score": "Strong"\n}' }],
     });
+  });
+
+  it("generateTotpHandler forwards secret and output format", async () => {
+    const runner = makeRunner({ stdout: '{"totp":"123456"}', stderr: "" });
+    const result = await generateTotpHandler(runner, {
+      secretOrUri: "otpauth://totp/Example?secret=JBSWY3DPEHPK3PXP",
+      output: "json",
+    });
+
+    expect(runner).toHaveBeenCalledWith([
+      "totp",
+      "generate",
+      "otpauth://totp/Example?secret=JBSWY3DPEHPK3PXP",
+      "--output",
+      "json",
+    ]);
+    expect(result.content[0].text).toContain('"totp": "123456"');
   });
 });
 
@@ -1973,6 +2000,7 @@ describe("server setup", () => {
 
     await tools.view_session_info.handler();
     await tools.check_status.handler();
+    await tools.support.handler();
     await tools.inject.handler({ inFile: "template.env", confirm: true });
     await tools.run.handler({ command: ["echo", "hello"], confirm: true });
     await tools.view_user_info.handler({ output: "json" });
@@ -1982,6 +2010,10 @@ describe("server setup", () => {
     await tools.generate_random_password.handler({ length: 16, uppercase: true });
     await tools.generate_passphrase.handler({ count: 5, separator: "hyphens" });
     await tools.score_password.handler({ password: "MySecureP@ssw0rd", output: "json" });
+    await tools.generate_totp.handler({
+      secretOrUri: "otpauth://totp/Example?secret=JBSWY3DPEHPK3PXP",
+      output: "json",
+    });
     await tools.list_vaults.handler({ output: "json" });
     await tools.list_vault_members.handler({ shareId: "s1" });
     await tools.update_vault_member.handler({
@@ -2127,6 +2159,8 @@ describe("server setup", () => {
     expect(tools.generate_random_password).toBeDefined();
     expect(tools.generate_passphrase).toBeDefined();
     expect(tools.score_password).toBeDefined();
+    expect(tools.generate_totp).toBeDefined();
+    expect(tools.support).toBeDefined();
     expect(tools.inject).toBeDefined();
     expect(tools.run).toBeDefined();
     expect(tools.update_vault_member).toBeDefined();
@@ -2149,7 +2183,7 @@ describe("server setup", () => {
     expect(tools.share_item).toBeDefined();
     expect(tools.create_item_alias).toBeDefined();
 
-    expect(runner).toHaveBeenCalledTimes(43);
+    expect(runner).toHaveBeenCalledTimes(45);
   });
 
   it("registered tool handlers return standardized auth error payloads", async () => {

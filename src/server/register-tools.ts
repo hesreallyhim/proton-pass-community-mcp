@@ -72,6 +72,8 @@ import {
   viewSettingsHandler,
 } from "../tools/settings.js";
 import { listSharesHandler, listSharesInputSchema } from "../tools/share.js";
+import { supportHandler } from "../tools/support.js";
+import { generateTotpHandler, generateTotpInputSchema } from "../tools/totp.js";
 import {
   createVaultHandler,
   createVaultInputSchema,
@@ -113,6 +115,14 @@ export function registerTools(
         "Run preflight checks for connectivity/authentication and CLI version compatibility.",
     },
     async () => checkStatusHandler(passCli, versionPolicy),
+  );
+
+  server.registerTool(
+    "support",
+    {
+      description: "Display Proton Pass CLI support guidance text.",
+    },
+    withAuthErrorHandling(async () => supportHandler(passCli)),
   );
 
   server.registerTool(
@@ -283,6 +293,15 @@ export function registerTools(
       inputSchema: scorePasswordInputSchema,
     },
     withAuthErrorHandling(async (input) => scorePasswordHandler(passCli, input)),
+  );
+
+  server.registerTool(
+    "generate_totp",
+    {
+      description: "Generate a TOTP token from a secret or otpauth URI.",
+      inputSchema: generateTotpInputSchema,
+    },
+    withAuthErrorHandling(async (input) => generateTotpHandler(passCli, input)),
   );
 
   server.registerTool(
