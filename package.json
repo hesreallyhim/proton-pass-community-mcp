@@ -52,7 +52,7 @@
     "@modelcontextprotocol/inspector": "^0.21.1",
     "@vitest/coverage-v8": "^4.0.18",
     "eslint": "^10.0.2",
-    "globals": "^17.3.0",
+    "globals": "^17.4.0",
     "husky": "^9.1.7",
     "prettier": "^3.8.1",
     "tsx": "^4.21.0",
