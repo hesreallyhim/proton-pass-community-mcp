@@ -23,6 +23,7 @@ export * from "./pass-cli/version.js";
 export * from "./tools/check-status.js";
 export * from "./tools/invite.js";
 export * from "./tools/item.js";
+export * from "./tools/password.js";
 export * from "./tools/session.js";
 export * from "./tools/settings.js";
 export * from "./tools/share.js";

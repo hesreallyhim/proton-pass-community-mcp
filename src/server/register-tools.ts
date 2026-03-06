@@ -31,6 +31,14 @@ import {
   listInvitesInputSchema,
 } from "../tools/invite.js";
 import {
+  generatePassphraseHandler,
+  generatePassphraseInputSchema,
+  generateRandomPasswordHandler,
+  generateRandomPasswordInputSchema,
+  scorePasswordHandler,
+  scorePasswordInputSchema,
+} from "../tools/password.js";
+import {
   viewSessionInfoHandler,
   viewUserInfoHandler,
   viewUserInfoInputSchema,
@@ -205,6 +213,33 @@ export function registerTools(
       inputSchema: settingsUnsetDefaultFormatInputSchema,
     },
     withAuthErrorHandling(async (input) => settingsUnsetDefaultFormatHandler(passCli, input)),
+  );
+
+  server.registerTool(
+    "generate_random_password",
+    {
+      description: "Generate a random password.",
+      inputSchema: generateRandomPasswordInputSchema,
+    },
+    withAuthErrorHandling(async (input) => generateRandomPasswordHandler(passCli, input)),
+  );
+
+  server.registerTool(
+    "generate_passphrase",
+    {
+      description: "Generate a passphrase.",
+      inputSchema: generatePassphraseInputSchema,
+    },
+    withAuthErrorHandling(async (input) => generatePassphraseHandler(passCli, input)),
+  );
+
+  server.registerTool(
+    "score_password",
+    {
+      description: "Score password strength.",
+      inputSchema: scorePasswordInputSchema,
+    },
+    withAuthErrorHandling(async (input) => scorePasswordHandler(passCli, input)),
   );
 
   server.registerTool(
