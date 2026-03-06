@@ -49,12 +49,8 @@ import {
   viewUserInfoInputSchema,
 } from "../tools/session.js";
 import {
-  settingsSetDefaultFormatHandler,
-  settingsSetDefaultFormatInputSchema,
   settingsSetDefaultVaultHandler,
   settingsSetDefaultVaultInputSchema,
-  settingsUnsetDefaultFormatHandler,
-  settingsUnsetDefaultFormatInputSchema,
   settingsUnsetDefaultVaultHandler,
   settingsUnsetDefaultVaultInputSchema,
   viewSettingsHandler,
@@ -238,30 +234,12 @@ export function registerTools(
   );
 
   server.registerTool(
-    "set_default_format",
-    {
-      description: "Set default output format (human/json).",
-      inputSchema: settingsSetDefaultFormatInputSchema,
-    },
-    withAuthErrorHandling(async (input) => settingsSetDefaultFormatHandler(passCli, input)),
-  );
-
-  server.registerTool(
     "unset_default_vault",
     {
       description: "Unset default vault setting.",
       inputSchema: settingsUnsetDefaultVaultInputSchema,
     },
     withAuthErrorHandling(async (input) => settingsUnsetDefaultVaultHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "unset_default_format",
-    {
-      description: "Unset default output format setting.",
-      inputSchema: settingsUnsetDefaultFormatInputSchema,
-    },
-    withAuthErrorHandling(async (input) => settingsUnsetDefaultFormatHandler(passCli, input)),
   );
 
   server.registerTool(
