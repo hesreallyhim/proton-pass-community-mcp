@@ -23,6 +23,7 @@ Primary optimization target: item discovery (`pass-cli item list`) should return
 5. Listing/search tools return references, then callers use `view_item` for full content.
 6. Release branches may retain non-release code paths, but only release-scoped tools are registered/exposed by default.
 7. Authentication lifecycle (`pass-cli login`, `pass-cli logout`) remains out-of-band and is not exposed as MCP tools.
+8. CLI binary lifecycle commands (for example `pass-cli update` / track switching) remain out-of-band and are not exposed as MCP tools.
 
 ## Shared Schemas
 
@@ -225,7 +226,7 @@ Status key:
 | `check_status`      | `pass-cli test` + `pass-cli --version` | Implemented                | none                                                   | Connectivity/auth preflight + CLI version compatibility |
 | `view_session_info` | `pass-cli info`                        | Implemented                | `output?`                                              | Account/session info                                    |
 | `view_user_info`    | `pass-cli user info`                   | Implemented                | `output?`                                              | User profile                                            |
-| `update`            | `pass-cli update`                      | Planned                    | `yes?`, `setTrack?`, `confirm`                         | Update result                                           |
+| `update`            | `pass-cli update`                      | Out of Scope (Out-of-Band) | n/a                                                    | n/a                                                     |
 | `support`           | `pass-cli support`                     | Planned                    | none                                                   | Support guidance text                                   |
 | `inject`            | `pass-cli inject`                      | Planned                    | `inFile`, `outFile?`, `fileMode?`, `force?`, `confirm` | Output path/status                                      |
 | `run`               | `pass-cli run`                         | Planned                    | `command[]`, `envFile[]?`, `noMasking?`, `confirm`     | Exit code/stdout/stderr summary                         |
