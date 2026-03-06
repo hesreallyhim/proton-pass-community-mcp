@@ -21,8 +21,13 @@ import {
   PassCliAuthError,
   viewSessionInfoHandler,
   createLoginItemFromTemplateHandler,
+  createCreditCardItemHandler,
+  createCustomItemHandler,
+  createIdentityItemHandler,
   createItemAliasHandler,
   createLoginItemHandler,
+  createNoteItemHandler,
+  createWifiItemHandler,
   deleteItemHandler,
   itemTotpHandler,
   listItemsHandler,
@@ -1419,6 +1424,140 @@ describe("write handlers", () => {
     );
   });
 
+  it("createNote/CreditCard/Wifi handlers validate scope and build command arguments", async () => {
+    process.env.ALLOW_WRITE = "1";
+    const runner = makeRunner({ stdout: '{"ok":true}', stderr: "" });
+
+    await expect(
+      createNoteItemHandler(runner, {
+        shareId: "s1",
+        vaultName: "Work",
+        title: "Note",
+        note: "body",
+        confirm: true,
+      }),
+    ).rejects.toThrow("Provide only one of shareId or vaultName");
+
+    await createNoteItemHandler(runner, {
+      shareId: "s1",
+      title: "Note",
+      note: "body",
+      confirm: true,
+    });
+
+    await createCreditCardItemHandler(runner, {
+      vaultName: "Work",
+      title: "Card",
+      cardholderName: "A U Thor",
+      number: "4111111111111111",
+      cvv: "123",
+      expirationDate: "2027-12",
+      pin: "0000",
+      note: "Demo",
+      confirm: true,
+    });
+
+    await createWifiItemHandler(runner, {
+      shareId: "s1",
+      title: "Cafe WiFi",
+      ssid: "Cafe",
+      password: "",
+      security: "open",
+      note: "Guest",
+      confirm: true,
+    });
+
+    expect(runner).toHaveBeenNthCalledWith(1, [
+      "item",
+      "create",
+      "note",
+      "--share-id",
+      "s1",
+      "--title",
+      "Note",
+      "--note",
+      "body",
+    ]);
+
+    expect(runner).toHaveBeenNthCalledWith(2, [
+      "item",
+      "create",
+      "credit-card",
+      "--vault-name",
+      "Work",
+      "--title",
+      "Card",
+      "--cardholder-name",
+      "A U Thor",
+      "--number",
+      "4111111111111111",
+      "--cvv",
+      "123",
+      "--expiration-date",
+      "2027-12",
+      "--pin",
+      "0000",
+      "--note",
+      "Demo",
+    ]);
+
+    expect(runner).toHaveBeenNthCalledWith(3, [
+      "item",
+      "create",
+      "wifi",
+      "--share-id",
+      "s1",
+      "--title",
+      "Cafe WiFi",
+      "--ssid",
+      "Cafe",
+      "--password",
+      "",
+      "--security",
+      "open",
+      "--note",
+      "Guest",
+    ]);
+  });
+
+  it("createCustom/Identity handlers validate scope and forward template stdin", async () => {
+    process.env.ALLOW_WRITE = "1";
+    const runner = makeRunner({ stdout: '{"ok":true}', stderr: "" });
+
+    await expect(
+      createCustomItemHandler(runner, {
+        shareId: "s1",
+        vaultName: "Work",
+        template: { title: "Custom 1" },
+        confirm: true,
+      }),
+    ).rejects.toThrow("Provide only one of shareId or vaultName");
+
+    await createCustomItemHandler(runner, {
+      shareId: "s1",
+      template: { title: "Custom 1", note: null },
+      confirm: true,
+    });
+
+    expect(runner).toHaveBeenNthCalledWith(
+      1,
+      ["item", "create", "custom", "--from-template", "-", "--share-id", "s1"],
+      '{"title":"Custom 1","note":null}',
+    );
+
+    await createIdentityItemHandler(runner, {
+      vaultName: "Work",
+      template: { title: "Identity 1", first_name: "Ada", work_email: null },
+      confirm: true,
+    });
+
+    expect(runner).toHaveBeenNthCalledWith(
+      2,
+      ["item", "create", "identity", "--from-template", "-", "--vault-name", "Work"],
+      '{"title":"Identity 1","first_name":"Ada","work_email":null}',
+    );
+  });
+
   it("updateItemHandler validates selectors and builds field arguments", async () => {
     process.env.ALLOW_WRITE = "1";
     const runner = makeRunner({ stdout: "", stderr: "updated" });
@@ -1835,6 +1974,42 @@ describe("server setup", () => {
       output: "json",
       confirm: true,
     });
+    await tools.create_note_item.handler({
+      vaultName: "Sandbox",
+      title: "Note 1",
+      note: "demo",
+      confirm: true,
+    });
+    await tools.create_credit_card_item.handler({
+      shareId: "s1",
+      title: "Card 1",
+      number: "4111111111111111",
+      expirationDate: "2027-12",
+      confirm: true,
+    });
+    await tools.create_wifi_item.handler({
+      shareId: "s1",
+      title: "Wifi 1",
+      ssid: "Guest",
+      security: "open",
+      confirm: true,
+    });
+    await tools.create_custom_item.handler({
+      shareId: "s1",
+      template: {
+        title: "Custom 1",
+        note: null,
+      },
+      confirm: true,
+    });
+    await tools.create_identity_item.handler({
+      vaultName: "Sandbox",
+      template: {
+        title: "Identity 1",
+        first_name: "Ada",
+      },
+      confirm: true,
+    });
     await tools.update_item.handler({
       shareId: "s1",
       itemId: "i1",
@@ -1879,12 +2054,17 @@ describe("server setup", () => {
     expect(tools.generate_item_totp).toBeDefined();
     expect(tools.create_login_item).toBeDefined();
     expect(tools.create_login_item_from_template).toBeDefined();
+    expect(tools.create_note_item).toBeDefined();
+    expect(tools.create_credit_card_item).toBeDefined();
+    expect(tools.create_wifi_item).toBeDefined();
+    expect(tools.create_custom_item).toBeDefined();
+    expect(tools.create_identity_item).toBeDefined();
     expect(tools.update_item).toBeDefined();
     expect(tools.delete_item).toBeDefined();
     expect(tools.share_item).toBeDefined();
     expect(tools.create_item_alias).toBeDefined();
 
-    expect(runner).toHaveBeenCalledTimes(35);
+    expect(runner).toHaveBeenCalledTimes(40);
   });
 
   it("registered tool handlers return standardized auth error payloads", async () => {

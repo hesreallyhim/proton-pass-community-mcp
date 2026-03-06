@@ -6,12 +6,22 @@ import type { PassCliVersionPolicy } from "../pass-cli/version.js";
 import { checkStatusHandler } from "../tools/check-status.js";
 import { injectHandler, injectInputSchema, runHandler, runInputSchema } from "../tools/contents.js";
 import {
+  createCreditCardItemHandler,
+  createCreditCardItemInputSchema,
+  createCustomItemHandler,
+  createCustomItemInputSchema,
+  createIdentityItemHandler,
+  createIdentityItemInputSchema,
   createItemAliasHandler,
   createItemAliasInputSchema,
   createLoginItemFromTemplateHandler,
   createLoginItemFromTemplateInputSchema,
   createLoginItemHandler,
   createLoginItemInputSchema,
+  createNoteItemHandler,
+  createNoteItemInputSchema,
+  createWifiItemHandler,
+  createWifiItemInputSchema,
   deleteItemHandler,
   deleteItemInputSchema,
   itemTotpHandler,
@@ -341,6 +351,51 @@ export function registerTools(
       inputSchema: createLoginItemFromTemplateInputSchema,
     },
     withAuthErrorHandling(async (input) => createLoginItemFromTemplateHandler(passCli, input)),
+  );
+
+  server.registerTool(
+    "create_note_item",
+    {
+      description: "Create a note item in a vault or share.",
+      inputSchema: createNoteItemInputSchema,
+    },
+    withAuthErrorHandling(async (input) => createNoteItemHandler(passCli, input)),
+  );
+
+  server.registerTool(
+    "create_credit_card_item",
+    {
+      description: "Create a credit card item in a vault or share.",
+      inputSchema: createCreditCardItemInputSchema,
+    },
+    withAuthErrorHandling(async (input) => createCreditCardItemHandler(passCli, input)),
+  );
+
+  server.registerTool(
+    "create_wifi_item",
+    {
+      description: "Create a WiFi item in a vault or share.",
+      inputSchema: createWifiItemInputSchema,
+    },
+    withAuthErrorHandling(async (input) => createWifiItemHandler(passCli, input)),
+  );
+
+  server.registerTool(
+    "create_custom_item",
+    {
+      description: "Create a custom item from template payload in a vault or share.",
+      inputSchema: createCustomItemInputSchema,
+    },
+    withAuthErrorHandling(async (input) => createCustomItemHandler(passCli, input)),
+  );
+
+  server.registerTool(
+    "create_identity_item",
+    {
+      description: "Create an identity item from template payload in a vault or share.",
+      inputSchema: createIdentityItemInputSchema,
+    },
+    withAuthErrorHandling(async (input) => createIdentityItemHandler(passCli, input)),
   );
 
   server.registerTool(
