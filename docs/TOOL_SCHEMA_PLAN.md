@@ -243,6 +243,20 @@ Output:
 1. `structuredContent` with parsed settings when machine-readable shape is derivable.
 2. `content` remains present for debugging/interoperability.
 
+## Resource Inventory
+
+Status key:
+
+1. `Implemented`: currently registered as MCP resources.
+2. `Planned`: not yet registered.
+
+| Resource URI Prefix                   | Status      | Source                                                                 | Notes                                                                                     |
+| ------------------------------------- | ----------- | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| `pass://templates/item-create`        | Implemented | Snapshot artifact (`docs/testing/item-create-templates.snapshot.json`) | Catalog/index resource                                                                    |
+| `pass://templates/item-create/<type>` | Implemented | Snapshot artifact (`docs/testing/item-create-templates.snapshot.json`) | Per-type template resource (`login`, `note`, `credit-card`, `wifi`, `custom`, `identity`) |
+| `pass://vaults`                       | Planned     | MCP-native                                                             | High-read vault listing                                                                   |
+| `pass://share/<id>/items`             | Planned     | MCP-native                                                             | High-read item refs                                                                       |
+
 ## Planned Tool Inventory
 
 Status key:
@@ -309,23 +323,24 @@ Input summary convention:
 
 ### Item Creation
 
-| Tool                              | Source                                       | Status                     | Input Summary                                                                         | Output Summary                                                                   |
-| --------------------------------- | -------------------------------------------- | -------------------------- | ------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ------------ |
-| `create_login_item`               | `pass-cli item create login`                 | Implemented                | required: `title`, `confirm`; optional: selector `shareId                             | vaultName`, `username`, `email`, `password`, `url`, `generatePassword`, `output` | Created item |
-| `create_login_item_from_template` | `pass-cli item create login --from-template` | Implemented                | required: `template.title`, `template.urls[]`, `confirm`; optional: selector `shareId | vaultName`, `template.username`, `template.email`, `template.password`, `output` | Created item |
-| `create_note_item`                | `pass-cli item create note`                  | Planned                    | required: `confirm`; selector + note fields (TBD)                                     | Created item                                                                     |
-| `create_credit_card_item`         | `pass-cli item create credit-card`           | Planned                    | required: `confirm`; selector + card fields (TBD)                                     | Created item                                                                     |
-| `create_wifi_item`                | `pass-cli item create wifi`                  | Planned                    | required: `confirm`; selector + wifi fields (TBD)                                     | Created item                                                                     |
-| `create_custom_item`              | `pass-cli item create custom`                | Planned                    | required: `confirm`; selector + custom fields (TBD)                                   | Created item                                                                     |
-| `create_identity_item`            | `pass-cli item create identity`              | Planned                    | required: `confirm`; selector + identity fields (TBD)                                 | Created item                                                                     |
-| `generate_ssh_key_item`           | `pass-cli item create ssh-key generate`      | Out of Scope (Out-of-Band) | n/a                                                                                   | n/a                                                                              |
-| `import_ssh_key_item`             | `pass-cli item create ssh-key import`        | Out of Scope (Out-of-Band) | n/a                                                                                   | n/a                                                                              |
+| Tool                              | Source                                       | Status                     | Input Summary                                                                                          | Output Summary                                                                   |
+| --------------------------------- | -------------------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------- | ------------ |
+| `create_login_item`               | `pass-cli item create login`                 | Implemented                | required: `title`, `confirm`; optional: selector `shareId \\                                           | vaultName`, `username`, `email`, `password`, `url`, `generatePassword`, `output` | Created item |
+| `create_login_item_from_template` | `pass-cli item create login --from-template` | Implemented                | required: `template.title`, `template.urls[]`, `confirm`; optional: selector `shareId \\               | vaultName`, `template.username`, `template.email`, `template.password`, `output` | Created item |
+| `create_note_item`                | `pass-cli item create note`                  | Planned                    | required: `confirm`; optional: selector + note fields; template mode supported by CLI (schema TBD)     | Created item                                                                     |
+| `create_credit_card_item`         | `pass-cli item create credit-card`           | Planned                    | required: `confirm`; optional: selector + card fields; template mode supported by CLI (schema TBD)     | Created item                                                                     |
+| `create_wifi_item`                | `pass-cli item create wifi`                  | Planned                    | required: `confirm`; optional: selector + wifi fields; template mode supported by CLI (schema TBD)     | Created item                                                                     |
+| `create_custom_item`              | `pass-cli item create custom`                | Planned                    | required: `confirm`; optional: selector + custom fields; template mode supported by CLI (schema TBD)   | Created item                                                                     |
+| `create_identity_item`            | `pass-cli item create identity`              | Planned                    | required: `confirm`; optional: selector + identity fields; template mode supported by CLI (schema TBD) | Created item                                                                     |
+| `generate_ssh_key_item`           | `pass-cli item create ssh-key generate`      | Out of Scope (Out-of-Band) | n/a                                                                                                    | n/a                                                                              |
+| `import_ssh_key_item`             | `pass-cli item create ssh-key import`        | Out of Scope (Out-of-Band) | n/a                                                                                                    | n/a                                                                              |
 
 Notes:
 
-1. Docs verification (snapshot `v1.5.2` and `protonpass.github.io`, checked on March 6, 2026): `--get-template` / `--from-template` are documented under `item create login`, and the only explicit schema documented is "Login template format".
-2. This plan therefore treats template-driven creation as login-scoped unless upstream docs and/or approved empirical validation confirm additional item-type template contracts.
-3. `item create login --get-template` is currently out-of-band (not exposed as an MCP tool).
+1. Docs verification (snapshot `v1.5.2` and `protonpass.github.io`, checked on March 6, 2026): template options and explicit schema documentation are centered on login.
+2. Empirical validation against the throwaway account on March 6, 2026 (`scripts/pass-dev.sh`) confirmed `--get-template` and `--from-template` support for `note`, `credit-card`, `custom`, `wifi`, and `identity` (in addition to `login`).
+3. Because non-login template payload schemas are less explicitly documented upstream, this MCP currently exposes only `create_login_item_from_template`; expanding template tools for other types should include per-type schema hardening/tests.
+4. `item create login --get-template` is currently out-of-band (not exposed as an MCP tool).
 
 ### Item Alias, Attachment, and Members
 

@@ -1,0 +1,102 @@
+{
+  "captured_at": "2026-03-06T15:24:35.287Z",
+  "captured_by": "scripts/pass-dev.sh item create <type> --get-template",
+  "pass_cli_version": "Proton Pass CLI 1.5.2 (41cf394)",
+  "templates": {
+    "login": {
+      "title": "",
+      "username": null,
+      "email": null,
+      "password": null,
+      "urls": []
+    },
+    "note": {
+      "title": "",
+      "note": null
+    },
+    "credit-card": {
+      "title": "",
+      "cardholder_name": null,
+      "card_type": null,
+      "number": null,
+      "cvv": null,
+      "expiration_date": null,
+      "pin": null,
+      "note": null
+    },
+    "wifi": {
+      "title": "",
+      "ssid": "",
+      "password": "",
+      "security": "",
+      "note": ""
+    },
+    "custom": {
+      "title": "",
+      "note": "",
+      "sections": [
+        {
+          "section_name": "Section 1",
+          "fields": [
+            {
+              "field_name": "Text Field",
+              "field_type": "text",
+              "value": ""
+            },
+            {
+              "field_name": "Hidden Field",
+              "field_type": "hidden",
+              "value": ""
+            },
+            {
+              "field_name": "TOTP Field",
+              "field_type": "totp",
+              "value": "otpauth://..."
+            },
+            {
+              "field_name": "Timestamp Field",
+              "field_type": "timestamp",
+              "value": "1730000000"
+            }
+          ]
+        }
+      ]
+    },
+    "identity": {
+      "title": "",
+      "note": "",
+      "full_name": "",
+      "email": "",
+      "phone_number": "",
+      "first_name": "",
+      "middle_name": "",
+      "last_name": "",
+      "birthdate": "",
+      "gender": "",
+      "organization": "",
+      "street_address": "",
+      "zip_or_postal_code": "",
+      "city": "",
+      "state_or_province": "",
+      "country_or_region": "",
+      "floor": "",
+      "county": "",
+      "social_security_number": "",
+      "passport_number": "",
+      "license_number": "",
+      "website": "",
+      "x_handle": "",
+      "second_phone_number": "",
+      "linkedin": "",
+      "reddit": "",
+      "facebook": "",
+      "yahoo": "",
+      "instagram": "",
+      "company": "",
+      "job_title": "",
+      "personal_website": "",
+      "work_phone_number": "",
+      "work_email": ""
+    }
+  }
+}

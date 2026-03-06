@@ -54,6 +54,22 @@ Mutative tools currently require write gate opt-in (`ALLOW_WRITE=1`) and explici
 
 Proposed protocol-aligned confirmation policy (elicitation-first with fail-closed fallback) is documented in [docs/TOOL_SCHEMA_PLAN.md](./docs/TOOL_SCHEMA_PLAN.md#write-authorization-and-confirmation-policy-proposal).
 
+## Available Resources
+
+The server also exposes static MCP resources for item-create template snapshots:
+
+- `pass://templates/item-create` (catalog/index)
+- `pass://templates/item-create/login`
+- `pass://templates/item-create/note`
+- `pass://templates/item-create/credit-card`
+- `pass://templates/item-create/wifi`
+- `pass://templates/item-create/custom`
+- `pass://templates/item-create/identity`
+
+Snapshot artifact source:
+
+- [docs/testing/item-create-templates.snapshot.json](./docs/testing/item-create-templates.snapshot.json)
+
 ## Item Discovery Contract
 
 `list_items` and `search_items` return token-efficient results. These operations do not contain the full contents or secrets of any items, thus preventing unnecessary leakage of sensitive data from the CLI to the host application or the LLM.
