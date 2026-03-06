@@ -98,6 +98,24 @@ export const updateVaultMemberInputSchema = z
     },
   );
 
+export const transferVaultInputSchema = z
+  .object({
+    shareId: z.string().max(100).optional().describe("Share ID of the vault"),
+    vaultName: z.string().max(255).optional().describe("Name of the vault"),
+    memberShareId: z.string().max(100).describe("Member share ID that will become owner"),
+    confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+  })
+  .refine(
+    (input) => {
+      const hasShareId = Boolean(input.shareId);
+      const hasVaultName = Boolean(input.vaultName);
+      return hasShareId !== hasVaultName;
+    },
+    {
+      message: "Provide exactly one of shareId or vaultName.",
+    },
+  );
+
 export const removeVaultMemberInputSchema = z
   .object({
     shareId: z.string().max(100).optional().describe("Share ID of the vault"),
@@ -123,6 +141,7 @@ export type UpdateVaultInput = z.infer<typeof updateVaultInputSchema>;
 export type DeleteVaultInput = z.infer<typeof deleteVaultInputSchema>;
 export type ShareVaultInput = z.infer<typeof shareVaultInputSchema>;
 export type UpdateVaultMemberInput = z.infer<typeof updateVaultMemberInputSchema>;
+export type TransferVaultInput = z.infer<typeof transferVaultInputSchema>;
 export type RemoveVaultMemberInput = z.infer<typeof removeVaultMemberInputSchema>;
 
 export type VaultMemberRef = {
@@ -329,6 +348,21 @@ export async function removeVaultMemberHandler(
   if (shareId) args.push("--share-id", shareId);
   else args.push("--vault-name", vaultName!);
   args.push("--member-share-id", memberShareId);
+  const { stdout, stderr } = await passCli(args);
+  const out = joinStdoutStderr(stdout, stderr);
+  return asTextContent(out || "OK");
+}
+
+export async function transferVaultHandler(
+  passCli: PassCliRunner,
+  { shareId, vaultName, memberShareId, confirm }: TransferVaultInput,
+) {
+  requireWriteGate(confirm);
+  if (!!shareId === !!vaultName) throw new Error("Provide exactly one of shareId or vaultName.");
+  const args = ["vault", "transfer"];
+  if (shareId) args.push("--share-id", shareId);
+  else args.push("--vault-name", vaultName!);
+  args.push(memberShareId);
   const { stdout, stderr } = await passCli(args);
   const out = joinStdoutStderr(stdout, stderr);
   return asTextContent(out || "OK");
