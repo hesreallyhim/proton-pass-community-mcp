@@ -83,7 +83,10 @@ if [[ -z "${ACTUAL_ACCOUNT}" ]]; then
   exit 4
 fi
 
-if [[ "${ACTUAL_ACCOUNT,,}" != "${EXPECTED_ACCOUNT,,}" ]]; then
+ACTUAL_ACCOUNT_NORM="$(printf '%s' "${ACTUAL_ACCOUNT}" | tr '[:upper:]' '[:lower:]')"
+EXPECTED_ACCOUNT_NORM="$(printf '%s' "${EXPECTED_ACCOUNT}" | tr '[:upper:]' '[:lower:]')"
+
+if [[ "${ACTUAL_ACCOUNT_NORM}" != "${EXPECTED_ACCOUNT_NORM}" ]]; then
   cat >&2 <<EOF
 Refusing to continue: active pass-cli account does not match throwaway target.
 
