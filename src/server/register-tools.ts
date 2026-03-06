@@ -33,7 +33,17 @@ import {
   viewUserInfoHandler,
   viewUserInfoInputSchema,
 } from "../tools/session.js";
-import { viewSettingsHandler } from "../tools/settings.js";
+import {
+  settingsSetDefaultFormatHandler,
+  settingsSetDefaultFormatInputSchema,
+  settingsSetDefaultVaultHandler,
+  settingsSetDefaultVaultInputSchema,
+  settingsUnsetDefaultFormatHandler,
+  settingsUnsetDefaultFormatInputSchema,
+  settingsUnsetDefaultVaultHandler,
+  settingsUnsetDefaultVaultInputSchema,
+  viewSettingsHandler,
+} from "../tools/settings.js";
 import { listSharesHandler, listSharesInputSchema } from "../tools/share.js";
 import {
   createVaultHandler,
@@ -157,6 +167,42 @@ export function registerTools(
       description: "View current Proton Pass CLI settings.",
     },
     withAuthErrorHandling(async () => viewSettingsHandler(passCli)),
+  );
+
+  server.registerTool(
+    "settings_set_default_vault",
+    {
+      description: "Set default vault by share ID or vault name.",
+      inputSchema: settingsSetDefaultVaultInputSchema,
+    },
+    withAuthErrorHandling(async (input) => settingsSetDefaultVaultHandler(passCli, input)),
+  );
+
+  server.registerTool(
+    "settings_set_default_format",
+    {
+      description: "Set default output format (human/json).",
+      inputSchema: settingsSetDefaultFormatInputSchema,
+    },
+    withAuthErrorHandling(async (input) => settingsSetDefaultFormatHandler(passCli, input)),
+  );
+
+  server.registerTool(
+    "settings_unset_default_vault",
+    {
+      description: "Unset default vault setting.",
+      inputSchema: settingsUnsetDefaultVaultInputSchema,
+    },
+    withAuthErrorHandling(async (input) => settingsUnsetDefaultVaultHandler(passCli, input)),
+  );
+
+  server.registerTool(
+    "settings_unset_default_format",
+    {
+      description: "Unset default output format setting.",
+      inputSchema: settingsUnsetDefaultFormatInputSchema,
+    },
+    withAuthErrorHandling(async (input) => settingsUnsetDefaultFormatHandler(passCli, input)),
   );
 
   server.registerTool(

@@ -25,6 +25,10 @@ import {
   searchItemsHandler,
   updateItemHandler,
   viewItemHandler,
+  settingsSetDefaultFormatHandler,
+  settingsSetDefaultVaultHandler,
+  settingsUnsetDefaultFormatHandler,
+  settingsUnsetDefaultVaultHandler,
   viewSettingsHandler,
   viewUserInfoHandler,
   inviteAcceptHandler,
@@ -1290,6 +1294,45 @@ describe("write handlers", () => {
     expect(runner).toHaveBeenNthCalledWith(1, ["invite", "accept", "--invite-token", "tok-accept"]);
     expect(runner).toHaveBeenNthCalledWith(2, ["invite", "reject", "--invite-token", "tok-reject"]);
   });
+
+  it("settings default handlers enforce gate and call expected commands", async () => {
+    const runner = makeRunner({ stdout: "", stderr: "" });
+    process.env.ALLOW_WRITE = "1";
+
+    await expect(
+      settingsSetDefaultVaultHandler(runner, {
+        shareId: "s1",
+        vaultName: "Work",
+        confirm: true,
+      }),
+    ).rejects.toThrow("Provide exactly one of shareId or vaultName");
+
+    await settingsSetDefaultVaultHandler(runner, {
+      vaultName: "Work",
+      confirm: true,
+    });
+    await settingsSetDefaultFormatHandler(runner, {
+      format: "json",
+      confirm: true,
+    });
+    await settingsUnsetDefaultVaultHandler(runner, {
+      confirm: true,
+    });
+    await settingsUnsetDefaultFormatHandler(runner, {
+      confirm: true,
+    });
+
+    expect(runner).toHaveBeenNthCalledWith(1, [
+      "settings",
+      "set",
+      "default-vault",
+      "--vault-name",
+      "Work",
+    ]);
+    expect(runner).toHaveBeenNthCalledWith(2, ["settings", "set", "default-format", "json"]);
+    expect(runner).toHaveBeenNthCalledWith(3, ["settings", "unset", "default-vault"]);
+    expect(runner).toHaveBeenNthCalledWith(4, ["settings", "unset", "default-format"]);
+  });
 });
 
 describe("server setup", () => {
@@ -1326,6 +1369,10 @@ describe("server setup", () => {
     await tools.check_status.handler();
     await tools.view_user_info.handler({ output: "json" });
     await tools.view_settings.handler();
+    await tools.settings_set_default_vault.handler({ vaultName: "Sandbox", confirm: true });
+    await tools.settings_set_default_format.handler({ format: "json", confirm: true });
+    await tools.settings_unset_default_vault.handler({ confirm: true });
+    await tools.settings_unset_default_format.handler({ confirm: true });
     await tools.list_vaults.handler({ output: "json" });
     await tools.list_vault_members.handler({ shareId: "s1" });
     await tools.create_vault.handler({ name: "Sandbox", confirm: true });
@@ -1376,12 +1423,16 @@ describe("server setup", () => {
     expect(tools.delete_vault).toBeDefined();
     expect(tools.invite_accept).toBeDefined();
     expect(tools.invite_reject).toBeDefined();
+    expect(tools.settings_set_default_vault).toBeDefined();
+    expect(tools.settings_set_default_format).toBeDefined();
+    expect(tools.settings_unset_default_vault).toBeDefined();
+    expect(tools.settings_unset_default_format).toBeDefined();
     expect(tools.create_login_item).toBeDefined();
     expect(tools.create_item_from_template).toBeDefined();
     expect(tools.update_item).toBeDefined();
     expect(tools.delete_item).toBeDefined();
 
-    expect(runner).toHaveBeenCalledTimes(21);
+    expect(runner).toHaveBeenCalledTimes(25);
   });
 
   it("registered tool handlers return standardized auth error payloads", async () => {
