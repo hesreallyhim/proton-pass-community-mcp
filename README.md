@@ -70,6 +70,8 @@ Snapshot artifact source:
 
 - [docs/testing/item-create-templates.snapshot.json](./docs/testing/item-create-templates.snapshot.json)
 
+These template resources are example well-formed payloads from `pass-cli --get-template`, not authoritative validation schemas.
+
 ## Item Discovery Contract
 
 `list_items` and `search_items` return token-efficient results. These operations do not contain the full contents or secrets of any items, thus preventing unnecessary leakage of sensitive data from the CLI to the host application or the LLM.
