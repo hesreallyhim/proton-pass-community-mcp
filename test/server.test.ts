@@ -1302,6 +1302,7 @@ describe("server setup", () => {
     await tools.list_vaults.handler({ output: "json" });
     await tools.list_vault_members.handler({ shareId: "s1" });
     await tools.create_vault.handler({ name: "Sandbox", confirm: true });
+    await tools.update_vault.handler({ vaultName: "Sandbox", newName: "Sandbox 2", confirm: true });
     await tools.delete_vault.handler({ vaultName: "Sandbox", confirm: true });
     await tools.list_shares.handler({ output: "json" });
     await tools.list_invites.handler({});
@@ -1322,6 +1323,13 @@ describe("server setup", () => {
       output: "json",
       confirm: true,
     });
+    await tools.create_item_from_template.handler({
+      itemType: "note",
+      vaultName: "Sandbox",
+      templateJson: '{"content":{"title":"Demo Note"}}',
+      output: "json",
+      confirm: true,
+    });
     await tools.update_item.handler({
       shareId: "s1",
       itemId: "i1",
@@ -1335,14 +1343,14 @@ describe("server setup", () => {
     });
 
     expect(tools.create_vault).toBeDefined();
+    expect(tools.update_vault).toBeDefined();
     expect(tools.delete_vault).toBeDefined();
     expect(tools.create_login_item).toBeDefined();
+    expect(tools.create_item_from_template).toBeDefined();
     expect(tools.update_item).toBeDefined();
     expect(tools.delete_item).toBeDefined();
-    expect(tools.update_vault).toBeUndefined();
-    expect(tools.create_item_from_template).toBeUndefined();
 
-    expect(runner).toHaveBeenCalledTimes(17);
+    expect(runner).toHaveBeenCalledTimes(19);
   });
 
   it("registered tool handlers return standardized auth error payloads", async () => {

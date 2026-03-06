@@ -7,6 +7,8 @@ import { checkStatusHandler } from "../tools/check-status.js";
 import {
   createLoginItemHandler,
   createLoginItemInputSchema,
+  createItemFromTemplateHandler,
+  createItemFromTemplateInputSchema,
   deleteItemHandler,
   deleteItemInputSchema,
   listItemsHandler,
@@ -35,6 +37,8 @@ import {
   listVaultMembersInputSchema,
   listVaultsHandler,
   listVaultsInputSchema,
+  updateVaultHandler,
+  updateVaultInputSchema,
 } from "../tools/vault.js";
 
 export function registerTools(
@@ -84,6 +88,15 @@ export function registerTools(
       inputSchema: createVaultInputSchema,
     },
     withAuthErrorHandling(async (input) => createVaultHandler(passCli, input)),
+  );
+
+  server.registerTool(
+    "update_vault",
+    {
+      description: "Update a vault by share ID or vault name.",
+      inputSchema: updateVaultInputSchema,
+    },
+    withAuthErrorHandling(async (input) => updateVaultHandler(passCli, input)),
   );
 
   server.registerTool(
@@ -156,6 +169,15 @@ export function registerTools(
       inputSchema: createLoginItemInputSchema,
     },
     withAuthErrorHandling(async (input) => createLoginItemHandler(passCli, input)),
+  );
+
+  server.registerTool(
+    "create_item_from_template",
+    {
+      description: "Create an item from template JSON.",
+      inputSchema: createItemFromTemplateInputSchema,
+    },
+    withAuthErrorHandling(async (input) => createItemFromTemplateHandler(passCli, input)),
   );
 
   server.registerTool(
