@@ -20,7 +20,14 @@ import {
   viewItemHandler,
   viewItemInputSchema,
 } from "../tools/item.js";
-import { listInvitesHandler, listInvitesInputSchema } from "../tools/invite.js";
+import {
+  inviteAcceptHandler,
+  inviteAcceptInputSchema,
+  inviteRejectHandler,
+  inviteRejectInputSchema,
+  listInvitesHandler,
+  listInvitesInputSchema,
+} from "../tools/invite.js";
 import {
   viewSessionInfoHandler,
   viewUserInfoHandler,
@@ -124,6 +131,24 @@ export function registerTools(
       inputSchema: listInvitesInputSchema,
     },
     withAuthErrorHandling(async (input) => listInvitesHandler(passCli, input)),
+  );
+
+  server.registerTool(
+    "invite_accept",
+    {
+      description: "Accept an invitation token.",
+      inputSchema: inviteAcceptInputSchema,
+    },
+    withAuthErrorHandling(async (input) => inviteAcceptHandler(passCli, input)),
+  );
+
+  server.registerTool(
+    "invite_reject",
+    {
+      description: "Reject an invitation token.",
+      inputSchema: inviteRejectInputSchema,
+    },
+    withAuthErrorHandling(async (input) => inviteRejectHandler(passCli, input)),
   );
 
   server.registerTool(

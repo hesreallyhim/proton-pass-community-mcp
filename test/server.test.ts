@@ -27,6 +27,8 @@ import {
   viewItemHandler,
   viewSettingsHandler,
   viewUserInfoHandler,
+  inviteAcceptHandler,
+  inviteRejectHandler,
   listInvitesHandler,
   listSharesHandler,
   createVaultHandler,
@@ -1263,6 +1265,31 @@ describe("write handlers", () => {
     expect(runner).toHaveBeenCalledWith(["item", "delete", "--share-id", "s1", "--item-id", "i1"]);
     expect(result).toEqual({ content: [{ type: "text", text: "OK" }] });
   });
+
+  it("inviteAcceptHandler and inviteRejectHandler enforce gate and call invite commands", async () => {
+    const runner = makeRunner({ stdout: "", stderr: "" });
+    process.env.ALLOW_WRITE = "1";
+
+    await expect(
+      inviteAcceptHandler(runner, {
+        inviteToken: "tok-accept",
+        confirm: false,
+      }),
+    ).rejects.toThrow("explicit confirmation");
+
+    await inviteAcceptHandler(runner, {
+      inviteToken: "tok-accept",
+      confirm: true,
+    });
+
+    await inviteRejectHandler(runner, {
+      inviteToken: "tok-reject",
+      confirm: true,
+    });
+
+    expect(runner).toHaveBeenNthCalledWith(1, ["invite", "accept", "--invite-token", "tok-accept"]);
+    expect(runner).toHaveBeenNthCalledWith(2, ["invite", "reject", "--invite-token", "tok-reject"]);
+  });
 });
 
 describe("server setup", () => {
@@ -1306,6 +1333,8 @@ describe("server setup", () => {
     await tools.delete_vault.handler({ vaultName: "Sandbox", confirm: true });
     await tools.list_shares.handler({ output: "json" });
     await tools.list_invites.handler({});
+    await tools.invite_accept.handler({ inviteToken: "tok-accept", confirm: true });
+    await tools.invite_reject.handler({ inviteToken: "tok-reject", confirm: true });
     await tools.list_items.handler({ shareId: "s1", output: "json" });
     await tools.search_items.handler({
       query: "GitHub",
@@ -1345,12 +1374,14 @@ describe("server setup", () => {
     expect(tools.create_vault).toBeDefined();
     expect(tools.update_vault).toBeDefined();
     expect(tools.delete_vault).toBeDefined();
+    expect(tools.invite_accept).toBeDefined();
+    expect(tools.invite_reject).toBeDefined();
     expect(tools.create_login_item).toBeDefined();
     expect(tools.create_item_from_template).toBeDefined();
     expect(tools.update_item).toBeDefined();
     expect(tools.delete_item).toBeDefined();
 
-    expect(runner).toHaveBeenCalledTimes(19);
+    expect(runner).toHaveBeenCalledTimes(21);
   });
 
   it("registered tool handlers return standardized auth error payloads", async () => {
