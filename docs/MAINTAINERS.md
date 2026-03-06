@@ -67,3 +67,41 @@ Notes:
 
 1. Use stable `name` values for cross-reference consistency.
 2. Keep `description` concrete and operational (not marketing text).
+
+## Throwaway CLI Auth Quick Commands
+
+Use repo wrapper for all project-side CLI calls:
+
+```bash
+scripts/pass-dev.sh <pass-cli-args...>
+```
+
+Local throwaway login + guardrail preflight:
+
+```bash
+scripts/pass-dev.sh login --interactive <throwaway-account-identifier>
+export PASS_DEV_EXPECTED_ACCOUNT=<throwaway-account-identifier>
+scripts/pass-dev-preflight.sh
+```
+
+Quick verification:
+
+```bash
+scripts/pass-dev.sh info
+scripts/pass-dev.sh user info --output json
+```
+
+CI-style auth pattern (`env` key provider):
+
+```bash
+export PROTON_PASS_KEY_PROVIDER=env
+export PROTON_PASS_ENCRYPTION_KEY=<ci-secret-value>
+scripts/pass-dev.sh login --interactive <throwaway-account-identifier>
+scripts/pass-dev-preflight.sh <throwaway-account-identifier>
+```
+
+Cleanup:
+
+```bash
+scripts/pass-dev.sh logout
+```

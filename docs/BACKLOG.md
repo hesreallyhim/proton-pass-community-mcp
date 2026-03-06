@@ -10,6 +10,31 @@ As the project matures, backlog tracking should move to a dedicated system (for 
 
 ## Status Snapshot
 
+## Next Implementation Slice
+
+Status: Ready to implement.
+
+Goal: Add a minimal mutative-tool loop for throwaway-account integration testing.
+
+Sequence:
+
+1. `create_vault`
+2. `create_login_item`
+3. `update_item`
+4. `delete_item`
+5. `delete_vault`
+
+Supporting read calls:
+
+1. `list_items` to resolve `share_id` and `item_id` for update/delete paths.
+2. Optional `view_item` to assert expected mutation results before cleanup.
+
+Acceptance criteria:
+
+1. Tools are registered in MCP with existing write-gate/confirmation controls.
+2. End-to-end loop executes in throwaway account only (preflight required).
+3. Integration test covers create -> update -> delete item and delete vault cleanup.
+
 ### 1. Secondary throwaway account for test/dev usage
 
 Status: Mostly complete (operational model and docs are in place).
