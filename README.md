@@ -20,6 +20,7 @@ As this project is in its initial stages, it exposes the following tools:
 | `view_session_info`               | Session/account status from `pass-cli info`      |
 | `view_user_info`                  | User account details from `pass-cli user info`   |
 | `check_status`                    | Check user authentication status and CLI version |
+| `support`                         | Show Proton Pass CLI support guidance            |
 | `inject`                          | Inject secrets into template files               |
 | `run`                             | Run commands with secret references resolved     |
 | `list_vaults`                     | List vaults                                      |
@@ -44,13 +45,21 @@ As this project is in its initial stages, it exposes the following tools:
 | `create_wifi_item`                | Create a WiFi item                               |
 | `create_custom_item`              | Create a custom item from template payload       |
 | `create_identity_item`            | Create an identity item from template payload    |
+| `move_item`                       | Move an item between vaults                      |
+| `trash_item`                      | Move an item to trash                            |
+| `untrash_item`                    | Restore an item from trash                       |
 | `update_item`                     | Update an item field set                         |
 | `delete_item`                     | Delete an item                                   |
+| `download_item_attachment`        | Download an item attachment                      |
+| `list_item_members`               | List members of an item                          |
+| `update_item_member`              | Update an item member role                       |
+| `remove_item_member`              | Remove an item member                            |
 | `create_item_alias`               | Create an alias item                             |
 | `share_item`                      | Share an item with a user                        |
 | `generate_item_totp`              | Generate item TOTP codes                         |
 | `generate_random_password`        | Generate a random password                       |
 | `generate_passphrase`             | Generate a passphrase                            |
+| `generate_totp`                   | Generate TOTP from secret/URI                    |
 | `score_password`                  | Score password strength                          |
 
 The `search_items` operation is additional functionality that is not provided by the base CLI.

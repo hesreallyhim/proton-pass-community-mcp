@@ -23,6 +23,7 @@ import {
   createLoginItemFromTemplateHandler,
   createCreditCardItemHandler,
   createCustomItemHandler,
+  downloadItemAttachmentHandler,
   createIdentityItemHandler,
   createItemAliasHandler,
   createLoginItemHandler,
@@ -34,7 +35,9 @@ import {
   deleteItemHandler,
   itemTotpHandler,
   listItemsHandler,
+  listItemMembersHandler,
   shareItemHandler,
+  removeItemMemberHandler,
   generatePassphraseHandler,
   generateRandomPasswordHandler,
   scorePasswordHandler,
@@ -59,6 +62,7 @@ import {
   transferVaultHandler,
   updateVaultMemberHandler,
   updateVaultHandler,
+  updateItemMemberHandler,
   requireWriteGate,
   startServer,
   generateTotpHandler,
@@ -1737,6 +1741,92 @@ describe("write handlers", () => {
     expect(result).toEqual({ content: [{ type: "text", text: "OK" }] });
   });
 
+  it("attachment and item-member handlers build expected command arguments", async () => {
+    process.env.ALLOW_WRITE = "1";
+    const runner = makeRunner(async (args) => {
+      if (args[0] === "item" && args[1] === "member" && args[2] === "list") {
+        return { stdout: '{"members":[]}', stderr: "" };
+      }
+      return { stdout: "", stderr: "" };
+    });
+
+    await downloadItemAttachmentHandler(runner, {
+      shareId: "s1",
+      itemId: "i1",
+      attachmentId: "a1",
+      outputPath: "./tmp.bin",
+      confirm: true,
+    });
+
+    const listResult = await listItemMembersHandler(runner, {
+      shareId: "s1",
+      itemId: "i1",
+      output: "json",
+    });
+
+    await updateItemMemberHandler(runner, {
+      shareId: "s1",
+      memberShareId: "m1",
+      role: "editor",
+      confirm: true,
+    });
+
+    await removeItemMemberHandler(runner, {
+      shareId: "s1",
+      memberShareId: "m1",
+      confirm: true,
+    });
+
+    expect(runner).toHaveBeenNthCalledWith(1, [
+      "item",
+      "attachment",
+      "download",
+      "--share-id",
+      "s1",
+      "--item-id",
+      "i1",
+      "--attachment-id",
+      "a1",
+      "--output",
+      "./tmp.bin",
+    ]);
+
+    expect(runner).toHaveBeenNthCalledWith(2, [
+      "item",
+      "member",
+      "list",
+      "--share-id",
+      "s1",
+      "--item-id",
+      "i1",
+      "--output",
+      "json",
+    ]);
+
+    expect(runner).toHaveBeenNthCalledWith(3, [
+      "item",
+      "member",
+      "update",
+      "--share-id",
+      "s1",
+      "--member-share-id",
+      "m1",
+      "--role",
+      "editor",
+    ]);
+
+    expect(runner).toHaveBeenNthCalledWith(4, [
+      "item",
+      "member",
+      "remove",
+      "--share-id",
+      "s1",
+      "--member-share-id",
+      "m1",
+    ]);
+    expect(listResult.content[0].text).toContain('"members"');
+  });
+
   it("shareItemHandler forwards required and optional sharing fields", async () => {
     process.env.ALLOW_WRITE = "1";
     const runner = makeRunner({ stdout: "shared", stderr: "" });
@@ -2135,11 +2225,34 @@ describe("server setup", () => {
       itemId: "i1",
       confirm: true,
     });
+    await tools.download_item_attachment.handler({
+      shareId: "s1",
+      itemId: "i1",
+      attachmentId: "a1",
+      outputPath: "./tmp.bin",
+      confirm: true,
+    });
     await tools.share_item.handler({
       shareId: "s1",
       itemId: "i1",
       email: "user@example.com",
       role: "editor",
+      confirm: true,
+    });
+    await tools.list_item_members.handler({
+      shareId: "s1",
+      itemId: "i1",
+      output: "json",
+    });
+    await tools.update_item_member.handler({
+      shareId: "s1",
+      memberShareId: "m1",
+      role: "editor",
+      confirm: true,
+    });
+    await tools.remove_item_member.handler({
+      shareId: "s1",
+      memberShareId: "m1",
       confirm: true,
     });
     await tools.create_item_alias.handler({
@@ -2180,10 +2293,14 @@ describe("server setup", () => {
     expect(tools.trash_item).toBeDefined();
     expect(tools.untrash_item).toBeDefined();
     expect(tools.delete_item).toBeDefined();
+    expect(tools.download_item_attachment).toBeDefined();
     expect(tools.share_item).toBeDefined();
+    expect(tools.list_item_members).toBeDefined();
+    expect(tools.update_item_member).toBeDefined();
+    expect(tools.remove_item_member).toBeDefined();
     expect(tools.create_item_alias).toBeDefined();
 
-    expect(runner).toHaveBeenCalledTimes(45);
+    expect(runner).toHaveBeenCalledTimes(49);
   });
 
   it("registered tool handlers return standardized auth error payloads", async () => {
