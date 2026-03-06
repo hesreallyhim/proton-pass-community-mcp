@@ -41,6 +41,8 @@
     "pass:dev:info": "scripts/pass-dev.sh info",
     "pass:dev:user:json": "scripts/pass-dev.sh user info --output json",
     "pass:dev:preflight": "scripts/pass-dev-preflight.sh",
+    "pass:dev:template:drift": "node scripts/check-item-create-template-drift.mjs --check",
+    "pass:dev:template:snapshot:update": "node scripts/check-item-create-template-drift.mjs --write",
     "docs:sync:pass-cli": "scripts/sync-pass-cli-docs.sh",
     "check:upstream:pass-cli": "node scripts/check-pass-cli-upstream.mjs",
     "check": "npm run lint && npm run format:check && npm run typecheck && npm run coverage",
