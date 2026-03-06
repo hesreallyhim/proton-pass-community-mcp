@@ -13,7 +13,7 @@ It is designed as a thin integration layer:
 
 ## Available Tools
 
-As this project is in its initial stages, it exposes the following read-only tools:
+As this project is in its initial stages, it exposes the following tools:
 
 | Tool                 | Purpose                                          |
 | -------------------- | ------------------------------------------------ |
@@ -28,8 +28,15 @@ As this project is in its initial stages, it exposes the following read-only too
 | `list_items`         | List vault or share items, omitting contents     |
 | `search_items`       | Search items by title                            |
 | `view_item`          | View item by URI or selectors                    |
+| `create_vault`       | Create a vault                                   |
+| `delete_vault`       | Delete a vault                                   |
+| `create_login_item`  | Create a login item                              |
+| `update_item`        | Update an item field set                         |
+| `delete_item`        | Delete an item                                   |
 
 The `search_items` operation is additional functionality that is not provided by the base CLI.
+
+Mutative tools require write gate opt-in (`ALLOW_WRITE=1`) and explicit per-call confirmation (`confirm: true`).
 
 ## Item Discovery Contract
 
