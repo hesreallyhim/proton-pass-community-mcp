@@ -21,6 +21,7 @@ export * from "./pass-cli/output.js";
 export * from "./pass-cli/runner.js";
 export * from "./pass-cli/version.js";
 export * from "./tools/check-status.js";
+export * from "./tools/contents.js";
 export * from "./tools/invite.js";
 export * from "./tools/item.js";
 export * from "./tools/password.js";

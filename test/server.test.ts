@@ -10,6 +10,8 @@ import {
   checkPassCliVersion,
   checkPassConnectivity,
   classifyPassCliAuthErrorText,
+  injectHandler,
+  runHandler,
   createRunPassCli,
   createServer,
   evaluatePassCliCompatibility,
@@ -1582,6 +1584,62 @@ describe("write handlers", () => {
     ]);
   });
 
+  it("injectHandler enforces gate and forwards file/options", async () => {
+    process.env.ALLOW_WRITE = "1";
+    const runner = makeRunner({ stdout: "injected", stderr: "" });
+
+    await expect(
+      injectHandler(runner, {
+        inFile: "template.env",
+        confirm: false,
+      }),
+    ).rejects.toThrow("explicit confirmation");
+
+    await injectHandler(runner, {
+      inFile: "template.env",
+      outFile: "rendered.env",
+      fileMode: "0600",
+      force: true,
+      confirm: true,
+    });
+
+    expect(runner).toHaveBeenCalledWith([
+      "inject",
+      "--in-file",
+      "template.env",
+      "--out-file",
+      "rendered.env",
+      "--file-mode",
+      "0600",
+      "--force",
+    ]);
+  });
+
+  it("runHandler enforces gate and builds env-file/no-masking command", async () => {
+    process.env.ALLOW_WRITE = "1";
+    const runner = makeRunner({ stdout: "ran", stderr: "" });
+
+    await runHandler(runner, {
+      command: ["node", "script.js", "--flag"],
+      envFiles: ["base.env", "secrets.env"],
+      noMasking: true,
+      confirm: true,
+    });
+
+    expect(runner).toHaveBeenCalledWith([
+      "run",
+      "--env-file",
+      "base.env",
+      "--env-file",
+      "secrets.env",
+      "--no-masking",
+      "--",
+      "node",
+      "script.js",
+      "--flag",
+    ]);
+  });
+
   it("inviteAcceptHandler and inviteRejectHandler enforce gate and call invite commands", async () => {
     const runner = makeRunner({ stdout: "", stderr: "" });
     process.env.ALLOW_WRITE = "1";
@@ -1679,6 +1737,8 @@ describe("server setup", () => {
 
     await tools.view_session_info.handler();
     await tools.check_status.handler();
+    await tools.inject.handler({ inFile: "template.env", confirm: true });
+    await tools.run.handler({ command: ["echo", "hello"], confirm: true });
     await tools.view_user_info.handler({ output: "json" });
     await tools.view_settings.handler();
     await tools.settings_set_default_vault.handler({ vaultName: "Sandbox", confirm: true });
@@ -1781,6 +1841,8 @@ describe("server setup", () => {
     expect(tools.generate_random_password).toBeDefined();
     expect(tools.generate_passphrase).toBeDefined();
     expect(tools.score_password).toBeDefined();
+    expect(tools.inject).toBeDefined();
+    expect(tools.run).toBeDefined();
     expect(tools.vault_member_update).toBeDefined();
     expect(tools.vault_member_remove).toBeDefined();
     expect(tools.vault_share).toBeDefined();
@@ -1793,7 +1855,7 @@ describe("server setup", () => {
     expect(tools.item_share).toBeDefined();
     expect(tools.create_item_alias).toBeDefined();
 
-    expect(runner).toHaveBeenCalledTimes(35);
+    expect(runner).toHaveBeenCalledTimes(37);
   });
 
   it("registered tool handlers return standardized auth error payloads", async () => {
