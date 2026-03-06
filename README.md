@@ -15,37 +15,38 @@ It is designed as a thin integration layer:
 
 As this project is in its initial stages, it exposes the following tools:
 
-| Tool                       | Purpose                                          |
-| -------------------------- | ------------------------------------------------ |
-| `view_session_info`        | Session/account status from `pass-cli info`      |
-| `view_user_info`           | User account details from `pass-cli user info`   |
-| `check_status`             | Check user authentication status and CLI version |
-| `inject`                   | Inject secrets into template files               |
-| `run`                      | Run commands with secret references resolved     |
-| `list_vaults`              | List vaults                                      |
-| `list_shares`              | List shares                                      |
-| `list_invites`             | List pending invitations                         |
-| `view_settings`            | View current Proton Pass CLI settings            |
-| `list_vault_members`       | List members of a specific vault                 |
-| `update_vault_member`      | Update a vault member role                       |
-| `remove_vault_member`      | Remove a vault member                            |
-| `list_items`               | List vault or share items, omitting contents     |
-| `search_items`             | Search items by title                            |
-| `view_item`                | View item by URI or selectors                    |
-| `create_vault`             | Create a vault                                   |
-| `update_vault`             | Update a vault name                              |
-| `delete_vault`             | Delete a vault                                   |
-| `share_vault`              | Share a vault with a user                        |
-| `transfer_vault`           | Transfer vault ownership                         |
-| `create_login_item`        | Create a login item                              |
-| `update_item`              | Update an item field set                         |
-| `delete_item`              | Delete an item                                   |
-| `create_item_alias`        | Create an alias item                             |
-| `share_item`               | Share an item with a user                        |
-| `generate_item_totp`       | Generate item TOTP codes                         |
-| `generate_random_password` | Generate a random password                       |
-| `generate_passphrase`      | Generate a passphrase                            |
-| `score_password`           | Score password strength                          |
+| Tool                              | Purpose                                          |
+| --------------------------------- | ------------------------------------------------ |
+| `view_session_info`               | Session/account status from `pass-cli info`      |
+| `view_user_info`                  | User account details from `pass-cli user info`   |
+| `check_status`                    | Check user authentication status and CLI version |
+| `inject`                          | Inject secrets into template files               |
+| `run`                             | Run commands with secret references resolved     |
+| `list_vaults`                     | List vaults                                      |
+| `list_shares`                     | List shares                                      |
+| `list_invites`                    | List pending invitations                         |
+| `view_settings`                   | View current Proton Pass CLI settings            |
+| `list_vault_members`              | List members of a specific vault                 |
+| `update_vault_member`             | Update a vault member role                       |
+| `remove_vault_member`             | Remove a vault member                            |
+| `list_items`                      | List vault or share items, omitting contents     |
+| `search_items`                    | Search items by title                            |
+| `view_item`                       | View item by URI or selectors                    |
+| `create_vault`                    | Create a vault                                   |
+| `update_vault`                    | Update a vault name                              |
+| `delete_vault`                    | Delete a vault                                   |
+| `share_vault`                     | Share a vault with a user                        |
+| `transfer_vault`                  | Transfer vault ownership                         |
+| `create_login_item`               | Create a login item                              |
+| `create_login_item_from_template` | Create a login item from template payload        |
+| `update_item`                     | Update an item field set                         |
+| `delete_item`                     | Delete an item                                   |
+| `create_item_alias`               | Create an alias item                             |
+| `share_item`                      | Share an item with a user                        |
+| `generate_item_totp`              | Generate item TOTP codes                         |
+| `generate_random_password`        | Generate a random password                       |
+| `generate_passphrase`             | Generate a passphrase                            |
+| `score_password`                  | Score password strength                          |
 
 The `search_items` operation is additional functionality that is not provided by the base CLI.
 
