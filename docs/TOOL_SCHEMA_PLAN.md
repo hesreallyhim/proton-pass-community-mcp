@@ -342,12 +342,16 @@ Notes:
 | `generate_totp`            | `pass-cli totp generate`                 | Planned                    | `secretOrUri`, `output?`               | TOTP value                |
 | `view_settings`            | `pass-cli settings view`                 | Implemented                | none                                   | Settings object           |
 | `set_default_vault`        | `pass-cli settings set default-vault`    | Implemented                | `vaultName \| shareId`, `confirm`      | Set status                |
-| `set_default_format`       | `pass-cli settings set default-format`   | Implemented                | `format`, `confirm`                    | Set status                |
 | `unset_default_vault`      | `pass-cli settings unset default-vault`  | Implemented                | `confirm`                              | Unset status              |
-| `unset_default_format`     | `pass-cli settings unset default-format` | Implemented                | `confirm`                              | Unset status              |
+| `set_default_format`       | `pass-cli settings set default-format`   | Out of Scope (Out-of-Band) | n/a                                    | n/a                       |
+| `unset_default_format`     | `pass-cli settings unset default-format` | Out of Scope (Out-of-Band) | n/a                                    | n/a                       |
 | `ssh_agent_start`          | `pass-cli ssh-agent start`               | Out of Scope (Out-of-Band) | n/a                                    | n/a                       |
 | `ssh_agent_load`           | `pass-cli ssh-agent load`                | Out of Scope (Out-of-Band) | n/a                                    | n/a                       |
 | `ssh_agent_debug`          | `pass-cli ssh-agent debug`               | Out of Scope (Out-of-Band) | n/a                                    | n/a                       |
+
+Notes:
+
+1. Output format defaults are intentionally user/workflow configuration and are not exposed as MCP tools. MCP tools should return structured outputs independent of CLI human/json display preferences.
 
 ## Phased Delivery
 
