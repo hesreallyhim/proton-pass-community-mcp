@@ -33,9 +33,7 @@ import {
   searchItemsHandler,
   updateItemHandler,
   viewItemHandler,
-  settingsSetDefaultFormatHandler,
   settingsSetDefaultVaultHandler,
-  settingsUnsetDefaultFormatHandler,
   settingsUnsetDefaultVaultHandler,
   viewSettingsHandler,
   viewUserInfoHandler,
@@ -1662,7 +1660,7 @@ describe("write handlers", () => {
     expect(runner).toHaveBeenNthCalledWith(2, ["invite", "reject", "--invite-token", "tok-reject"]);
   });
 
-  it("settings default handlers enforce gate and call expected commands", async () => {
+  it("settings default-vault handlers enforce gate and call expected commands", async () => {
     const runner = makeRunner({ stdout: "", stderr: "" });
     process.env.ALLOW_WRITE = "1";
 
@@ -1678,14 +1676,7 @@ describe("write handlers", () => {
       vaultName: "Work",
       confirm: true,
     });
-    await settingsSetDefaultFormatHandler(runner, {
-      format: "json",
-      confirm: true,
-    });
     await settingsUnsetDefaultVaultHandler(runner, {
-      confirm: true,
-    });
-    await settingsUnsetDefaultFormatHandler(runner, {
       confirm: true,
     });
 
@@ -1696,9 +1687,7 @@ describe("write handlers", () => {
       "--vault-name",
       "Work",
     ]);
-    expect(runner).toHaveBeenNthCalledWith(2, ["settings", "set", "default-format", "json"]);
-    expect(runner).toHaveBeenNthCalledWith(3, ["settings", "unset", "default-vault"]);
-    expect(runner).toHaveBeenNthCalledWith(4, ["settings", "unset", "default-format"]);
+    expect(runner).toHaveBeenNthCalledWith(2, ["settings", "unset", "default-vault"]);
   });
 });
 
@@ -1739,9 +1728,7 @@ describe("server setup", () => {
     await tools.view_user_info.handler({ output: "json" });
     await tools.view_settings.handler();
     await tools.set_default_vault.handler({ vaultName: "Sandbox", confirm: true });
-    await tools.set_default_format.handler({ format: "json", confirm: true });
     await tools.unset_default_vault.handler({ confirm: true });
-    await tools.unset_default_format.handler({ confirm: true });
     await tools.generate_random_password.handler({ length: 16, uppercase: true });
     await tools.generate_passphrase.handler({ count: 5, separator: "hyphens" });
     await tools.score_password.handler({ password: "MySecureP@ssw0rd", output: "json" });
@@ -1834,9 +1821,7 @@ describe("server setup", () => {
     expect(tools.accept_invite).toBeDefined();
     expect(tools.reject_invite).toBeDefined();
     expect(tools.set_default_vault).toBeDefined();
-    expect(tools.set_default_format).toBeDefined();
     expect(tools.unset_default_vault).toBeDefined();
-    expect(tools.unset_default_format).toBeDefined();
     expect(tools.generate_random_password).toBeDefined();
     expect(tools.generate_passphrase).toBeDefined();
     expect(tools.score_password).toBeDefined();
@@ -1854,7 +1839,7 @@ describe("server setup", () => {
     expect(tools.share_item).toBeDefined();
     expect(tools.create_item_alias).toBeDefined();
 
-    expect(runner).toHaveBeenCalledTimes(37);
+    expect(runner).toHaveBeenCalledTimes(35);
   });
 
   it("registered tool handlers return standardized auth error payloads", async () => {

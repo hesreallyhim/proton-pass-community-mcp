@@ -57,23 +57,12 @@ export const settingsSetDefaultVaultInputSchema = z
     },
   );
 
-export const settingsSetDefaultFormatInputSchema = z.object({
-  format: z.enum(["human", "json"]).describe("Default output format"),
-  confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
-});
-
 export const settingsUnsetDefaultVaultInputSchema = z.object({
   confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
 });
 
-export const settingsUnsetDefaultFormatInputSchema = z.object({
-  confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
-});
-
 export type SettingsSetDefaultVaultInput = z.infer<typeof settingsSetDefaultVaultInputSchema>;
-export type SettingsSetDefaultFormatInput = z.infer<typeof settingsSetDefaultFormatInputSchema>;
 export type SettingsUnsetDefaultVaultInput = z.infer<typeof settingsUnsetDefaultVaultInputSchema>;
-export type SettingsUnsetDefaultFormatInput = z.infer<typeof settingsUnsetDefaultFormatInputSchema>;
 
 export async function viewSettingsHandler(passCli: PassCliRunner) {
   const { stdout } = await passCli(["settings", "view"]);
@@ -124,32 +113,12 @@ export async function settingsSetDefaultVaultHandler(
   return asTextContent(out || "OK");
 }
 
-export async function settingsSetDefaultFormatHandler(
-  passCli: PassCliRunner,
-  { format, confirm }: SettingsSetDefaultFormatInput,
-) {
-  requireWriteGate(confirm);
-  const { stdout, stderr } = await passCli(["settings", "set", "default-format", format]);
-  const out = joinStdoutStderr(stdout, stderr);
-  return asTextContent(out || "OK");
-}
-
 export async function settingsUnsetDefaultVaultHandler(
   passCli: PassCliRunner,
   { confirm }: SettingsUnsetDefaultVaultInput,
 ) {
   requireWriteGate(confirm);
   const { stdout, stderr } = await passCli(["settings", "unset", "default-vault"]);
-  const out = joinStdoutStderr(stdout, stderr);
-  return asTextContent(out || "OK");
-}
-
-export async function settingsUnsetDefaultFormatHandler(
-  passCli: PassCliRunner,
-  { confirm }: SettingsUnsetDefaultFormatInput,
-) {
-  requireWriteGate(confirm);
-  const { stdout, stderr } = await passCli(["settings", "unset", "default-format"]);
   const out = joinStdoutStderr(stdout, stderr);
   return asTextContent(out || "OK");
 }
