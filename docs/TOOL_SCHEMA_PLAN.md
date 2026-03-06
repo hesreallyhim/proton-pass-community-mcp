@@ -341,7 +341,8 @@ Notes:
 2. Empirical validation against the throwaway account on March 6, 2026 (`scripts/pass-dev.sh`) confirmed `--get-template` and `--from-template` support for `note`, `credit-card`, `custom`, `wifi`, and `identity` (in addition to `login`).
 3. Inferred per-type template contracts are documented in `docs/testing/ITEM_CREATE_TEMPLATE_SCHEMA_INFERENCE.md` and should be treated as tested working contracts, not authoritative upstream schema guarantees.
 4. `item create <type> --get-template` outputs should be treated as templates/examples, not strict schemas; `wifi` template defaults are a concrete case where baseline output is not directly create-ready.
-5. `item create login --get-template` is currently out-of-band (not exposed as an MCP tool).
+5. Additional-properties probe (March 6, 2026): unknown template keys are accepted by parser/create flow across tested types, but spot-check persistence indicates they are ignored/dropped; MCP contracts should not assume unknown keys become stored fields.
+6. `item create login --get-template` is currently out-of-band (not exposed as an MCP tool).
 
 ### Item Alias, Attachment, and Members
 

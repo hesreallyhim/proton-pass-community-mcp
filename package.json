@@ -44,6 +44,7 @@
     "pass:dev:template:drift": "node scripts/check-item-create-template-drift.mjs --check",
     "pass:dev:template:snapshot:update": "node scripts/check-item-create-template-drift.mjs --write",
     "pass:dev:template:probe": "node scripts/probe-item-create-template-contract.mjs --run",
+    "pass:dev:template:probe:additional-properties": "node scripts/probe-item-create-template-additional-properties.mjs --run",
     "docs:sync:pass-cli": "scripts/sync-pass-cli-docs.sh",
     "check:upstream:pass-cli": "node scripts/check-pass-cli-upstream.mjs",
     "check": "npm run lint && npm run format:check && npm run typecheck && npm run coverage",
