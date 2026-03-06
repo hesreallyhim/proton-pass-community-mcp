@@ -1273,6 +1273,7 @@ describe("server setup", () => {
   });
 
   it("registered tool handlers are invocable from internal tool registry", async () => {
+    process.env.ALLOW_WRITE = "1";
     const runner = makeRunner(async (args) => {
       if (args[0] === "vault" && args[1] === "member") {
         return { stdout: '{"members":[]}', stderr: "" };
@@ -1300,6 +1301,8 @@ describe("server setup", () => {
     await tools.view_settings.handler();
     await tools.list_vaults.handler({ output: "json" });
     await tools.list_vault_members.handler({ shareId: "s1" });
+    await tools.create_vault.handler({ name: "Sandbox", confirm: true });
+    await tools.delete_vault.handler({ vaultName: "Sandbox", confirm: true });
     await tools.list_shares.handler({ output: "json" });
     await tools.list_invites.handler({});
     await tools.list_items.handler({ shareId: "s1", output: "json" });
@@ -1311,16 +1314,35 @@ describe("server setup", () => {
       shareId: "s1",
     });
     await tools.view_item.handler({ uri: "pass://Work/GitHub/password", output: "json" });
+    await tools.create_login_item.handler({
+      vaultName: "Sandbox",
+      title: "GitHub",
+      username: "octocat",
+      password: "s3cr3t",
+      output: "json",
+      confirm: true,
+    });
+    await tools.update_item.handler({
+      shareId: "s1",
+      itemId: "i1",
+      fields: ["password=updated"],
+      confirm: true,
+    });
+    await tools.delete_item.handler({
+      shareId: "s1",
+      itemId: "i1",
+      confirm: true,
+    });
 
-    expect(tools.create_vault).toBeUndefined();
+    expect(tools.create_vault).toBeDefined();
+    expect(tools.delete_vault).toBeDefined();
+    expect(tools.create_login_item).toBeDefined();
+    expect(tools.update_item).toBeDefined();
+    expect(tools.delete_item).toBeDefined();
     expect(tools.update_vault).toBeUndefined();
-    expect(tools.delete_vault).toBeUndefined();
-    expect(tools.create_login_item).toBeUndefined();
     expect(tools.create_item_from_template).toBeUndefined();
-    expect(tools.update_item).toBeUndefined();
-    expect(tools.delete_item).toBeUndefined();
 
-    expect(runner).toHaveBeenCalledTimes(12);
+    expect(runner).toHaveBeenCalledTimes(17);
   });
 
   it("registered tool handlers return standardized auth error payloads", async () => {

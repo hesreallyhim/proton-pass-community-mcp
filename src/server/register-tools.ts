@@ -5,10 +5,16 @@ import type { PassCliRunner } from "../pass-cli/runner.js";
 import type { PassCliVersionPolicy } from "../pass-cli/version.js";
 import { checkStatusHandler } from "../tools/check-status.js";
 import {
+  createLoginItemHandler,
+  createLoginItemInputSchema,
+  deleteItemHandler,
+  deleteItemInputSchema,
   listItemsHandler,
   listItemsInputSchema,
   searchItemsHandler,
   searchItemsInputSchema,
+  updateItemHandler,
+  updateItemInputSchema,
   viewItemHandler,
   viewItemInputSchema,
 } from "../tools/item.js";
@@ -21,6 +27,10 @@ import {
 import { viewSettingsHandler } from "../tools/settings.js";
 import { listSharesHandler, listSharesInputSchema } from "../tools/share.js";
 import {
+  createVaultHandler,
+  createVaultInputSchema,
+  deleteVaultHandler,
+  deleteVaultInputSchema,
   listVaultMembersHandler,
   listVaultMembersInputSchema,
   listVaultsHandler,
@@ -65,6 +75,24 @@ export function registerTools(
       inputSchema: listVaultsInputSchema,
     },
     withAuthErrorHandling(async (input) => listVaultsHandler(passCli, input)),
+  );
+
+  server.registerTool(
+    "create_vault",
+    {
+      description: "Create a new vault.",
+      inputSchema: createVaultInputSchema,
+    },
+    withAuthErrorHandling(async (input) => createVaultHandler(passCli, input)),
+  );
+
+  server.registerTool(
+    "delete_vault",
+    {
+      description: "Delete a vault by share ID or vault name.",
+      inputSchema: deleteVaultInputSchema,
+    },
+    withAuthErrorHandling(async (input) => deleteVaultHandler(passCli, input)),
   );
 
   server.registerTool(
@@ -122,6 +150,33 @@ export function registerTools(
   );
 
   server.registerTool(
+    "create_login_item",
+    {
+      description: "Create a login item in a vault or share.",
+      inputSchema: createLoginItemInputSchema,
+    },
+    withAuthErrorHandling(async (input) => createLoginItemHandler(passCli, input)),
+  );
+
+  server.registerTool(
+    "update_item",
+    {
+      description: "Update an item using selectors and field assignments.",
+      inputSchema: updateItemInputSchema,
+    },
+    withAuthErrorHandling(async (input) => updateItemHandler(passCli, input)),
+  );
+
+  server.registerTool(
+    "delete_item",
+    {
+      description: "Delete an item by share ID and item ID.",
+      inputSchema: deleteItemInputSchema,
+    },
+    withAuthErrorHandling(async (input) => deleteItemHandler(passCli, input)),
+  );
+
+  server.registerTool(
     "search_items",
     {
       description: "Search items by title with MCP pagination support for JSON output.",
@@ -129,5 +184,4 @@ export function registerTools(
     },
     withAuthErrorHandling(async (input) => searchItemsHandler(passCli, input)),
   );
-  // Release 0.1 intentionally does not register mutative tools.
 }
