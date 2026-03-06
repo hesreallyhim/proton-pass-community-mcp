@@ -329,9 +329,7 @@ Status key:
 1. Add resources for high-read paths (`pass://vaults`, `pass://share/<id>/items`).
 2. Keep tools for actions and targeted retrieval.
 
-## Open Questions
+## Decisions
 
-1. Compatibility strategy for `list_items` response change:
-   Option A: break to ref-only now.
-   Option B: transition with `includeRawItem`.
-2. If a CLI command has no documented JSON mode, what minimum parsed structure should MCP provide by default.
+1. `list_items` response strategy: use ref-only now (Option A). Future compatibility expansions are conditional on concrete downstream tool-flow needs, not preemptive.
+2. MCP output format policy: JSON-only for tool-facing responses. When upstream CLI offers human/json output modes, MCP tool handlers should select/normalize JSON and minimize fields for agent consumption.
