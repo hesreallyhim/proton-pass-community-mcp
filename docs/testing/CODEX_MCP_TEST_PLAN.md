@@ -65,7 +65,7 @@ Cases:
    - expected: authentication required error
 2. `CLI-AUTH-FS`
    - setup: login via web/interactive using wrapper
-   - action: `scripts/pass-dev.sh info` and `scripts/pass-dev-preflight.sh <expected-email>`
+   - action: `scripts/pass-dev.sh info` and `scripts/pass-dev-preflight.sh <expected-account-identifier>`
    - expected: info succeeds, preflight succeeds
 3. `CLI-ENV-CI-PARITY`
    - setup: `PROTON_PASS_KEY_PROVIDER=env` + `PROTON_PASS_ENCRYPTION_KEY`
@@ -114,7 +114,7 @@ Cases:
    - action: invoke `check_status`, `view_session_info`, `view_user_info` in Codex
    - expected: successful responses
 3. `CODEX-WRONG-ACCOUNT-BLOCK`
-   - setup: set `PASS_DEV_EXPECTED_EMAIL` to expected throwaway account
+   - setup: set `PASS_DEV_EXPECTED_ACCOUNT` to expected throwaway account identifier
    - action: run preflight before test flow
    - expected: fails on mismatch and blocks flow
 

@@ -103,7 +103,7 @@ The wrapper intentionally avoids the keyring backend in normal project usage.
 ```bash
 scripts/pass-dev.sh login
 # or:
-scripts/pass-dev.sh login --interactive throwaway@proton.me
+scripts/pass-dev.sh login --interactive throwaway-account-id
 ```
 
 Verify:
@@ -118,7 +118,7 @@ scripts/pass-dev.sh user info --output json
 Set your expected throwaway account:
 
 ```bash
-export PASS_DEV_EXPECTED_EMAIL=throwaway@proton.me
+export PASS_DEV_EXPECTED_ACCOUNT=throwaway-account-id
 ```
 
 Then run:
@@ -162,7 +162,7 @@ Recommended CI env:
 2. `PROTON_PASS_KEY_PROVIDER=env`
 3. `PROTON_PASS_ENCRYPTION_KEY` from CI secret store
 4. Login via `pass-cli login --interactive <test-user>` with env/file-based password/TOTP/extra-password inputs
-5. Run `scripts/pass-dev-preflight.sh <test-user-email>`
+5. Run `scripts/pass-dev-preflight.sh <test-user-account-identifier>`
 6. Run tests
 7. Cleanup with `pass-cli logout` (or `pass-cli logout --force` fallback)
 
@@ -178,7 +178,7 @@ Required GitHub Actions secrets:
 
 1. `PROTON_PASS_USERNAME`
 2. `PROTON_PASS_PASSWORD`
-3. `PROTON_PASS_EXPECTED_EMAIL`
+3. `PROTON_PASS_EXPECTED_ACCOUNT`
 4. `PROTON_PASS_ENCRYPTION_KEY`
 
 Optional secrets (only if the account requires them):
