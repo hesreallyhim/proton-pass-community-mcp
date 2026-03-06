@@ -9,7 +9,7 @@ description: Canonical specification and phased roadmap for proton-pass-communit
 
 This document defines the planned MCP tool surface for `proton-pass-community-mcp` with two goals:
 
-1. Expose the full `pass-cli` command surface (command parity).
+1. Expose the applicable `pass-cli` command surface (command parity), excluding authentication lifecycle commands that are intentionally user-managed out-of-band.
 2. Add MCP-native tools/contracts where raw CLI output is not LLM-efficient.
 
 Primary optimization target: item discovery (`pass-cli item list`) should return lightweight references, not full item payloads.
@@ -22,6 +22,7 @@ Primary optimization target: item discovery (`pass-cli item list`) should return
 4. `content` text remains present for interoperability/debugging.
 5. Listing/search tools return references, then callers use `view_item` for full content.
 6. Release branches may retain non-release code paths, but only release-scoped tools are registered/exposed by default.
+7. Authentication lifecycle (`pass-cli login`, `pass-cli logout`) remains out-of-band and is not exposed as MCP tools.
 
 ## Shared Schemas
 
@@ -213,20 +214,21 @@ Status key:
 1. `Implemented`: currently in server.
 2. `Planned`: targeted for schema/tool implementation.
 3. `Planned (MCP-native)`: added for MCP ergonomics, not direct CLI command.
+4. `Out of Scope (Out-of-Band)`: intentionally not exposed as MCP tools.
 
 ### Session and Utilities
 
-| Tool                | Source                                 | Status      | Input Summary                                          | Output Summary                                          |
-| ------------------- | -------------------------------------- | ----------- | ------------------------------------------------------ | ------------------------------------------------------- |
-| `login`             | `pass-cli login`                       | Planned     | `username?`, `interactive?`                            | Session/login result text or json                       |
-| `logout`            | `pass-cli logout`                      | Planned     | `force?`, `confirm`                                    | Operation result                                        |
-| `check_status`      | `pass-cli test` + `pass-cli --version` | Implemented | none                                                   | Connectivity/auth preflight + CLI version compatibility |
-| `view_session_info` | `pass-cli info`                        | Implemented | `output?`                                              | Account/session info                                    |
-| `view_user_info`    | `pass-cli user info`                   | Implemented | `output?`                                              | User profile                                            |
-| `update`            | `pass-cli update`                      | Planned     | `yes?`, `setTrack?`, `confirm`                         | Update result                                           |
-| `support`           | `pass-cli support`                     | Planned     | none                                                   | Support guidance text                                   |
-| `inject`            | `pass-cli inject`                      | Planned     | `inFile`, `outFile?`, `fileMode?`, `force?`, `confirm` | Output path/status                                      |
-| `run`               | `pass-cli run`                         | Planned     | `command[]`, `envFile[]?`, `noMasking?`, `confirm`     | Exit code/stdout/stderr summary                         |
+| Tool                | Source                                 | Status                     | Input Summary                                          | Output Summary                                          |
+| ------------------- | -------------------------------------- | -------------------------- | ------------------------------------------------------ | ------------------------------------------------------- |
+| `login`             | `pass-cli login`                       | Out of Scope (Out-of-Band) | n/a                                                    | n/a                                                     |
+| `logout`            | `pass-cli logout`                      | Out of Scope (Out-of-Band) | n/a                                                    | n/a                                                     |
+| `check_status`      | `pass-cli test` + `pass-cli --version` | Implemented                | none                                                   | Connectivity/auth preflight + CLI version compatibility |
+| `view_session_info` | `pass-cli info`                        | Implemented                | `output?`                                              | Account/session info                                    |
+| `view_user_info`    | `pass-cli user info`                   | Implemented                | `output?`                                              | User profile                                            |
+| `update`            | `pass-cli update`                      | Planned                    | `yes?`, `setTrack?`, `confirm`                         | Update result                                           |
+| `support`           | `pass-cli support`                     | Planned                    | none                                                   | Support guidance text                                   |
+| `inject`            | `pass-cli inject`                      | Planned                    | `inFile`, `outFile?`, `fileMode?`, `force?`, `confirm` | Output path/status                                      |
+| `run`               | `pass-cli run`                         | Planned                    | `command[]`, `envFile[]?`, `noMasking?`, `confirm`     | Exit code/stdout/stderr summary                         |
 
 ### Vault Tools
 
