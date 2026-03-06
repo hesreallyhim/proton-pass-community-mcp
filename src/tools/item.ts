@@ -31,6 +31,7 @@ const ITEM_SORT_OPTIONS = [
   "created-asc",
   "created-desc",
 ] as const;
+const WIFI_SECURITY_OPTIONS = ["wpa", "wpa2", "wpa3", "wep", "open", "none"] as const;
 const VAULT_NAME_SCOPE_DESCRIPTION =
   "Vault name scope. Provide exactly one of vaultName or shareId.";
 const SHARE_ID_SCOPE_DESCRIPTION = "Share ID scope. Provide exactly one of shareId or vaultName.";
@@ -230,19 +231,138 @@ export const createLoginItemInputSchema = z.object({
 
 export const loginItemTemplateSchema = z
   .object({
-    title: z.string().min(1).max(255).describe("Title of the login item"),
-    urls: z.array(z.string().max(1024)).min(1).describe("List of URL strings for the login item"),
-    username: z.string().max(255).optional().describe("Optional username"),
-    email: z.string().max(255).optional().describe("Optional email"),
-    password: z.string().max(1024).optional().describe("Optional password"),
+    title: z.string().max(255).describe("Title of the login item"),
+    urls: z.array(z.string().max(1024)).optional().describe("Optional list of URL strings"),
+    username: z.string().max(255).nullable().optional().describe("Optional username"),
+    email: z.string().max(255).nullable().optional().describe("Optional email"),
+    password: z.string().max(1024).nullable().optional().describe("Optional password"),
   })
-  .passthrough();
+  .strict();
 
 export const createLoginItemFromTemplateInputSchema = z.object({
   shareId: z.string().max(100).optional().describe("Share ID for the new item"),
   vaultName: z.string().max(255).optional().describe("Vault name for the new item"),
   template: loginItemTemplateSchema.describe("Login template payload"),
   output: z.enum(["json", "human"]).default("json").describe("Output format"),
+  confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+});
+
+export const createNoteItemInputSchema = z.object({
+  shareId: z.string().max(100).optional().describe("Share ID for the new item"),
+  vaultName: z.string().max(255).optional().describe("Vault name for the new item"),
+  title: z.string().max(255).describe("Title for the new note item"),
+  note: z.string().max(10000).optional().describe("Optional note content"),
+  confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+});
+
+export const createCreditCardItemInputSchema = z.object({
+  shareId: z.string().max(100).optional().describe("Share ID for the new item"),
+  vaultName: z.string().max(255).optional().describe("Vault name for the new item"),
+  title: z.string().max(255).describe("Title for the new credit card item"),
+  cardholderName: z.string().max(255).optional().describe("Cardholder name"),
+  number: z.string().max(64).optional().describe("Card number"),
+  cvv: z.string().max(16).optional().describe("CVV/CVC security code"),
+  expirationDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}$/, "Expected YYYY-MM")
+    .optional()
+    .describe("Expiration date (YYYY-MM)"),
+  pin: z.string().max(64).optional().describe("Card PIN"),
+  note: z.string().max(10000).optional().describe("Optional note content"),
+  confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+});
+
+export const createWifiItemInputSchema = z.object({
+  shareId: z.string().max(100).optional().describe("Share ID for the new item"),
+  vaultName: z.string().max(255).optional().describe("Vault name for the new item"),
+  title: z.string().max(255).describe("Title for the new WiFi item"),
+  ssid: z.string().min(1).max(255).describe("Network SSID (required, non-empty)"),
+  password: z
+    .string()
+    .max(2048)
+    .optional()
+    .describe("Network password (optional; empty string for open networks)"),
+  security: z
+    .enum(WIFI_SECURITY_OPTIONS)
+    .optional()
+    .describe("WiFi security type: wpa, wpa2, wpa3, wep, open, none"),
+  note: z.string().max(10000).optional().describe("Optional note content"),
+  confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+});
+
+const customTemplateFieldSchema = z
+  .object({
+    field_name: z.string().min(1).max(255).describe("Field display name"),
+    field_type: z.string().min(1).max(100).describe("Field type (for example text, hidden, totp)"),
+    value: z.string().max(10000).describe("Field value"),
+  })
+  .strict();
+
+const customTemplateSectionSchema = z
+  .object({
+    section_name: z.string().min(1).max(255).describe("Section name"),
+    fields: z.array(customTemplateFieldSchema).describe("Fields in this section"),
+  })
+  .strict();
+
+export const customItemTemplateSchema = z
+  .object({
+    title: z.string().max(255).describe("Title of the custom item"),
+    note: z.string().max(10000).nullable().optional().describe("Optional note"),
+    sections: z.array(customTemplateSectionSchema).optional().describe("Optional custom sections"),
+  })
+  .strict();
+
+export const createCustomItemInputSchema = z.object({
+  shareId: z.string().max(100).optional().describe("Share ID for the new item"),
+  vaultName: z.string().max(255).optional().describe("Vault name for the new item"),
+  template: customItemTemplateSchema.describe("Custom item template payload"),
+  confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+});
+
+export const identityItemTemplateSchema = z
+  .object({
+    title: z.string().max(255),
+    note: z.string().max(255).nullable().optional(),
+    full_name: z.string().max(255).nullable().optional(),
+    email: z.string().max(320).nullable().optional(),
+    phone_number: z.string().max(255).nullable().optional(),
+    first_name: z.string().max(255).nullable().optional(),
+    middle_name: z.string().max(255).nullable().optional(),
+    last_name: z.string().max(255).nullable().optional(),
+    birthdate: z.string().max(255).nullable().optional(),
+    gender: z.string().max(255).nullable().optional(),
+    organization: z.string().max(255).nullable().optional(),
+    street_address: z.string().max(255).nullable().optional(),
+    zip_or_postal_code: z.string().max(255).nullable().optional(),
+    city: z.string().max(255).nullable().optional(),
+    state_or_province: z.string().max(255).nullable().optional(),
+    country_or_region: z.string().max(255).nullable().optional(),
+    floor: z.string().max(255).nullable().optional(),
+    county: z.string().max(255).nullable().optional(),
+    social_security_number: z.string().max(255).nullable().optional(),
+    passport_number: z.string().max(255).nullable().optional(),
+    license_number: z.string().max(255).nullable().optional(),
+    website: z.string().max(255).nullable().optional(),
+    x_handle: z.string().max(255).nullable().optional(),
+    second_phone_number: z.string().max(255).nullable().optional(),
+    linkedin: z.string().max(255).nullable().optional(),
+    reddit: z.string().max(255).nullable().optional(),
+    facebook: z.string().max(255).nullable().optional(),
+    yahoo: z.string().max(255).nullable().optional(),
+    instagram: z.string().max(255).nullable().optional(),
+    company: z.string().max(255).nullable().optional(),
+    job_title: z.string().max(255).nullable().optional(),
+    personal_website: z.string().max(255).nullable().optional(),
+    work_phone_number: z.string().max(255).nullable().optional(),
+    work_email: z.string().max(320).nullable().optional(),
+  })
+  .strict();
+
+export const createIdentityItemInputSchema = z.object({
+  shareId: z.string().max(100).optional().describe("Share ID for the new item"),
+  vaultName: z.string().max(255).optional().describe("Vault name for the new item"),
+  template: identityItemTemplateSchema.describe("Identity item template payload"),
   confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
 });
 
@@ -295,6 +415,11 @@ export type CreateLoginItemInput = z.infer<typeof createLoginItemInputSchema>;
 export type CreateLoginItemFromTemplateInput = z.infer<
   typeof createLoginItemFromTemplateInputSchema
 >;
+export type CreateNoteItemInput = z.infer<typeof createNoteItemInputSchema>;
+export type CreateCreditCardItemInput = z.infer<typeof createCreditCardItemInputSchema>;
+export type CreateWifiItemInput = z.infer<typeof createWifiItemInputSchema>;
+export type CreateCustomItemInput = z.infer<typeof createCustomItemInputSchema>;
+export type CreateIdentityItemInput = z.infer<typeof createIdentityItemInputSchema>;
 export type UpdateItemInput = z.infer<typeof updateItemInputSchema>;
 export type DeleteItemInput = z.infer<typeof deleteItemInputSchema>;
 export type ShareItemInput = z.infer<typeof shareItemInputSchema>;
@@ -566,6 +691,101 @@ export async function createLoginItemFromTemplateHandler(
   else if (input.vaultName) args.push("--vault-name", input.vaultName);
 
   args.push("--output", input.output);
+
+  const { stdout, stderr } = await passCli(args, JSON.stringify(input.template));
+  const out = joinStdoutStderr(stdout, stderr);
+  return asTextContent(asJsonTextOrRaw(out));
+}
+
+export async function createNoteItemHandler(passCli: PassCliRunner, input: CreateNoteItemInput) {
+  requireWriteGate(input.confirm);
+  if (input.shareId && input.vaultName)
+    throw new Error("Provide only one of shareId or vaultName.");
+
+  const args: string[] = ["item", "create", "note"];
+  if (input.shareId) args.push("--share-id", input.shareId);
+  else if (input.vaultName) args.push("--vault-name", input.vaultName);
+
+  args.push("--title", input.title);
+  if (input.note !== undefined) args.push("--note", input.note);
+
+  const { stdout, stderr } = await passCli(args);
+  const out = joinStdoutStderr(stdout, stderr);
+  return asTextContent(asJsonTextOrRaw(out));
+}
+
+export async function createCreditCardItemHandler(
+  passCli: PassCliRunner,
+  input: CreateCreditCardItemInput,
+) {
+  requireWriteGate(input.confirm);
+  if (input.shareId && input.vaultName)
+    throw new Error("Provide only one of shareId or vaultName.");
+
+  const args: string[] = ["item", "create", "credit-card"];
+  if (input.shareId) args.push("--share-id", input.shareId);
+  else if (input.vaultName) args.push("--vault-name", input.vaultName);
+
+  args.push("--title", input.title);
+  if (input.cardholderName !== undefined) args.push("--cardholder-name", input.cardholderName);
+  if (input.number !== undefined) args.push("--number", input.number);
+  if (input.cvv !== undefined) args.push("--cvv", input.cvv);
+  if (input.expirationDate !== undefined) args.push("--expiration-date", input.expirationDate);
+  if (input.pin !== undefined) args.push("--pin", input.pin);
+  if (input.note !== undefined) args.push("--note", input.note);
+
+  const { stdout, stderr } = await passCli(args);
+  const out = joinStdoutStderr(stdout, stderr);
+  return asTextContent(asJsonTextOrRaw(out));
+}
+
+export async function createWifiItemHandler(passCli: PassCliRunner, input: CreateWifiItemInput) {
+  requireWriteGate(input.confirm);
+  if (input.shareId && input.vaultName)
+    throw new Error("Provide only one of shareId or vaultName.");
+
+  const args: string[] = ["item", "create", "wifi"];
+  if (input.shareId) args.push("--share-id", input.shareId);
+  else if (input.vaultName) args.push("--vault-name", input.vaultName);
+
+  args.push("--title", input.title, "--ssid", input.ssid);
+  if (input.password !== undefined) args.push("--password", input.password);
+  if (input.security !== undefined) args.push("--security", input.security);
+  if (input.note !== undefined) args.push("--note", input.note);
+
+  const { stdout, stderr } = await passCli(args);
+  const out = joinStdoutStderr(stdout, stderr);
+  return asTextContent(asJsonTextOrRaw(out));
+}
+
+export async function createCustomItemHandler(
+  passCli: PassCliRunner,
+  input: CreateCustomItemInput,
+) {
+  requireWriteGate(input.confirm);
+  if (input.shareId && input.vaultName)
+    throw new Error("Provide only one of shareId or vaultName.");
+
+  const args: string[] = ["item", "create", "custom", "--from-template", "-"];
+  if (input.shareId) args.push("--share-id", input.shareId);
+  else if (input.vaultName) args.push("--vault-name", input.vaultName);
+
+  const { stdout, stderr } = await passCli(args, JSON.stringify(input.template));
+  const out = joinStdoutStderr(stdout, stderr);
+  return asTextContent(asJsonTextOrRaw(out));
+}
+
+export async function createIdentityItemHandler(
+  passCli: PassCliRunner,
+  input: CreateIdentityItemInput,
+) {
+  requireWriteGate(input.confirm);
+  if (input.shareId && input.vaultName)
+    throw new Error("Provide only one of shareId or vaultName.");
+
+  const args: string[] = ["item", "create", "identity", "--from-template", "-"];
+  if (input.shareId) args.push("--share-id", input.shareId);
+  else if (input.vaultName) args.push("--vault-name", input.vaultName);
 
   const { stdout, stderr } = await passCli(args, JSON.stringify(input.template));
   const out = joinStdoutStderr(stdout, stderr);

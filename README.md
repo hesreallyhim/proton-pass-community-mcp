@@ -39,6 +39,11 @@ As this project is in its initial stages, it exposes the following tools:
 | `transfer_vault`                  | Transfer vault ownership                         |
 | `create_login_item`               | Create a login item                              |
 | `create_login_item_from_template` | Create a login item from template payload        |
+| `create_note_item`                | Create a note item                               |
+| `create_credit_card_item`         | Create a credit card item                        |
+| `create_wifi_item`                | Create a WiFi item                               |
+| `create_custom_item`              | Create a custom item from template payload       |
+| `create_identity_item`            | Create an identity item from template payload    |
 | `update_item`                     | Update an item field set                         |
 | `delete_item`                     | Delete an item                                   |
 | `create_item_alias`               | Create an alias item                             |
