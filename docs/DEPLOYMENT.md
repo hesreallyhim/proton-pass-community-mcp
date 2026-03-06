@@ -32,10 +32,10 @@ This runbook covers:
 
 ## Release Process
 
-1. Push release-ready commits to `main`.
-2. Wait for CI workflow (`.github/workflows/ci.yml`) to pass.
+1. Merge release-ready commits into `main` via PR (PR-first; no direct push to `main` in the default flow).
+2. Wait for CI workflow (`.github/workflows/ci.yml`) on `main` to pass.
 3. Wait for Release Please workflow (`.github/workflows/release-please.yml`) to open a release PR.
-4. Review the release PR:
+4. Review the Release Please PR:
    - expected version is `0.1.0`
    - changelog content matches intended scope
    - package metadata changes are correct
@@ -58,6 +58,6 @@ This runbook covers:
 2. Release PR version is wrong:
    - inspect commit history and release-please config
    - correct configuration, then rerun workflow
-3. CI failing on release branch:
-   - fix failures on branch
-   - push again and re-run checks before merging release PR
+3. CI failing on PR or `main`:
+   - fix failures on branch/PR
+   - re-run checks before merging

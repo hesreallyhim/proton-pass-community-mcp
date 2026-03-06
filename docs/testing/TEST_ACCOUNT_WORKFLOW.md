@@ -11,9 +11,9 @@ Use one disposable Proton Pass account for this repository's development and int
 
 Related planning documents:
 
-1. `docs/CODEX_MCP_AUTH_SPEC.md`
-2. `docs/CODEX_MCP_TEST_PLAN.md`
-3. `docs/THROWAWAY_DATA_PLAN.md`
+1. `docs/testing/CODEX_MCP_AUTH_SPEC.md`
+2. `docs/testing/CODEX_MCP_TEST_PLAN.md`
+3. `docs/testing/THROWAWAY_DATA_PLAN.md`
 
 ## Supported Proton Pass CLI Login Methods
 
