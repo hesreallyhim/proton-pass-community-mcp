@@ -27,22 +27,22 @@ As this project is in its initial stages, it exposes the following tools:
 | `list_invites`             | List pending invitations                         |
 | `view_settings`            | View current Proton Pass CLI settings            |
 | `list_vault_members`       | List members of a specific vault                 |
-| `vault_member_update`      | Update a vault member role                       |
-| `vault_member_remove`      | Remove a vault member                            |
+| `update_vault_member`      | Update a vault member role                       |
+| `remove_vault_member`      | Remove a vault member                            |
 | `list_items`               | List vault or share items, omitting contents     |
 | `search_items`             | Search items by title                            |
 | `view_item`                | View item by URI or selectors                    |
 | `create_vault`             | Create a vault                                   |
 | `update_vault`             | Update a vault name                              |
 | `delete_vault`             | Delete a vault                                   |
-| `vault_share`              | Share a vault with a user                        |
-| `vault_transfer`           | Transfer vault ownership                         |
+| `share_vault`              | Share a vault with a user                        |
+| `transfer_vault`           | Transfer vault ownership                         |
 | `create_login_item`        | Create a login item                              |
 | `update_item`              | Update an item field set                         |
 | `delete_item`              | Delete an item                                   |
 | `create_item_alias`        | Create an alias item                             |
-| `item_share`               | Share an item with a user                        |
-| `item_totp`                | Generate item TOTP codes                         |
+| `share_item`               | Share an item with a user                        |
+| `generate_item_totp`       | Generate item TOTP codes                         |
 | `generate_random_password` | Generate a random password                       |
 | `generate_passphrase`      | Generate a passphrase                            |
 | `score_password`           | Score password strength                          |
