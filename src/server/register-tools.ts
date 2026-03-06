@@ -4,6 +4,7 @@ import { withAuthErrorHandling } from "../pass-cli/errors.js";
 import type { PassCliRunner } from "../pass-cli/runner.js";
 import type { PassCliVersionPolicy } from "../pass-cli/version.js";
 import { checkStatusHandler } from "../tools/check-status.js";
+import { injectHandler, injectInputSchema, runHandler, runInputSchema } from "../tools/contents.js";
 import {
   createItemAliasHandler,
   createItemAliasInputSchema,
@@ -100,6 +101,24 @@ export function registerTools(
         "Run preflight checks for connectivity/authentication and CLI version compatibility.",
     },
     async () => checkStatusHandler(passCli, versionPolicy),
+  );
+
+  server.registerTool(
+    "inject",
+    {
+      description: "Inject secrets from Proton Pass references into a template file.",
+      inputSchema: injectInputSchema,
+    },
+    withAuthErrorHandling(async (input) => injectHandler(passCli, input)),
+  );
+
+  server.registerTool(
+    "run",
+    {
+      description: "Run a command with Proton Pass secret references resolved in environment.",
+      inputSchema: runInputSchema,
+    },
+    withAuthErrorHandling(async (input) => runHandler(passCli, input)),
   );
 
   server.registerTool(
