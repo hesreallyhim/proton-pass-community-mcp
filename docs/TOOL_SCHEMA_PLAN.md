@@ -42,6 +42,7 @@ This section defines the target mutation-safety model for this server, aligned w
 1. Elicitation is not a universal requirement across all protocol versions.
 2. Elicitation was introduced in spec version `2025-06-18`; sessions negotiating older versions cannot use it.
 3. Even on current spec versions, elicitation is capability-negotiated and optional at runtime; servers must branch behavior based on negotiated capabilities.
+4. For local `stdio` deployments, the same person usually controls both sides (client config and server process environment), so write-gate env vars are effectively user-chosen launch policy. This does not weaken enforcement: the server still applies its own gate checks at runtime.
 
 ### Decision Matrix (Target Behavior)
 
