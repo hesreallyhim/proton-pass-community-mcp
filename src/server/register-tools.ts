@@ -8,10 +8,10 @@ import { injectHandler, injectInputSchema, runHandler, runInputSchema } from "..
 import {
   createItemAliasHandler,
   createItemAliasInputSchema,
+  createLoginItemFromTemplateHandler,
+  createLoginItemFromTemplateInputSchema,
   createLoginItemHandler,
   createLoginItemInputSchema,
-  createItemFromTemplateHandler,
-  createItemFromTemplateInputSchema,
   deleteItemHandler,
   deleteItemInputSchema,
   itemTotpHandler,
@@ -357,12 +357,12 @@ export function registerTools(
   );
 
   server.registerTool(
-    "create_item_from_template",
+    "create_login_item_from_template",
     {
-      description: "Create an item from template JSON.",
-      inputSchema: createItemFromTemplateInputSchema,
+      description: "Create a login item from template JSON.",
+      inputSchema: createLoginItemFromTemplateInputSchema,
     },
-    withAuthErrorHandling(async (input) => createItemFromTemplateHandler(passCli, input)),
+    withAuthErrorHandling(async (input) => createLoginItemFromTemplateHandler(passCli, input)),
   );
 
   server.registerTool(

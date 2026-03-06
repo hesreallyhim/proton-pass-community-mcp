@@ -64,7 +64,7 @@ async function main() {
     "update_vault",
     "delete_vault",
     "create_login_item",
-    "create_item_from_template",
+    "create_login_item_from_template",
     "update_item",
     "delete_item",
   ];

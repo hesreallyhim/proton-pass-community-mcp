@@ -20,7 +20,7 @@ import {
   checkStatusHandler,
   PassCliAuthError,
   viewSessionInfoHandler,
-  createItemFromTemplateHandler,
+  createLoginItemFromTemplateHandler,
   createItemAliasHandler,
   createLoginItemHandler,
   deleteItemHandler,
@@ -1372,38 +1372,35 @@ describe("write handlers", () => {
     ]);
   });
 
-  it("createItemFromTemplateHandler validates selector conflicts and forwards stdin", async () => {
+  it("createLoginItemFromTemplateHandler validates selector conflicts and forwards stdin", async () => {
     process.env.ALLOW_WRITE = "1";
     const runner = makeRunner({ stdout: '{"ok":true}', stderr: "" });
 
     await expect(
-      createItemFromTemplateHandler(runner, {
-        itemType: "login",
+      createLoginItemFromTemplateHandler(runner, {
         shareId: "s1",
         vaultName: "Work",
-        templateJson: "{}",
+        template: { title: "Demo", urls: ["https://example.com"] },
         output: "json",
         confirm: true,
       }),
     ).rejects.toThrow("Provide only one of shareId or vaultName");
 
-    await createItemFromTemplateHandler(runner, {
-      itemType: "login",
+    await createLoginItemFromTemplateHandler(runner, {
       shareId: "s1",
-      templateJson: '{"x":1}',
+      template: { title: "Demo", urls: ["https://example.com"] },
       output: "json",
       confirm: true,
     });
 
     expect(runner).toHaveBeenCalledWith(
       ["item", "create", "login", "--from-template", "-", "--share-id", "s1", "--output", "json"],
-      '{"x":1}',
+      '{"title":"Demo","urls":["https://example.com"]}',
     );
 
-    await createItemFromTemplateHandler(runner, {
-      itemType: "login",
+    await createLoginItemFromTemplateHandler(runner, {
       vaultName: "Work",
-      templateJson: "{}",
+      template: { title: "Demo", urls: ["https://example.com"] },
       output: "human",
       confirm: true,
     });
@@ -1420,7 +1417,7 @@ describe("write handlers", () => {
         "--output",
         "human",
       ],
-      "{}",
+      '{"title":"Demo","urls":["https://example.com"]}',
     );
   });
 
@@ -1797,10 +1794,12 @@ describe("server setup", () => {
       output: "json",
       confirm: true,
     });
-    await tools.create_item_from_template.handler({
-      itemType: "note",
+    await tools.create_login_item_from_template.handler({
       vaultName: "Sandbox",
-      templateJson: '{"content":{"title":"Demo Note"}}',
+      template: {
+        title: "Demo Note",
+        urls: ["https://example.com"],
+      },
       output: "json",
       confirm: true,
     });
@@ -1849,7 +1848,7 @@ describe("server setup", () => {
     expect(tools.transfer_vault).toBeDefined();
     expect(tools.generate_item_totp).toBeDefined();
     expect(tools.create_login_item).toBeDefined();
-    expect(tools.create_item_from_template).toBeDefined();
+    expect(tools.create_login_item_from_template).toBeDefined();
     expect(tools.update_item).toBeDefined();
     expect(tools.delete_item).toBeDefined();
     expect(tools.share_item).toBeDefined();
