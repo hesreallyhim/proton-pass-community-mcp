@@ -24,6 +24,7 @@ Primary optimization target: item discovery (`pass-cli item list`) should return
 6. Release branches may retain non-release code paths, but only release-scoped tools are registered/exposed by default.
 7. Authentication lifecycle (`pass-cli login`, `pass-cli logout`) remains out-of-band and is not exposed as MCP tools.
 8. CLI binary lifecycle commands (for example `pass-cli update` / track switching) remain out-of-band and are not exposed as MCP tools.
+9. Host SSH agent integration/lifecycle commands (`pass-cli ssh-agent *`) remain out-of-band and are not exposed as MCP tools.
 
 ## Shared Schemas
 
@@ -306,9 +307,9 @@ Status key:
 | `settings_set_default_format`   | `pass-cli settings set default-format`   | Planned     | `format`, `confirm`                    | Set status                |
 | `settings_unset_default_vault`  | `pass-cli settings unset default-vault`  | Planned     | `confirm`                              | Unset status              |
 | `settings_unset_default_format` | `pass-cli settings unset default-format` | Planned     | `confirm`                              | Unset status              |
-| `ssh_agent_start`               | `pass-cli ssh-agent start`               | Planned     | CLI flags passthrough, `confirm`       | Agent status              |
-| `ssh_agent_load`                | `pass-cli ssh-agent load`                | Planned     | CLI flags passthrough, `confirm`       | Load status               |
-| `ssh_agent_debug`               | `pass-cli ssh-agent debug`               | Planned     | selectors, `output?`                   | Debug report              |
+| `ssh_agent_start`               | `pass-cli ssh-agent start`               | Out-of-SCope     | N/A                                | N/A                      |
+| `ssh_agent_load`                | `pass-cli ssh-agent load`                | Out-of-SCope     | N/A                                | N/A             |
+| `ssh_agent_debug`               | `pass-cli ssh-agent debug`               | Out-of-SCope     | N/A                                 | N/A            |
 
 ## Phased Delivery
 
