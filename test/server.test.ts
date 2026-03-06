@@ -23,6 +23,7 @@ import {
   deleteItemHandler,
   itemTotpHandler,
   listItemsHandler,
+  shareItemHandler,
   generatePassphraseHandler,
   generateRandomPasswordHandler,
   scorePasswordHandler,
@@ -44,6 +45,7 @@ import {
   listVaultMembersHandler,
   listVaultsHandler,
   removeVaultMemberHandler,
+  shareVaultHandler,
   updateVaultMemberHandler,
   updateVaultHandler,
   requireWriteGate,
@@ -1186,6 +1188,49 @@ describe("write handlers", () => {
     expect(runner).toHaveBeenNthCalledWith(2, ["vault", "delete", "--vault-name", "Work"]);
   });
 
+  it("shareVaultHandler validates scope and supports optional role", async () => {
+    process.env.ALLOW_WRITE = "1";
+    const runner = makeRunner({ stdout: "shared", stderr: "" });
+
+    await expect(
+      shareVaultHandler(runner, {
+        email: "user@example.com",
+        confirm: true,
+      }),
+    ).rejects.toThrow("exactly one");
+
+    await shareVaultHandler(runner, {
+      shareId: "s1",
+      email: "user@example.com",
+      confirm: true,
+    });
+
+    await shareVaultHandler(runner, {
+      vaultName: "Work",
+      email: "manager@example.com",
+      role: "manager",
+      confirm: true,
+    });
+
+    expect(runner).toHaveBeenNthCalledWith(1, [
+      "vault",
+      "share",
+      "--share-id",
+      "s1",
+      "user@example.com",
+    ]);
+
+    expect(runner).toHaveBeenNthCalledWith(2, [
+      "vault",
+      "share",
+      "--vault-name",
+      "Work",
+      "manager@example.com",
+      "--role",
+      "manager",
+    ]);
+  });
+
   it("vault member write handlers validate scope and build command arguments", async () => {
     process.env.ALLOW_WRITE = "1";
     const runner = makeRunner({ stdout: "ok", stderr: "" });
@@ -1441,6 +1486,46 @@ describe("write handlers", () => {
     expect(result).toEqual({ content: [{ type: "text", text: "OK" }] });
   });
 
+  it("shareItemHandler forwards required and optional sharing fields", async () => {
+    process.env.ALLOW_WRITE = "1";
+    const runner = makeRunner({ stdout: "shared", stderr: "" });
+
+    await shareItemHandler(runner, {
+      shareId: "s1",
+      itemId: "i1",
+      email: "viewer@example.com",
+      confirm: true,
+    });
+    await shareItemHandler(runner, {
+      shareId: "s2",
+      itemId: "i2",
+      email: "editor@example.com",
+      role: "editor",
+      confirm: true,
+    });
+
+    expect(runner).toHaveBeenNthCalledWith(1, [
+      "item",
+      "share",
+      "--share-id",
+      "s1",
+      "--item-id",
+      "i1",
+      "viewer@example.com",
+    ]);
+    expect(runner).toHaveBeenNthCalledWith(2, [
+      "item",
+      "share",
+      "--share-id",
+      "s2",
+      "--item-id",
+      "i2",
+      "editor@example.com",
+      "--role",
+      "editor",
+    ]);
+  });
+
   it("inviteAcceptHandler and inviteRejectHandler enforce gate and call invite commands", async () => {
     const runner = makeRunner({ stdout: "", stderr: "" });
     process.env.ALLOW_WRITE = "1";
@@ -1560,6 +1645,12 @@ describe("server setup", () => {
       memberShareId: "m1",
       confirm: true,
     });
+    await tools.vault_share.handler({
+      shareId: "s1",
+      email: "user@example.com",
+      role: "viewer",
+      confirm: true,
+    });
     await tools.create_vault.handler({ name: "Sandbox", confirm: true });
     await tools.update_vault.handler({ vaultName: "Sandbox", newName: "Sandbox 2", confirm: true });
     await tools.delete_vault.handler({ vaultName: "Sandbox", confirm: true });
@@ -1603,6 +1694,13 @@ describe("server setup", () => {
       itemId: "i1",
       confirm: true,
     });
+    await tools.item_share.handler({
+      shareId: "s1",
+      itemId: "i1",
+      email: "user@example.com",
+      role: "editor",
+      confirm: true,
+    });
 
     expect(tools.create_vault).toBeDefined();
     expect(tools.update_vault).toBeDefined();
@@ -1618,13 +1716,15 @@ describe("server setup", () => {
     expect(tools.score_password).toBeDefined();
     expect(tools.vault_member_update).toBeDefined();
     expect(tools.vault_member_remove).toBeDefined();
+    expect(tools.vault_share).toBeDefined();
     expect(tools.item_totp).toBeDefined();
     expect(tools.create_login_item).toBeDefined();
     expect(tools.create_item_from_template).toBeDefined();
     expect(tools.update_item).toBeDefined();
     expect(tools.delete_item).toBeDefined();
+    expect(tools.item_share).toBeDefined();
 
-    expect(runner).toHaveBeenCalledTimes(31);
+    expect(runner).toHaveBeenCalledTimes(33);
   });
 
   it("registered tool handlers return standardized auth error payloads", async () => {

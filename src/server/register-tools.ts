@@ -17,6 +17,8 @@ import {
   listItemsInputSchema,
   searchItemsHandler,
   searchItemsInputSchema,
+  shareItemHandler,
+  shareItemInputSchema,
   updateItemHandler,
   updateItemInputSchema,
   viewItemHandler,
@@ -70,6 +72,8 @@ import {
   updateVaultMemberInputSchema,
   updateVaultHandler,
   updateVaultInputSchema,
+  shareVaultHandler,
+  shareVaultInputSchema,
 } from "../tools/vault.js";
 
 export function registerTools(
@@ -128,6 +132,15 @@ export function registerTools(
       inputSchema: updateVaultInputSchema,
     },
     withAuthErrorHandling(async (input) => updateVaultHandler(passCli, input)),
+  );
+
+  server.registerTool(
+    "vault_share",
+    {
+      description: "Share a vault with a user.",
+      inputSchema: shareVaultInputSchema,
+    },
+    withAuthErrorHandling(async (input) => shareVaultHandler(passCli, input)),
   );
 
   server.registerTool(
@@ -336,6 +349,15 @@ export function registerTools(
       inputSchema: deleteItemInputSchema,
     },
     withAuthErrorHandling(async (input) => deleteItemHandler(passCli, input)),
+  );
+
+  server.registerTool(
+    "item_share",
+    {
+      description: "Share an item with a user.",
+      inputSchema: shareItemInputSchema,
+    },
+    withAuthErrorHandling(async (input) => shareItemHandler(passCli, input)),
   );
 
   server.registerTool(
