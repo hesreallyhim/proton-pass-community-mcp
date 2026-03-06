@@ -302,17 +302,21 @@ Status key:
 
 ### Item Creation
 
-| Tool                        | Source                                  | Status                     | Input Summary                                   | Output Summary |
-| --------------------------- | --------------------------------------- | -------------------------- | ----------------------------------------------- | -------------- |
-| `create_login_item`         | `pass-cli item create login`            | Implemented                | typed login fields or template mode, `confirm`  | Created item   |
-| `create_note_item`          | `pass-cli item create note`             | Planned                    | note fields or template mode, `confirm`         | Created item   |
-| `create_credit_card_item`   | `pass-cli item create credit-card`      | Planned                    | card fields or template mode, `confirm`         | Created item   |
-| `create_wifi_item`          | `pass-cli item create wifi`             | Planned                    | wifi fields or template mode, `confirm`         | Created item   |
-| `create_custom_item`        | `pass-cli item create custom`           | Planned                    | template mode, `confirm`                        | Created item   |
-| `create_identity_item`      | `pass-cli item create identity`         | Planned                    | template mode, `confirm`                        | Created item   |
-| `generate_ssh_key_item`     | `pass-cli item create ssh-key generate` | Out of Scope (Out-of-Band) | n/a                                             | n/a            |
-| `import_ssh_key_item`       | `pass-cli item create ssh-key import`   | Out of Scope (Out-of-Band) | n/a                                             | n/a            |
-| `create_item_from_template` | MCP wrapper around `--from-template -`  | Implemented                | `itemType`, selector, `templateJson`, `confirm` | Created item   |
+| Tool                              | Source                                       | Status                     | Input Summary                                                                               | Output Summary |
+| --------------------------------- | -------------------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------- | -------------- |
+| `create_login_item`               | `pass-cli item create login`                 | Implemented                | typed login fields, `confirm`                                                               | Created item   |
+| `create_login_item_from_template` | `pass-cli item create login --from-template` | Implemented                | selector, `template` (`title`, `urls[]`, optional `username`/`email`/`password`), `confirm` | Created item   |
+| `create_note_item`                | `pass-cli item create note`                  | Planned                    | note fields, `confirm`                                                                      | Created item   |
+| `create_credit_card_item`         | `pass-cli item create credit-card`           | Planned                    | card fields, `confirm`                                                                      | Created item   |
+| `create_wifi_item`                | `pass-cli item create wifi`                  | Planned                    | wifi fields, `confirm`                                                                      | Created item   |
+| `create_custom_item`              | `pass-cli item create custom`                | Planned                    | custom fields, `confirm`                                                                    | Created item   |
+| `create_identity_item`            | `pass-cli item create identity`              | Planned                    | identity fields, `confirm`                                                                  | Created item   |
+| `generate_ssh_key_item`           | `pass-cli item create ssh-key generate`      | Out of Scope (Out-of-Band) | n/a                                                                                         | n/a            |
+| `import_ssh_key_item`             | `pass-cli item create ssh-key import`        | Out of Scope (Out-of-Band) | n/a                                                                                         | n/a            |
+
+Notes:
+
+1. Current Proton Pass CLI docs explicitly document `--get-template` / `--from-template` for login creation; this plan treats template-driven creation as login-scoped unless/until upstream docs/behavior confirm additional item-type template contracts.
 
 ### Item Alias, Attachment, and Members
 

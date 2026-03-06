@@ -228,11 +228,20 @@ export const createLoginItemInputSchema = z.object({
   confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
 });
 
-export const createItemFromTemplateInputSchema = z.object({
-  itemType: z.string().max(50).describe("Item type (e.g. login, note, alias, creditCard)"),
+export const loginItemTemplateSchema = z
+  .object({
+    title: z.string().min(1).max(255).describe("Title of the login item"),
+    urls: z.array(z.string().max(1024)).min(1).describe("List of URL strings for the login item"),
+    username: z.string().max(255).optional().describe("Optional username"),
+    email: z.string().max(255).optional().describe("Optional email"),
+    password: z.string().max(1024).optional().describe("Optional password"),
+  })
+  .passthrough();
+
+export const createLoginItemFromTemplateInputSchema = z.object({
   shareId: z.string().max(100).optional().describe("Share ID for the new item"),
   vaultName: z.string().max(255).optional().describe("Vault name for the new item"),
-  templateJson: z.string().max(65536).describe("JSON template content for the new item"),
+  template: loginItemTemplateSchema.describe("Login template payload"),
   output: z.enum(["json", "human"]).default("json").describe("Output format"),
   confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
 });
@@ -283,7 +292,9 @@ export type ViewItemInput = z.infer<typeof viewItemInputSchema>;
 export type ItemTotpInput = z.infer<typeof itemTotpInputSchema>;
 export type SearchItemsInput = z.infer<typeof searchItemsInputSchema>;
 export type CreateLoginItemInput = z.infer<typeof createLoginItemInputSchema>;
-export type CreateItemFromTemplateInput = z.infer<typeof createItemFromTemplateInputSchema>;
+export type CreateLoginItemFromTemplateInput = z.infer<
+  typeof createLoginItemFromTemplateInputSchema
+>;
 export type UpdateItemInput = z.infer<typeof updateItemInputSchema>;
 export type DeleteItemInput = z.infer<typeof deleteItemInputSchema>;
 export type ShareItemInput = z.infer<typeof shareItemInputSchema>;
@@ -542,21 +553,21 @@ export async function createLoginItemHandler(passCli: PassCliRunner, input: Crea
   return asTextContent(asJsonTextOrRaw(out));
 }
 
-export async function createItemFromTemplateHandler(
+export async function createLoginItemFromTemplateHandler(
   passCli: PassCliRunner,
-  input: CreateItemFromTemplateInput,
+  input: CreateLoginItemFromTemplateInput,
 ) {
   requireWriteGate(input.confirm);
   if (input.shareId && input.vaultName)
     throw new Error("Provide only one of shareId or vaultName.");
 
-  const args: string[] = ["item", "create", input.itemType, "--from-template", "-"];
+  const args: string[] = ["item", "create", "login", "--from-template", "-"];
   if (input.shareId) args.push("--share-id", input.shareId);
   else if (input.vaultName) args.push("--vault-name", input.vaultName);
 
   args.push("--output", input.output);
 
-  const { stdout, stderr } = await passCli(args, input.templateJson);
+  const { stdout, stderr } = await passCli(args, JSON.stringify(input.template));
   const out = joinStdoutStderr(stdout, stderr);
   return asTextContent(asJsonTextOrRaw(out));
 }
