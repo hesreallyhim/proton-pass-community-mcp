@@ -241,7 +241,7 @@ Status key:
 | `update_vault`        | `pass-cli vault update`        | Implemented | `shareId \| vaultName`, `newName`, `confirm`               | Update status                |
 | `delete_vault`        | `pass-cli vault delete`        | Implemented | `shareId \| vaultName`, `confirm`                          | Delete status                |
 | `vault_share`         | `pass-cli vault share`         | Implemented | `shareId \| vaultName`, `email`, `role?`, `confirm`        | Share result                 |
-| `vault_transfer`      | `pass-cli vault transfer`      | Planned     | `shareId \| vaultName`, `memberShareId`, `confirm`         | Transfer result              |
+| `vault_transfer`      | `pass-cli vault transfer`      | Implemented | `shareId \| vaultName`, `memberShareId`, `confirm`         | Transfer result              |
 | `list_vault_members`  | `pass-cli vault member list`   | Implemented | `shareId \| vaultName`, `pageSize?`, `cursor?`             | `CursorPage<VaultMemberRef>` |
 | `vault_member_update` | `pass-cli vault member update` | Implemented | `shareId \| vaultName`, `memberShareId`, `role`, `confirm` | Update status                |
 | `vault_member_remove` | `pass-cli vault member remove` | Implemented | `shareId \| vaultName`, `memberShareId`, `confirm`         | Remove status                |
@@ -282,13 +282,13 @@ Status key:
 
 ### Item Alias, Attachment, and Members
 
-| Tool                       | Source                              | Status  | Input Summary                                                | Output Summary       |
-| -------------------------- | ----------------------------------- | ------- | ------------------------------------------------------------ | -------------------- |
-| `item_alias_create`        | `pass-cli item alias create`        | Planned | `shareId \| vaultName`, `prefix`, `output?`, `confirm`       | Alias item           |
-| `item_attachment_download` | `pass-cli item attachment download` | Planned | `shareId`, `itemId`, `attachmentId`, `outputPath`, `confirm` | Download status/path |
-| `item_member_list`         | `pass-cli item member list`         | Planned | `shareId`, `itemId`, `output?`                               | Member list          |
-| `item_member_update`       | `pass-cli item member update`       | Planned | `shareId`, `memberShareId`, `role`, `confirm`                | Update status        |
-| `item_member_remove`       | `pass-cli item member remove`       | Planned | `shareId`, `memberShareId`, `confirm`                        | Remove status        |
+| Tool                       | Source                              | Status      | Input Summary                                                | Output Summary       |
+| -------------------------- | ----------------------------------- | ----------- | ------------------------------------------------------------ | -------------------- |
+| `create_item_alias`        | `pass-cli item alias create`        | Implemented | `shareId \| vaultName`, `prefix`, `output?`, `confirm`       | Alias item           |
+| `item_attachment_download` | `pass-cli item attachment download` | Planned     | `shareId`, `itemId`, `attachmentId`, `outputPath`, `confirm` | Download status/path |
+| `item_member_list`         | `pass-cli item member list`         | Planned     | `shareId`, `itemId`, `output?`                               | Member list          |
+| `item_member_update`       | `pass-cli item member update`       | Planned     | `shareId`, `memberShareId`, `role`, `confirm`                | Update status        |
+| `item_member_remove`       | `pass-cli item member remove`       | Planned     | `shareId`, `memberShareId`, `confirm`                        | Remove status        |
 
 ### Share, Invite, Password, TOTP, User, Settings, SSH Agent
 

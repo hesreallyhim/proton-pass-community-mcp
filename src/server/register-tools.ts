@@ -5,6 +5,8 @@ import type { PassCliRunner } from "../pass-cli/runner.js";
 import type { PassCliVersionPolicy } from "../pass-cli/version.js";
 import { checkStatusHandler } from "../tools/check-status.js";
 import {
+  createItemAliasHandler,
+  createItemAliasInputSchema,
   createLoginItemHandler,
   createLoginItemInputSchema,
   createItemFromTemplateHandler,
@@ -74,6 +76,8 @@ import {
   updateVaultInputSchema,
   shareVaultHandler,
   shareVaultInputSchema,
+  transferVaultHandler,
+  transferVaultInputSchema,
 } from "../tools/vault.js";
 
 export function registerTools(
@@ -141,6 +145,15 @@ export function registerTools(
       inputSchema: shareVaultInputSchema,
     },
     withAuthErrorHandling(async (input) => shareVaultHandler(passCli, input)),
+  );
+
+  server.registerTool(
+    "vault_transfer",
+    {
+      description: "Transfer vault ownership to a member.",
+      inputSchema: transferVaultInputSchema,
+    },
+    withAuthErrorHandling(async (input) => transferVaultHandler(passCli, input)),
   );
 
   server.registerTool(
@@ -349,6 +362,15 @@ export function registerTools(
       inputSchema: deleteItemInputSchema,
     },
     withAuthErrorHandling(async (input) => deleteItemHandler(passCli, input)),
+  );
+
+  server.registerTool(
+    "create_item_alias",
+    {
+      description: "Create an email alias item.",
+      inputSchema: createItemAliasInputSchema,
+    },
+    withAuthErrorHandling(async (input) => createItemAliasHandler(passCli, input)),
   );
 
   server.registerTool(
