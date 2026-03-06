@@ -158,7 +158,7 @@ export function registerTools(
   );
 
   server.registerTool(
-    "vault_share",
+    "share_vault",
     {
       description: "Share a vault with a user.",
       inputSchema: shareVaultInputSchema,
@@ -167,7 +167,7 @@ export function registerTools(
   );
 
   server.registerTool(
-    "vault_transfer",
+    "transfer_vault",
     {
       description: "Transfer vault ownership to a member.",
       inputSchema: transferVaultInputSchema,
@@ -203,7 +203,7 @@ export function registerTools(
   );
 
   server.registerTool(
-    "invite_accept",
+    "accept_invite",
     {
       description: "Accept an invitation token.",
       inputSchema: inviteAcceptInputSchema,
@@ -212,7 +212,7 @@ export function registerTools(
   );
 
   server.registerTool(
-    "invite_reject",
+    "reject_invite",
     {
       description: "Reject an invitation token.",
       inputSchema: inviteRejectInputSchema,
@@ -229,7 +229,7 @@ export function registerTools(
   );
 
   server.registerTool(
-    "settings_set_default_vault",
+    "set_default_vault",
     {
       description: "Set default vault by share ID or vault name.",
       inputSchema: settingsSetDefaultVaultInputSchema,
@@ -238,7 +238,7 @@ export function registerTools(
   );
 
   server.registerTool(
-    "settings_set_default_format",
+    "set_default_format",
     {
       description: "Set default output format (human/json).",
       inputSchema: settingsSetDefaultFormatInputSchema,
@@ -247,7 +247,7 @@ export function registerTools(
   );
 
   server.registerTool(
-    "settings_unset_default_vault",
+    "unset_default_vault",
     {
       description: "Unset default vault setting.",
       inputSchema: settingsUnsetDefaultVaultInputSchema,
@@ -256,7 +256,7 @@ export function registerTools(
   );
 
   server.registerTool(
-    "settings_unset_default_format",
+    "unset_default_format",
     {
       description: "Unset default output format setting.",
       inputSchema: settingsUnsetDefaultFormatInputSchema,
@@ -301,7 +301,7 @@ export function registerTools(
   );
 
   server.registerTool(
-    "vault_member_update",
+    "update_vault_member",
     {
       description: "Update a vault member role.",
       inputSchema: updateVaultMemberInputSchema,
@@ -310,7 +310,7 @@ export function registerTools(
   );
 
   server.registerTool(
-    "vault_member_remove",
+    "remove_vault_member",
     {
       description: "Remove a member from a vault.",
       inputSchema: removeVaultMemberInputSchema,
@@ -338,7 +338,7 @@ export function registerTools(
   );
 
   server.registerTool(
-    "item_totp",
+    "generate_item_totp",
     {
       description:
         "Generate TOTP code(s) for an item by URI or selectors, optionally targeting a specific field.",
@@ -393,7 +393,7 @@ export function registerTools(
   );
 
   server.registerTool(
-    "item_share",
+    "share_item",
     {
       description: "Share an item with a user.",
       inputSchema: shareItemInputSchema,

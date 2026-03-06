@@ -1741,33 +1741,33 @@ describe("server setup", () => {
     await tools.run.handler({ command: ["echo", "hello"], confirm: true });
     await tools.view_user_info.handler({ output: "json" });
     await tools.view_settings.handler();
-    await tools.settings_set_default_vault.handler({ vaultName: "Sandbox", confirm: true });
-    await tools.settings_set_default_format.handler({ format: "json", confirm: true });
-    await tools.settings_unset_default_vault.handler({ confirm: true });
-    await tools.settings_unset_default_format.handler({ confirm: true });
+    await tools.set_default_vault.handler({ vaultName: "Sandbox", confirm: true });
+    await tools.set_default_format.handler({ format: "json", confirm: true });
+    await tools.unset_default_vault.handler({ confirm: true });
+    await tools.unset_default_format.handler({ confirm: true });
     await tools.generate_random_password.handler({ length: 16, uppercase: true });
     await tools.generate_passphrase.handler({ count: 5, separator: "hyphens" });
     await tools.score_password.handler({ password: "MySecureP@ssw0rd", output: "json" });
     await tools.list_vaults.handler({ output: "json" });
     await tools.list_vault_members.handler({ shareId: "s1" });
-    await tools.vault_member_update.handler({
+    await tools.update_vault_member.handler({
       shareId: "s1",
       memberShareId: "m1",
       role: "editor",
       confirm: true,
     });
-    await tools.vault_member_remove.handler({
+    await tools.remove_vault_member.handler({
       shareId: "s1",
       memberShareId: "m1",
       confirm: true,
     });
-    await tools.vault_share.handler({
+    await tools.share_vault.handler({
       shareId: "s1",
       email: "user@example.com",
       role: "viewer",
       confirm: true,
     });
-    await tools.vault_transfer.handler({
+    await tools.transfer_vault.handler({
       shareId: "s1",
       memberShareId: "m1",
       confirm: true,
@@ -1777,8 +1777,8 @@ describe("server setup", () => {
     await tools.delete_vault.handler({ vaultName: "Sandbox", confirm: true });
     await tools.list_shares.handler({ output: "json" });
     await tools.list_invites.handler({});
-    await tools.invite_accept.handler({ inviteToken: "tok-accept", confirm: true });
-    await tools.invite_reject.handler({ inviteToken: "tok-reject", confirm: true });
+    await tools.accept_invite.handler({ inviteToken: "tok-accept", confirm: true });
+    await tools.reject_invite.handler({ inviteToken: "tok-reject", confirm: true });
     await tools.list_items.handler({ shareId: "s1", output: "json" });
     await tools.search_items.handler({
       query: "GitHub",
@@ -1788,7 +1788,7 @@ describe("server setup", () => {
       shareId: "s1",
     });
     await tools.view_item.handler({ uri: "pass://Work/GitHub/password", output: "json" });
-    await tools.item_totp.handler({ uri: "pass://Work/GitHub/totp", output: "json" });
+    await tools.generate_item_totp.handler({ uri: "pass://Work/GitHub/totp", output: "json" });
     await tools.create_login_item.handler({
       vaultName: "Sandbox",
       title: "GitHub",
@@ -1815,7 +1815,7 @@ describe("server setup", () => {
       itemId: "i1",
       confirm: true,
     });
-    await tools.item_share.handler({
+    await tools.share_item.handler({
       shareId: "s1",
       itemId: "i1",
       email: "user@example.com",
@@ -1832,27 +1832,27 @@ describe("server setup", () => {
     expect(tools.create_vault).toBeDefined();
     expect(tools.update_vault).toBeDefined();
     expect(tools.delete_vault).toBeDefined();
-    expect(tools.invite_accept).toBeDefined();
-    expect(tools.invite_reject).toBeDefined();
-    expect(tools.settings_set_default_vault).toBeDefined();
-    expect(tools.settings_set_default_format).toBeDefined();
-    expect(tools.settings_unset_default_vault).toBeDefined();
-    expect(tools.settings_unset_default_format).toBeDefined();
+    expect(tools.accept_invite).toBeDefined();
+    expect(tools.reject_invite).toBeDefined();
+    expect(tools.set_default_vault).toBeDefined();
+    expect(tools.set_default_format).toBeDefined();
+    expect(tools.unset_default_vault).toBeDefined();
+    expect(tools.unset_default_format).toBeDefined();
     expect(tools.generate_random_password).toBeDefined();
     expect(tools.generate_passphrase).toBeDefined();
     expect(tools.score_password).toBeDefined();
     expect(tools.inject).toBeDefined();
     expect(tools.run).toBeDefined();
-    expect(tools.vault_member_update).toBeDefined();
-    expect(tools.vault_member_remove).toBeDefined();
-    expect(tools.vault_share).toBeDefined();
-    expect(tools.vault_transfer).toBeDefined();
-    expect(tools.item_totp).toBeDefined();
+    expect(tools.update_vault_member).toBeDefined();
+    expect(tools.remove_vault_member).toBeDefined();
+    expect(tools.share_vault).toBeDefined();
+    expect(tools.transfer_vault).toBeDefined();
+    expect(tools.generate_item_totp).toBeDefined();
     expect(tools.create_login_item).toBeDefined();
     expect(tools.create_item_from_template).toBeDefined();
     expect(tools.update_item).toBeDefined();
     expect(tools.delete_item).toBeDefined();
-    expect(tools.item_share).toBeDefined();
+    expect(tools.share_item).toBeDefined();
     expect(tools.create_item_alias).toBeDefined();
 
     expect(runner).toHaveBeenCalledTimes(37);
