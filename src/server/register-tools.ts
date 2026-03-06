@@ -11,6 +11,8 @@ import {
   createItemFromTemplateInputSchema,
   deleteItemHandler,
   deleteItemInputSchema,
+  itemTotpHandler,
+  itemTotpInputSchema,
   listItemsHandler,
   listItemsInputSchema,
   searchItemsHandler,
@@ -231,6 +233,16 @@ export function registerTools(
       inputSchema: viewItemInputSchema,
     },
     withAuthErrorHandling(async (input) => viewItemHandler(passCli, input)),
+  );
+
+  server.registerTool(
+    "item_totp",
+    {
+      description:
+        "Generate TOTP code(s) for an item by URI or selectors, optionally targeting a specific field.",
+      inputSchema: itemTotpInputSchema,
+    },
+    withAuthErrorHandling(async (input) => itemTotpHandler(passCli, input)),
   );
 
   server.registerTool(
