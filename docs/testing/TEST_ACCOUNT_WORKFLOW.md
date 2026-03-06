@@ -174,6 +174,12 @@ This repository includes a manual workflow template:
 
 It is `workflow_dispatch` only and intended as an opt-in smoke/integration job for the throwaway account.
 
+This repository also includes a scheduled drift check workflow:
+
+- `.github/workflows/pass-cli-template-drift-weekly.yml`
+
+It runs weekly (Monday) and checks whether `item create <type> --get-template` output drifts from the committed snapshot artifact.
+
 Required GitHub Actions secrets:
 
 1. `PROTON_PASS_USERNAME`
@@ -185,6 +191,11 @@ Optional secrets (only if the account requires them):
 
 1. `PROTON_PASS_TOTP`
 2. `PROTON_PASS_EXTRA_PASSWORD`
+
+Template drift check commands:
+
+1. `npm run pass:dev:template:drift`
+2. `npm run pass:dev:template:snapshot:update` (only when intentionally accepting template changes)
 
 ## Provider Compatibility Validation (One-Time)
 

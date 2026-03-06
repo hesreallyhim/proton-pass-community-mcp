@@ -1,0 +1,59 @@
+name: Pass CLI Template Drift (Weekly)
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 9 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  template-drift:
+    name: Template Drift Check
+    runs-on: ubuntu-latest
+    if: ${{ secrets.PROTON_PASS_ENCRYPTION_KEY != '' && secrets.PROTON_PASS_USERNAME != '' && secrets.PROTON_PASS_PASSWORD != '' && secrets.PROTON_PASS_EXPECTED_ACCOUNT != '' }}
+    env:
+      PROTON_PASS_KEY_PROVIDER: env
+      PROTON_PASS_ENCRYPTION_KEY: ${{ secrets.PROTON_PASS_ENCRYPTION_KEY }}
+      PASS_DEV_EXPECTED_ACCOUNT: ${{ secrets.PROTON_PASS_EXPECTED_ACCOUNT }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Configure throwaway session directory
+        run: |
+          echo "PROTON_PASS_SESSION_DIR=${RUNNER_TEMP}/proton-pass-dev-session" >> "$GITHUB_ENV"
+          mkdir -p "${RUNNER_TEMP}/proton-pass-dev-session"
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Proton Pass CLI
+        run: |
+          sudo apt-get update
+          curl -fsSL https://proton.me/download/pass-cli/install.sh | bash
+          pass-cli --version
+
+      - name: Login with throwaway account
+        env:
+          PROTON_PASS_PASSWORD: ${{ secrets.PROTON_PASS_PASSWORD }}
+          PROTON_PASS_TOTP: ${{ secrets.PROTON_PASS_TOTP }}
+          PROTON_PASS_EXTRA_PASSWORD: ${{ secrets.PROTON_PASS_EXTRA_PASSWORD }}
+        run: scripts/pass-dev.sh login --interactive "${{ secrets.PROTON_PASS_USERNAME }}"
+
+      - name: Account preflight
+        run: npm run pass:dev:preflight
+
+      - name: Check item-create template drift
+        run: npm run pass:dev:template:drift
+
+      - name: Logout (best-effort)
+        if: always()
+        run: scripts/pass-dev.sh logout --force || true

@@ -11,15 +11,16 @@ Establish a repeatable way to hydrate disposable Proton Pass test data for local
 
 ## Current CLI Capability Assumptions
 
-Based on current Proton Pass CLI docs:
+Based on current Proton Pass CLI docs and local empirical checks:
 
-1. Documented item creation path is command-driven (`item create ...`), including template-based login creation (`--get-template`, `--from-template`).
-2. SSH key import is supported for SSH key items (`item create ssh-key import`).
-3. Generic account-level bulk import is not currently documented in the command reference.
+1. Documented item creation path is command-driven (`item create ...`), and template flow (`--get-template`, `--from-template`) is explicitly documented for login.
+2. Empirically validated on March 6, 2026 (throwaway account): template flow also works for `note`, `credit-card`, `wifi`, `custom`, and `identity`.
+3. SSH key import is supported for SSH key items (`item create ssh-key import`).
+4. Generic account-level bulk import is not currently documented in the command reference.
 
 Planning implication:
 
-1. Seed/hydrate should be implemented as scripted creation loops, not assumed bulk-import APIs.
+1. Seed/hydrate should be implemented as scripted creation loops (template-based where suitable), not assumed bulk-import APIs.
 2. Proton Pass UI bulk import can be used as a contingency/bootstrap path if CLI scripting is too slow or incomplete for a given dataset shape.
 
 ## Data Seeding Strategy
