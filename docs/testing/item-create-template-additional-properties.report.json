@@ -1,0 +1,407 @@
+{
+  "generated_at": "2026-03-06T16:20:02.340Z",
+  "pass_cli_version": "Proton Pass CLI 1.5.2 (41cf394)",
+  "share_id": "09pmGPeO8fJwRea9hLkYlpQlCWZ-X1t51Kcfm28LnKsC16qWifIiOD04FEd3kTs2PFN-ILO52JPo_4a1S1F_oA==",
+  "source_snapshot": "docs/testing/item-create-templates.snapshot.json",
+  "delay_ms": 250,
+  "cleanup_enabled": false,
+  "probe_scope": "template additional-properties acceptance",
+  "results": {
+    "credit-card": [
+      {
+        "variant": "control_valid_base",
+        "exit_code": 0,
+        "error_kind": "none",
+        "stdout": "5ktnCZPjRlLDV08nCnisECGVPozbwPAyXQVyfdg24eRvjNKQRlPKWVqO-qvSzw6TxGUsv2yzIZZF-uUoVs32Ng==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "extra_top_level_string",
+        "exit_code": 0,
+        "error_kind": "none",
+        "stdout": "KqTodse45S3jevuGIIJ2IKzP7bAMgS7LZSQtRHai_YJxHNObQN3DtSUsQdQb_De20SeS71RoxMXyb_JCovPsgg==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "extra_top_level_number",
+        "exit_code": 0,
+        "error_kind": "none",
+        "stdout": "gGm8XMXjNdBe5g9s5oVSkZLthuIJCUfgzSV6ESCze5gIRtJZqan-KHkNgz-eoeKv193ZhUje2N9bqfhetzLrBQ==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "extra_top_level_object",
+        "exit_code": 0,
+        "error_kind": "none",
+        "stdout": "MM9ew6UiD_yU5dbQ8-aGA7Cjx2H5Uvk6dj01m3WoMt2Ayb-R95yaNia5hLhI3cDcGO8lYXK1-Y3nn9IJBO9ZDg==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "extra_top_level_array",
+        "exit_code": 0,
+        "error_kind": "none",
+        "stdout": "HWMee4YHuc4y3-Q98GxEtVwZyg8Ynpc5abmOlggcw1RlgZFH--ZrX4BLKE6gMT0uDhFC2Sktlv790zVz0IEiyQ==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      }
+    ],
+    "custom": [
+      {
+        "variant": "control_valid_base",
+        "exit_code": 0,
+        "error_kind": "none",
+        "stdout": "b7eWPdOfJtLm8UvyNHvfkcYzAoJRhuuxCkhu4kJVsAqjvcP6tbL_yLTO1f-09FKMCC9wWG6RHX2pguMz-sj6_w==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "extra_top_level_string",
+        "exit_code": 0,
+        "error_kind": "none",
+        "stdout": "aUlqvxigFZkyYf3ewvE7omR15US71XPviJcfdJpoRrlS61iObe3RsS3q6Gz5RTny6cC_c_I0eNLx_L92bRfyvA==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "extra_top_level_number",
+        "exit_code": 0,
+        "error_kind": "none",
+        "stdout": "uGqhyv6iW8XYIpmR9ls1NXBQR7tMbTrCI38EYoQGqDW6PKpx_ETlXqdCp-nBH3vT5XOJObmAgidQ3ayiCEoxcA==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "extra_top_level_object",
+        "exit_code": 0,
+        "error_kind": "none",
+        "stdout": "OFI7fNB1byUr-aTGj-xh4yPWCeeknTLwHrbyfFWxGdRqO1bheS3L2tvIyK4S2XlGFJmcdT-awTP55kePb88fwg==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "extra_top_level_array",
+        "exit_code": 0,
+        "error_kind": "none",
+        "stdout": "1yr4AVxoCmg4aWTI7oGoD-Z7SOdKLvofr75VB7qIL3AjFoAQmvwncF7_m11zf9gYBISiF6Gh1Y8hjJeCRIzTnQ==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "custom_extra_section_property",
+        "exit_code": 0,
+        "error_kind": "none",
+        "stdout": "3_DkHk9eHYJJ3i5SSGsZtCh610YSHznWoWlpd0CQcaXTcnfFezScfC4MBu_etS6Iz4rGpfA0krJSx15YopUXuQ==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "custom_extra_field_property",
+        "exit_code": 0,
+        "error_kind": "none",
+        "stdout": "9EWfG627gIR4KJseK9BhWCpusYmVH-YI3CthGwXZVG4FMpmlfOz3Tuig4aNrn4O7fXTWKH7UCahiMgYohBdmaQ==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      }
+    ],
+    "identity": [
+      {
+        "variant": "control_valid_base",
+        "exit_code": 0,
+        "error_kind": "none",
+        "stdout": "9oEIDXMWXQmsiOxqzGMP15ItmzS0_sBN0as77Zf_0YK1wgiyQwC7pq_PAG3h8J9rijZCUsUAt-M1H82YpTi-EA==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "extra_top_level_string",
+        "exit_code": 0,
+        "error_kind": "none",
+        "stdout": "RzVuUukFwFZ-qikp0acZ9vpdODbu9KLA6aY2uNIJtF2eOnM96sL2B_FXHbb-wbNYF0XI57O2LyGWu1k3pPlpvg==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "extra_top_level_number",
+        "exit_code": 0,
+        "error_kind": "none",
+        "stdout": "r_cDr6yVL2NCvz6aJvBKdom3nA0onZDSA34gb9ze9sRXyHwRtdB4qNx86s7nVHKyFxCs52dMT0l_RGZgxA0hpg==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "extra_top_level_object",
+        "exit_code": 0,
+        "error_kind": "none",
+        "stdout": "_L9bNhAEUyUU8nufaLcHP6h0pZzdYBZSyMWQV2ccdrqLfvKnSoEZQJk0zbPjdNLeVsnOzVkF6gB0YmLA5jbHfQ==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "extra_top_level_array",
+        "exit_code": 0,
+        "error_kind": "none",
+        "stdout": "vBhevHTJFAsOmzPUAENE8J-OzjZFODztac6ZWzz6nVtZ54Z_LFNG5edoy24VEPqAP5Ck-0DYhDOPfmUu7-z-Rw==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      }
+    ],
+    "login": [
+      {
+        "variant": "control_valid_base",
+        "exit_code": 0,
+        "error_kind": "none",
+        "stdout": "WXVXTlb9duA_DbCbhIGNp5S-ZUIT0PL3NNw2Ahe4y7lXzAEqYER_2M0FYkF9Tzs4Q-gtSUFYRUmrd1AtwjOliA==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "extra_top_level_string",
+        "exit_code": 0,
+        "error_kind": "none",
+        "stdout": "N-FyI-sd6fsutolChfm73sxXZOkBlcge_Sn3lktk-BckyTkG8yhrqSTE-yvqhpFFicEPGJueVfXh8XxkdebZPw==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "extra_top_level_number",
+        "exit_code": 0,
+        "error_kind": "none",
+        "stdout": "7FFCcs6sQLyPfedX0akr9KXk6hLtiSZQGAqmJLKtSaSBwNiyqtd0Ar9jVZoZvGz7YyL1_HBPlU7G8XyVmGAf_g==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "extra_top_level_object",
+        "exit_code": 0,
+        "error_kind": "none",
+        "stdout": "dTQoGzQhroul63Qx3mM0ksSpmNOb8tWfvYttZ_lKtxexdgKERJ4RCDEJo1ZTsacmjZyflM9uBvz5x_sMpzQUWg==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "extra_top_level_array",
+        "exit_code": 0,
+        "error_kind": "none",
+        "stdout": "XW6lz6XR5zUUz4gTSOCjGEeh5IEzILvkoAvqZM7GNDKz6VMUz5CG-fZp67ZY7X7LaW3r0f4JEwk7-8WytVmqXw==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      }
+    ],
+    "note": [
+      {
+        "variant": "control_valid_base",
+        "exit_code": 0,
+        "error_kind": "none",
+        "stdout": "MvPyekOo4ujENcqHenqG5zY8HzM-jAgIsJafN6sxLczKYtleioiJ5uWxg4CxauzY9suY7c9gQk7rdA64NmrQTw==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "extra_top_level_string",
+        "exit_code": 0,
+        "error_kind": "none",
+        "stdout": "wetz0V8ROSNQAvKukiS4s3Spm64VxbAhRdnrKqYaJ4NUWHaqx5vqj9nIMIyJVAHKbFFsD4a_JW0PzT8moUO4Fg==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "extra_top_level_number",
+        "exit_code": 0,
+        "error_kind": "none",
+        "stdout": "qi0b34_G4tKJakOptQZMUG0xtlxXlAlb7hdVJRFMgZQIcW7K4IfuILhFo7af8_qtjbKd6noUYzJn78RxK0Z3IQ==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "extra_top_level_object",
+        "exit_code": 0,
+        "error_kind": "none",
+        "stdout": "nJfH3TzJoZgo_7RD7N4A8BO1hEyVXHF4843atx6Ki9fsIkU1gSSMedVYHz1U-s9fY4DYQ4EJGKQFHPnLY8rC3w==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "extra_top_level_array",
+        "exit_code": 0,
+        "error_kind": "none",
+        "stdout": "S3LXbSEAUmzCFMfe5az2jK7Thnr5EkXyUy_DJkOjpUoMvAeQvu-E8fss4G5Sc9QIOJvKXcj9gpPTTODjcopJmA==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      }
+    ],
+    "wifi": [
+      {
+        "variant": "control_valid_base",
+        "exit_code": 0,
+        "error_kind": "none",
+        "stdout": "VbGB8iHHyVkTeHB9KPvhY4QR5rz2R8EOA2S_BMoGTRv_yLAIL-Fx_KMAC1dj3wpWE_C5v1LsLLQDPE3mnGdXvw==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "extra_top_level_string",
+        "exit_code": 0,
+        "error_kind": "none",
+        "stdout": "7ljlj7ciGK-nyue2B2VyfqSE0tIxP7tiEUZwZmQMcNfnahnCaaWuX3cD2EzGC5v9Xxfd6WmIESzuwmKR5GYGkg==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "extra_top_level_number",
+        "exit_code": 0,
+        "error_kind": "none",
+        "stdout": "B1hksYuYzC7RuyT9jXeznUeqTQG-Klg5iFvDUI99gZKAhsb1d-wd0TOS4Y4iNvo1DJhXKXienfVt4BcukRBRdw==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "extra_top_level_object",
+        "exit_code": 0,
+        "error_kind": "none",
+        "stdout": "Z37n2EUvbdVIZTQS7RUT2b-VlC-NE1JAO5XDbv1YQXhJ1Mvdb9z4few0zRHG8fdSSoriM1waPC8OsHdybj0vDg==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      },
+      {
+        "variant": "extra_top_level_array",
+        "exit_code": 0,
+        "error_kind": "none",
+        "stdout": "Vkm9UOYn0uwOHGpywzhC8YAbO3TwNf5yF0dRuL3FQ41GaVmj_-vu2aG04isg5bO5XN3eLsta7LddaF2cjTtv2g==",
+        "stderr": "",
+        "cleanup_enabled": false,
+        "cleanup": {
+          "deleted": false,
+          "itemId": null
+        }
+      }
+    ]
+  }
+}

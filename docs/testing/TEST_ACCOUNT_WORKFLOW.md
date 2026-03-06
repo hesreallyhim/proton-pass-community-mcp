@@ -197,6 +197,7 @@ Template drift check commands:
 1. `npm run pass:dev:template:drift`
 2. `npm run pass:dev:template:snapshot:update` (only when intentionally accepting template changes)
 3. `npm run pass:dev:template:probe` (empirical required/optional/nullability probe; no cleanup by default)
+4. `npm run pass:dev:template:probe:additional-properties` (empirical unknown-key acceptance probe; no cleanup by default)
 
 Rate-limit caution for probe runs:
 
