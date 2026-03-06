@@ -1,35 +1,61 @@
 ---
 name: backlog
-description: Canonical backlog of open, non-release-bound work items for proton-pass-community-mcp.
+description: Transitional status snapshot of non-release-bound work items for proton-pass-community-mcp.
 ---
 
 # Backlog
 
-## Security and Test Environment
+This document is now a lightweight transitional backlog to prevent stale planning drift.
+As the project matures, backlog tracking should move to a dedicated system (for example GitHub Issues/Projects), while canonical implementation policy remains in the docs listed in `AGENTS.md`.
 
-1. Set up a secondary Proton account for disposable testing data.
+## Status Snapshot
 
-- Create non-production vaults/items only.
-- Use this account for MCP integration tests and exploratory CLI probing.
-- Keep all real credentials and sensitive information out of test runs.
-- Document setup steps and account usage rules once established.
-- Define seed/reset/snapshot workflow for throwaway data hydration (`docs/testing/THROWAWAY_DATA_PLAN.md`).
+### 1. Secondary throwaway account for test/dev usage
 
-2. Define MCP permissions and consent boundaries across all tools.
+Status: Mostly complete (operational model and docs are in place).
 
-- Define strict permission scope per tool so one tool call cannot implicitly widen access for another.
-- Validate that list/search tools return only minimal reference data unless explicitly authorized for full item reads.
-- Document boundary rules and expected client behavior for permission checks.
+Completed:
 
-3. Evaluate LLM integration options and choose the primary architecture.
+1. Throwaway-account workflow and guardrails documented in `docs/testing/TEST_ACCOUNT_WORKFLOW.md`.
+2. Auth/testing plan documented in `docs/testing/CODEX_MCP_AUTH_SPEC.md` and `docs/testing/CODEX_MCP_TEST_PLAN.md`.
+3. Seed/reset/snapshot strategy documented in `docs/testing/THROWAWAY_DATA_PLAN.md`.
 
-- Compare `MCP`, `skill`, and `connector` approaches for this project.
-- Define evaluation criteria (security boundaries, UX friction, portability, maintenance cost, ecosystem support).
-- Decide primary integration model and document rationale, with fallback/interop plan if needed.
+Remaining (incremental, only when needed):
 
-4. Refactor and harden item-list JSON normalization (`toItemRef`) for maintainability.
+1. Implement seed/reset/hydration scripts as destructive-tool work begins.
+2. Promote only stable CI-relevant fixture artifacts into version control.
 
-- Split extraction into smaller, named helpers (identity, scope, type, title, timestamps, URI derivation).
-- Add fixture-based shape tests using anonymized upstream snapshots to detect drift early.
-- Document supported raw-field paths and fallback precedence in one place.
-- Keep secret-bearing nested content out of `ItemRef` while preserving stable reference metadata.
+### 2. MCP permissions and consent boundaries
+
+Status: Partially complete; sufficient for current release scope.
+
+Completed:
+
+1. Write gate + explicit confirmation model captured in `docs/TOOL_SCHEMA_PLAN.md` and enforced in tests (`test/server.test.ts`).
+2. `ItemRef` contract set to reference-only list/search output (no nested secret-bearing fields).
+
+Remaining:
+
+1. Extend the same boundary rigor as additional planned tools are implemented.
+
+### 3. Evaluate MCP vs skill vs connector architecture
+
+Status: Closed / de-scoped.
+
+Decision:
+
+1. Project scope is MCP implementation.
+2. Skill/connector usage is optional downstream integration context, not a blocker for MCP delivery.
+
+### 4. Refactor/harden `toItemRef` normalization
+
+Status: Complete for current scope; monitor for drift.
+
+Completed:
+
+1. Current `ItemRef` contract and extraction behavior are defined and implemented for current release needs.
+2. Item-output policy decisions are documented in `docs/TOOL_SCHEMA_PLAN.md`.
+
+Remaining:
+
+1. Revisit only if new upstream shape drift or tool-flow requirements justify additional refactor work.
