@@ -13,6 +13,7 @@ description: Canonical backlog of open, non-release-bound work items for proton-
 - Use this account for MCP integration tests and exploratory CLI probing.
 - Keep all real credentials and sensitive information out of test runs.
 - Document setup steps and account usage rules once established.
+- Define seed/reset/snapshot workflow for throwaway data hydration (`docs/THROWAWAY_DATA_PLAN.md`).
 
 2. Define MCP permissions and consent boundaries across all tools.
 

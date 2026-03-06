@@ -1,0 +1,59 @@
+name: Pass CLI Integration (Manual)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  integration:
+    name: Throwaway Account Integration Smoke
+    runs-on: ubuntu-latest
+    env:
+      PROTON_PASS_SESSION_DIR: ${{ runner.temp }}/proton-pass-dev-session
+      PROTON_PASS_KEY_PROVIDER: env
+      PROTON_PASS_ENCRYPTION_KEY: ${{ secrets.PROTON_PASS_ENCRYPTION_KEY }}
+      PASS_DEV_EXPECTED_EMAIL: ${{ secrets.PROTON_PASS_EXPECTED_EMAIL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Proton Pass CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+          curl -fsSL https://proton.me/download/pass-cli/install.sh | bash
+          pass-cli --version
+
+      - name: Login with throwaway account
+        env:
+          PROTON_PASS_PASSWORD: ${{ secrets.PROTON_PASS_PASSWORD }}
+          PROTON_PASS_TOTP: ${{ secrets.PROTON_PASS_TOTP }}
+          PROTON_PASS_EXTRA_PASSWORD: ${{ secrets.PROTON_PASS_EXTRA_PASSWORD }}
+        run: scripts/pass-dev.sh login --interactive "${{ secrets.PROTON_PASS_USERNAME }}"
+
+      - name: Account preflight and auth smoke
+        run: |
+          npm run pass:dev:preflight
+          npm run pass:dev:info
+
+      - name: Build server
+        run: npm run build
+
+      # Replace this step with your integration test command once available.
+      - name: Placeholder integration check
+        run: npm run test
+
+      - name: Logout (best-effort)
+        if: always()
+        run: scripts/pass-dev.sh logout --force || true

@@ -114,6 +114,11 @@ Example MCP server config using environment overrides:
    - `compatible`: semver differs but appears compatible by policy
    - `possibly_incompatible`: semver indicates potential drift, or version parsing/execution prevented a strict comparison
 6. Version assessments are advisory. `check_status` is marked as an MCP error only when connectivity/authentication fails.
+7. There is no MCP-specific API token auth layer in this server. Authentication methods are those supported by `pass-cli` in the server process environment.
+
+### Test Account Workflow
+
+For disposable test-account usage in local development and CI (including account preflight checks and session isolation), see [docs/TEST_ACCOUNT_WORKFLOW.md](./docs/TEST_ACCOUNT_WORKFLOW.md).
 
 ## Startup Flags
 
@@ -137,6 +142,7 @@ npm run dev -- --allow-version-drift
 - See [ROADMAP.md](./ROADMAP.md) for planned features.
 - In addition to the MCP server, there is an agent [skill file](./skills/pass-cli-mcp/SKILL.md) that is intended to be integrated with this MCP - however, it is currently only a draft.
 - Developer runtime configuration and validation workflows are documented in [CONTRIBUTING.md](./CONTRIBUTING.md).
+- Disposable account setup and contributor/CI guidance are documented in [docs/TEST_ACCOUNT_WORKFLOW.md](./docs/TEST_ACCOUNT_WORKFLOW.md).
 - See [CONTRIBUTING.md](./CONTRIBUTING.md) if you're interested in contributing to this project. Contributors are highly welcome at this stage.
 
 LICENSE
