@@ -240,20 +240,20 @@ Status key:
 | `create_vault`        | `pass-cli vault create`        | Implemented | `name`, `confirm`                                          | Created vault status         |
 | `update_vault`        | `pass-cli vault update`        | Implemented | `shareId \| vaultName`, `newName`, `confirm`               | Update status                |
 | `delete_vault`        | `pass-cli vault delete`        | Implemented | `shareId \| vaultName`, `confirm`                          | Delete status                |
-| `vault_share`         | `pass-cli vault share`         | Planned     | `shareId \| vaultName`, `email`, `role?`, `confirm`        | Share result                 |
+| `vault_share`         | `pass-cli vault share`         | Implemented | `shareId \| vaultName`, `email`, `role?`, `confirm`        | Share result                 |
 | `vault_transfer`      | `pass-cli vault transfer`      | Planned     | `shareId \| vaultName`, `memberShareId`, `confirm`         | Transfer result              |
 | `list_vault_members`  | `pass-cli vault member list`   | Implemented | `shareId \| vaultName`, `pageSize?`, `cursor?`             | `CursorPage<VaultMemberRef>` |
-| `vault_member_update` | `pass-cli vault member update` | Planned     | `shareId \| vaultName`, `memberShareId`, `role`, `confirm` | Update status                |
-| `vault_member_remove` | `pass-cli vault member remove` | Planned     | `shareId \| vaultName`, `memberShareId`, `confirm`         | Remove status                |
+| `vault_member_update` | `pass-cli vault member update` | Implemented | `shareId \| vaultName`, `memberShareId`, `role`, `confirm` | Update status                |
+| `vault_member_remove` | `pass-cli vault member remove` | Implemented | `shareId \| vaultName`, `memberShareId`, `confirm`         | Remove status                |
 
 ### Item Discovery and Read
 
 | Tool           | Source               | Status                        | Input Summary                                                                            | Output Summary                 |
 | -------------- | -------------------- | ----------------------------- | ---------------------------------------------------------------------------------------- | ------------------------------ |
 | `list_items`   | `pass-cli item list` | Implemented (needs v2 schema) | `vaultName \| shareId`, `filterType?`, `filterState?`, `sortBy?`, `pageSize?`, `cursor?` | Planned: `CursorPage<ItemRef>` |
-| `search_items` | MCP-native           | Planned (MCP-native)          | `query`, title-search params, selectors, filters, paging                                 | `CursorPage<ItemRef>`          |
+| `search_items` | MCP-native           | Implemented (MCP-native)      | `query`, title-search params, selectors, filters, paging                                 | `CursorPage<ItemRef>`          |
 | `view_item`    | `pass-cli item view` | Implemented                   | `uri` or selector tuple, `field?`, `output?`                                             | Full item or selected field    |
-| `item_totp`    | `pass-cli item totp` | Planned                       | `uri` or selector tuple, `field?`, `output?`                                             | TOTP value(s)                  |
+| `item_totp`    | `pass-cli item totp` | Implemented                   | `uri` or selector tuple, `field?`, `output?`                                             | TOTP value(s)                  |
 
 ### Item Write and Lifecycle
 
@@ -262,7 +262,7 @@ Status key:
 | `update_item`  | `pass-cli item update`  | Implemented | selectors, `fields[]`, `confirm`                                  | Update status  |
 | `item_move`    | `pass-cli item move`    | Planned     | source selector + destination selector + item selector, `confirm` | Move status    |
 | `delete_item`  | `pass-cli item delete`  | Implemented | `shareId`, `itemId`, `confirm`                                    | Delete status  |
-| `item_share`   | `pass-cli item share`   | Planned     | `shareId`, `itemId`, `email`, `role?`, `confirm`                  | Share status   |
+| `item_share`   | `pass-cli item share`   | Implemented | `shareId`, `itemId`, `email`, `role?`, `confirm`                  | Share status   |
 | `item_trash`   | `pass-cli item trash`   | Planned     | selectors, `confirm`                                              | Trash status   |
 | `item_untrash` | `pass-cli item untrash` | Planned     | selectors, `confirm`                                              | Restore status |
 
@@ -296,17 +296,17 @@ Status key:
 | ------------------------------- | ---------------------------------------- | ------------ | -------------------------------------- | ------------------------- |
 | `list_shares`                   | `pass-cli share list`                    | Implemented  | `onlyItems?`, `onlyVaults?`, `output?` | Shares list               |
 | `list_invites`                  | `pass-cli invite list`                   | Implemented  | `pageSize?`, `cursor?`                 | `CursorPage<InviteRef>`   |
-| `invite_accept`                 | `pass-cli invite accept`                 | Planned      | `inviteId`, `confirm`                  | Accept status             |
-| `invite_reject`                 | `pass-cli invite reject`                 | Planned      | `inviteId`, `confirm`                  | Reject status             |
-| `generate_random_password`      | `pass-cli password generate random`      | Planned      | generation flags                       | Password value/metadata   |
-| `generate_passphrase`           | `pass-cli password generate passphrase`  | Planned      | generation flags                       | Passphrase value/metadata |
-| `score_password`                | `pass-cli password score`                | Planned      | `password`                             | Strength report           |
+| `invite_accept`                 | `pass-cli invite accept`                 | Implemented  | `inviteToken`, `confirm`               | Accept status             |
+| `invite_reject`                 | `pass-cli invite reject`                 | Implemented  | `inviteToken`, `confirm`               | Reject status             |
+| `generate_random_password`      | `pass-cli password generate random`      | Implemented  | generation flags                       | Password value/metadata   |
+| `generate_passphrase`           | `pass-cli password generate passphrase`  | Implemented  | generation flags                       | Passphrase value/metadata |
+| `score_password`                | `pass-cli password score`                | Implemented  | `password`                             | Strength report           |
 | `totp_generate`                 | `pass-cli totp generate`                 | Planned      | `secretOrUri`, `output?`               | TOTP value                |
 | `view_settings`                 | `pass-cli settings view`                 | Implemented  | none                                   | Settings object           |
-| `settings_set_default_vault`    | `pass-cli settings set default-vault`    | Planned      | `vaultName \| shareId`, `confirm`      | Set status                |
-| `settings_set_default_format`   | `pass-cli settings set default-format`   | Planned      | `format`, `confirm`                    | Set status                |
-| `settings_unset_default_vault`  | `pass-cli settings unset default-vault`  | Planned      | `confirm`                              | Unset status              |
-| `settings_unset_default_format` | `pass-cli settings unset default-format` | Planned      | `confirm`                              | Unset status              |
+| `settings_set_default_vault`    | `pass-cli settings set default-vault`    | Implemented  | `vaultName \| shareId`, `confirm`      | Set status                |
+| `settings_set_default_format`   | `pass-cli settings set default-format`   | Implemented  | `format`, `confirm`                    | Set status                |
+| `settings_unset_default_vault`  | `pass-cli settings unset default-vault`  | Implemented  | `confirm`                              | Unset status              |
+| `settings_unset_default_format` | `pass-cli settings unset default-format` | Implemented  | `confirm`                              | Unset status              |
 | `ssh_agent_start`               | `pass-cli ssh-agent start`               | Out-of-SCope | N/A                                    | N/A                       |
 | `ssh_agent_load`                | `pass-cli ssh-agent load`                | Out-of-SCope | N/A                                    | N/A                       |
 | `ssh_agent_debug`               | `pass-cli ssh-agent debug`               | Out-of-SCope | N/A                                    | N/A                       |
