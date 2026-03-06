@@ -170,6 +170,20 @@ export const viewItemInputSchema = z.object({
   output: z.enum(["json", "human"]).default("json").describe("Output format"),
 });
 
+export const itemTotpInputSchema = z.object({
+  uri: z
+    .string()
+    .max(1024)
+    .optional()
+    .describe("Item URI (e.g. pass://<shareId>/<itemId>/<field>)"),
+  shareId: z.string().max(100).optional().describe("Share ID containing the item"),
+  vaultName: z.string().max(255).optional().describe("Vault name containing the item"),
+  itemId: z.string().max(100).optional().describe("Item ID to generate TOTP for"),
+  itemTitle: z.string().max(255).optional().describe("Item title to generate TOTP for"),
+  field: z.string().max(100).optional().describe("Specific TOTP field to extract"),
+  output: z.enum(["json", "human"]).default("json").describe("Output format"),
+});
+
 export const searchItemsInputSchema = z
   .object({
     query: z.string().min(1).max(255).describe(SEARCH_QUERY_DESCRIPTION),
@@ -240,6 +254,7 @@ export const deleteItemInputSchema = z.object({
 
 export type ListItemsInput = z.infer<typeof listItemsInputSchema>;
 export type ViewItemInput = z.infer<typeof viewItemInputSchema>;
+export type ItemTotpInput = z.infer<typeof itemTotpInputSchema>;
 export type SearchItemsInput = z.infer<typeof searchItemsInputSchema>;
 export type CreateLoginItemInput = z.infer<typeof createLoginItemInputSchema>;
 export type CreateItemFromTemplateInput = z.infer<typeof createItemFromTemplateInputSchema>;
@@ -419,6 +434,40 @@ export async function viewItemHandler(passCli: PassCliRunner, input: ViewItemInp
   if (itemId && itemTitle) throw new Error("itemId and itemTitle are mutually exclusive.");
 
   const args: string[] = ["item", "view"];
+
+  if (usingUri) {
+    args.push("--output", output, "--", uri);
+  } else {
+    if (shareId) args.push("--share-id", shareId);
+    else args.push("--vault-name", vaultName!);
+
+    if (itemId) args.push("--item-id", itemId);
+    else args.push("--item-title", itemTitle!);
+
+    if (field) args.push("--field", field);
+    args.push("--output", output);
+  }
+
+  const { stdout } = await passCli(args);
+  return asTextContent(asJsonTextOrRaw(stdout));
+}
+
+export async function itemTotpHandler(passCli: PassCliRunner, input: ItemTotpInput) {
+  const { uri, shareId, vaultName, itemId, itemTitle, field, output } = input;
+
+  const usingUri = !!uri;
+  const usingSelectors = (shareId || vaultName) && (itemId || itemTitle);
+
+  if (!usingUri && !usingSelectors) {
+    throw new Error("Provide either uri OR (shareId|vaultName) AND (itemId|itemTitle).");
+  }
+  if (usingUri && (shareId || vaultName || itemId || itemTitle)) {
+    throw new Error("uri is mutually exclusive with selector arguments.");
+  }
+  if (shareId && vaultName) throw new Error("shareId and vaultName are mutually exclusive.");
+  if (itemId && itemTitle) throw new Error("itemId and itemTitle are mutually exclusive.");
+
+  const args: string[] = ["item", "totp"];
 
   if (usingUri) {
     args.push("--output", output, "--", uri);

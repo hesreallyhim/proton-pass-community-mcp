@@ -21,6 +21,7 @@ import {
   createItemFromTemplateHandler,
   createLoginItemHandler,
   deleteItemHandler,
+  itemTotpHandler,
   listItemsHandler,
   searchItemsHandler,
   updateItemHandler,
@@ -992,6 +993,57 @@ describe("read-only handlers", () => {
       "human",
     ]);
   });
+
+  it("itemTotpHandler validates selector combinations and builds arguments", async () => {
+    const runner = makeRunner({ stdout: '{"totp":"123456"}', stderr: "" });
+
+    await expect(itemTotpHandler(runner, { output: "json" })).rejects.toThrow(
+      "Provide either uri OR",
+    );
+
+    await expect(
+      itemTotpHandler(runner, {
+        uri: "pass://a/b/totp",
+        shareId: "s",
+        itemId: "i",
+        output: "json",
+      }),
+    ).rejects.toThrow("uri is mutually exclusive");
+
+    await itemTotpHandler(runner, {
+      uri: "pass://Work/GitHub/totp",
+      output: "json",
+    });
+
+    await itemTotpHandler(runner, {
+      vaultName: "Work",
+      itemTitle: "GitHub",
+      field: "totp",
+      output: "human",
+    });
+
+    expect(runner).toHaveBeenNthCalledWith(1, [
+      "item",
+      "totp",
+      "--output",
+      "json",
+      "--",
+      "pass://Work/GitHub/totp",
+    ]);
+
+    expect(runner).toHaveBeenNthCalledWith(2, [
+      "item",
+      "totp",
+      "--vault-name",
+      "Work",
+      "--item-title",
+      "GitHub",
+      "--field",
+      "totp",
+      "--output",
+      "human",
+    ]);
+  });
 });
 
 describe("write handlers", () => {
@@ -1391,6 +1443,7 @@ describe("server setup", () => {
       shareId: "s1",
     });
     await tools.view_item.handler({ uri: "pass://Work/GitHub/password", output: "json" });
+    await tools.item_totp.handler({ uri: "pass://Work/GitHub/totp", output: "json" });
     await tools.create_login_item.handler({
       vaultName: "Sandbox",
       title: "GitHub",
@@ -1427,12 +1480,13 @@ describe("server setup", () => {
     expect(tools.settings_set_default_format).toBeDefined();
     expect(tools.settings_unset_default_vault).toBeDefined();
     expect(tools.settings_unset_default_format).toBeDefined();
+    expect(tools.item_totp).toBeDefined();
     expect(tools.create_login_item).toBeDefined();
     expect(tools.create_item_from_template).toBeDefined();
     expect(tools.update_item).toBeDefined();
     expect(tools.delete_item).toBeDefined();
 
-    expect(runner).toHaveBeenCalledTimes(25);
+    expect(runner).toHaveBeenCalledTimes(26);
   });
 
   it("registered tool handlers return standardized auth error payloads", async () => {
