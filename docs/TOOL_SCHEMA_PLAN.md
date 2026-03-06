@@ -17,7 +17,7 @@ Primary optimization target: item discovery (`pass-cli item list`) should return
 ## Design Rules
 
 1. Tool names use snake_case without provider prefix and prefer natural-language order (for example `list_vaults`, `view_item`).
-2. Write/mutation tools require explicit confirmation (`confirm: true`) and write gate (`ALLOW_WRITE=1`).
+2. Current implementation requires explicit confirmation (`confirm: true`) and write gate (`ALLOW_WRITE=1`); see policy proposal below for elicitation-first migration.
 3. Read tools default to structured, token-efficient JSON in `structuredContent`.
 4. When `structuredContent` is returned, also return a `TextContent` serialization of that same JSON object for backwards compatibility/interoperability. This is not a separate human-output mode from the CLI.
 5. Listing/search tools return references, then callers use `view_item` for full content.
@@ -25,6 +25,39 @@ Primary optimization target: item discovery (`pass-cli item list`) should return
 7. Authentication lifecycle (`pass-cli login`, `pass-cli logout`) remains out-of-band and is not exposed as MCP tools.
 8. CLI binary lifecycle commands (for example `pass-cli update` / track switching) remain out-of-band and are not exposed as MCP tools.
 9. Host SSH agent integration/lifecycle commands (`pass-cli ssh-agent *`) remain out-of-band and are not exposed as MCP tools.
+
+## Write Authorization and Confirmation Policy (Proposal)
+
+This section defines the target mutation-safety model for this server, aligned with current MCP protocol semantics:
+
+1. `ALLOW_WRITE=1` is the hard, server-side write gate and remains mandatory.
+2. Tool annotations (for example `destructiveHint`) are advisory UX metadata only and are not treated as a security boundary.
+3. For destructive tools, the server should request runtime user confirmation via MCP elicitation (`elicitation/create`) when the negotiated client capability supports it.
+4. If elicitation is unavailable, interactive sessions should fail closed for destructive operations.
+5. CI/non-interactive automation may opt in with an explicit override environment variable (proposed: `ALLOW_NONINTERACTIVE_WRITE=1`) for throwaway-account workflows.
+6. The existing input-level `confirm` parameter is an implementation fallback and should be phased out once elicitation coverage is in place for supported hosts.
+
+### Protocol Version and Capability Notes
+
+1. Elicitation is not a universal requirement across all protocol versions.
+2. Elicitation was introduced in spec version `2025-06-18`; sessions negotiating older versions cannot use it.
+3. Even on current spec versions, elicitation is capability-negotiated and optional at runtime; servers must branch behavior based on negotiated capabilities.
+
+### Decision Matrix (Target Behavior)
+
+| Context                                                                            | Behavior                                                |
+| ---------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| Read-only tool                                                                     | Execute normally                                        |
+| Mutating tool + `ALLOW_WRITE!=1`                                                   | Deny (`WRITE_DISABLED`)                                 |
+| Mutating tool + `ALLOW_WRITE=1` + client supports elicitation                      | Prompt via elicitation; execute only on explicit accept |
+| Mutating tool + `ALLOW_WRITE=1` + no elicitation + `ALLOW_NONINTERACTIVE_WRITE!=1` | Deny (`WRITE_CONFIRMATION_UNAVAILABLE`)                 |
+| Mutating tool + `ALLOW_WRITE=1` + no elicitation + `ALLOW_NONINTERACTIVE_WRITE=1`  | Execute (CI/non-interactive throwaway-account mode)     |
+
+### Migration Plan
+
+1. Keep current `confirm`-based behavior while adding elicitation-backed flows.
+2. Prefer elicitation path when available; retain `confirm` only as temporary compatibility shim.
+3. Remove `confirm` from mutating tool schemas after host compatibility validation and test coverage are complete.
 
 ## Shared Schemas
 
