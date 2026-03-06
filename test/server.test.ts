@@ -23,6 +23,9 @@ import {
   deleteItemHandler,
   itemTotpHandler,
   listItemsHandler,
+  generatePassphraseHandler,
+  generateRandomPasswordHandler,
+  scorePasswordHandler,
   searchItemsHandler,
   updateItemHandler,
   viewItemHandler,
@@ -1044,6 +1047,72 @@ describe("read-only handlers", () => {
       "human",
     ]);
   });
+
+  it("password handlers build expected command arguments", async () => {
+    const runner = makeRunner(async (args) => {
+      if (args[0] === "password" && args[1] === "score") {
+        return { stdout: '{"password_score":"Strong"}', stderr: "" };
+      }
+      return { stdout: "generated-value\n", stderr: "" };
+    });
+
+    const randomResult = await generateRandomPasswordHandler(runner, {
+      length: 20,
+      numbers: true,
+      uppercase: true,
+      symbols: false,
+    });
+    const passphraseResult = await generatePassphraseHandler(runner, {
+      count: 4,
+      separator: "hyphens",
+      capitalize: true,
+      numbers: true,
+    });
+    const scoreResult = await scorePasswordHandler(runner, {
+      password: "MySecureP@ssw0rd",
+      output: "json",
+    });
+
+    expect(runner).toHaveBeenNthCalledWith(1, [
+      "password",
+      "generate",
+      "random",
+      "--length",
+      "20",
+      "--numbers",
+      "true",
+      "--uppercase",
+      "true",
+      "--symbols",
+      "false",
+    ]);
+    expect(runner).toHaveBeenNthCalledWith(2, [
+      "password",
+      "generate",
+      "passphrase",
+      "--count",
+      "4",
+      "--separator",
+      "hyphens",
+      "--capitalize",
+      "true",
+      "--numbers",
+      "true",
+    ]);
+    expect(runner).toHaveBeenNthCalledWith(3, [
+      "password",
+      "score",
+      "MySecureP@ssw0rd",
+      "--output",
+      "json",
+    ]);
+
+    expect(randomResult).toEqual({ content: [{ type: "text", text: "generated-value" }] });
+    expect(passphraseResult).toEqual({ content: [{ type: "text", text: "generated-value" }] });
+    expect(scoreResult).toEqual({
+      content: [{ type: "text", text: '{\n  "password_score": "Strong"\n}' }],
+    });
+  });
 });
 
 describe("write handlers", () => {
@@ -1425,6 +1494,9 @@ describe("server setup", () => {
     await tools.settings_set_default_format.handler({ format: "json", confirm: true });
     await tools.settings_unset_default_vault.handler({ confirm: true });
     await tools.settings_unset_default_format.handler({ confirm: true });
+    await tools.generate_random_password.handler({ length: 16, uppercase: true });
+    await tools.generate_passphrase.handler({ count: 5, separator: "hyphens" });
+    await tools.score_password.handler({ password: "MySecureP@ssw0rd", output: "json" });
     await tools.list_vaults.handler({ output: "json" });
     await tools.list_vault_members.handler({ shareId: "s1" });
     await tools.create_vault.handler({ name: "Sandbox", confirm: true });
@@ -1480,13 +1552,16 @@ describe("server setup", () => {
     expect(tools.settings_set_default_format).toBeDefined();
     expect(tools.settings_unset_default_vault).toBeDefined();
     expect(tools.settings_unset_default_format).toBeDefined();
+    expect(tools.generate_random_password).toBeDefined();
+    expect(tools.generate_passphrase).toBeDefined();
+    expect(tools.score_password).toBeDefined();
     expect(tools.item_totp).toBeDefined();
     expect(tools.create_login_item).toBeDefined();
     expect(tools.create_item_from_template).toBeDefined();
     expect(tools.update_item).toBeDefined();
     expect(tools.delete_item).toBeDefined();
 
-    expect(runner).toHaveBeenCalledTimes(26);
+    expect(runner).toHaveBeenCalledTimes(29);
   });
 
   it("registered tool handlers return standardized auth error payloads", async () => {
