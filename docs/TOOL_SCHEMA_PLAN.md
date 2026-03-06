@@ -229,8 +229,8 @@ Status key:
 | `view_user_info`    | `pass-cli user info`                   | Implemented                | `output?`                                              | User profile                                            |
 | `update`            | `pass-cli update`                      | Out of Scope (Out-of-Band) | n/a                                                    | n/a                                                     |
 | `support`           | `pass-cli support`                     | Planned                    | none                                                   | Support guidance text                                   |
-| `inject`            | `pass-cli inject`                      | Planned                    | `inFile`, `outFile?`, `fileMode?`, `force?`, `confirm` | Output path/status                                      |
-| `run`               | `pass-cli run`                         | Planned                    | `command[]`, `envFile[]?`, `noMasking?`, `confirm`     | Exit code/stdout/stderr summary                         |
+| `inject`            | `pass-cli inject`                      | Implemented                | `inFile`, `outFile?`, `fileMode?`, `force?`, `confirm` | Output path/status                                      |
+| `run`               | `pass-cli run`                         | Implemented                | `command[]`, `envFile[]?`, `noMasking?`, `confirm`     | Exit code/stdout/stderr summary                         |
 
 ### Vault Tools
 
@@ -260,11 +260,11 @@ Status key:
 | Tool           | Source                  | Status      | Input Summary                                                     | Output Summary |
 | -------------- | ----------------------- | ----------- | ----------------------------------------------------------------- | -------------- |
 | `update_item`  | `pass-cli item update`  | Implemented | selectors, `fields[]`, `confirm`                                  | Update status  |
-| `item_move`    | `pass-cli item move`    | Planned     | source selector + destination selector + item selector, `confirm` | Move status    |
+| `move_item`    | `pass-cli item move`    | Planned     | source selector + destination selector + item selector, `confirm` | Move status    |
 | `delete_item`  | `pass-cli item delete`  | Implemented | `shareId`, `itemId`, `confirm`                                    | Delete status  |
 | `item_share`   | `pass-cli item share`   | Implemented | `shareId`, `itemId`, `email`, `role?`, `confirm`                  | Share status   |
-| `item_trash`   | `pass-cli item trash`   | Planned     | selectors, `confirm`                                              | Trash status   |
-| `item_untrash` | `pass-cli item untrash` | Planned     | selectors, `confirm`                                              | Restore status |
+| `trash_item`   | `pass-cli item trash`   | Planned     | selectors, `confirm`                                              | Trash status   |
+| `untrash_item` | `pass-cli item untrash` | Planned     | selectors, `confirm`                                              | Restore status |
 
 ### Item Creation
 
