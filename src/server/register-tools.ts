@@ -10,6 +10,8 @@ import {
   createCreditCardItemInputSchema,
   createCustomItemHandler,
   createCustomItemInputSchema,
+  downloadItemAttachmentHandler,
+  downloadItemAttachmentInputSchema,
   createIdentityItemHandler,
   createIdentityItemInputSchema,
   createItemAliasHandler,
@@ -32,12 +34,18 @@ import {
   deleteItemInputSchema,
   itemTotpHandler,
   itemTotpInputSchema,
+  listItemMembersHandler,
+  listItemMembersInputSchema,
   listItemsHandler,
   listItemsInputSchema,
+  removeItemMemberHandler,
+  removeItemMemberInputSchema,
   searchItemsHandler,
   searchItemsInputSchema,
   shareItemHandler,
   shareItemInputSchema,
+  updateItemMemberHandler,
+  updateItemMemberInputSchema,
   updateItemHandler,
   updateItemInputSchema,
   viewItemHandler,
@@ -469,12 +477,48 @@ export function registerTools(
   );
 
   server.registerTool(
+    "download_item_attachment",
+    {
+      description: "Download an item attachment to a local path.",
+      inputSchema: downloadItemAttachmentInputSchema,
+    },
+    withAuthErrorHandling(async (input) => downloadItemAttachmentHandler(passCli, input)),
+  );
+
+  server.registerTool(
     "create_item_alias",
     {
       description: "Create an email alias item.",
       inputSchema: createItemAliasInputSchema,
     },
     withAuthErrorHandling(async (input) => createItemAliasHandler(passCli, input)),
+  );
+
+  server.registerTool(
+    "list_item_members",
+    {
+      description: "List item members.",
+      inputSchema: listItemMembersInputSchema,
+    },
+    withAuthErrorHandling(async (input) => listItemMembersHandler(passCli, input)),
+  );
+
+  server.registerTool(
+    "update_item_member",
+    {
+      description: "Update an item member role.",
+      inputSchema: updateItemMemberInputSchema,
+    },
+    withAuthErrorHandling(async (input) => updateItemMemberHandler(passCli, input)),
+  );
+
+  server.registerTool(
+    "remove_item_member",
+    {
+      description: "Remove an item member.",
+      inputSchema: removeItemMemberInputSchema,
+    },
+    withAuthErrorHandling(async (input) => removeItemMemberHandler(passCli, input)),
   );
 
   server.registerTool(

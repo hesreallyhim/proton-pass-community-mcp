@@ -425,6 +425,14 @@ export const untrashItemInputSchema = z
     message: "Provide exactly one of itemId or itemTitle.",
   });
 
+export const downloadItemAttachmentInputSchema = z.object({
+  shareId: z.string().max(100).describe("Share ID containing the item"),
+  itemId: z.string().max(100).describe("Item ID containing the attachment"),
+  attachmentId: z.string().max(100).describe("Attachment ID to download"),
+  outputPath: z.string().min(1).max(4096).describe("Output path for downloaded attachment"),
+  confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+});
+
 export const deleteItemInputSchema = z.object({
   shareId: z.string().max(100).describe("Share ID containing the item to delete"),
   itemId: z.string().max(100).describe("Item ID to delete"),
@@ -438,6 +446,25 @@ export const shareItemInputSchema = z.object({
   itemId: z.string().max(100).describe("Item ID to share"),
   email: z.string().email().max(320).describe("Email of the user to invite"),
   role: z.enum(SHARE_ROLE_OPTIONS).optional().describe("Role for the invited user"),
+  confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+});
+
+export const listItemMembersInputSchema = z.object({
+  shareId: z.string().max(100).describe("Share ID containing the item"),
+  itemId: z.string().max(100).describe("Item ID"),
+  output: z.enum(["json", "human"]).default("json").describe("Output format"),
+});
+
+export const updateItemMemberInputSchema = z.object({
+  shareId: z.string().max(100).describe("Share ID containing the item"),
+  memberShareId: z.string().max(100).describe("Member share ID"),
+  role: z.enum(SHARE_ROLE_OPTIONS).describe("Role for the member"),
+  confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+});
+
+export const removeItemMemberInputSchema = z.object({
+  shareId: z.string().max(100).describe("Share ID containing the item"),
+  memberShareId: z.string().max(100).describe("Member share ID"),
   confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
 });
 
@@ -474,8 +501,12 @@ export type MoveItemInput = z.infer<typeof moveItemInputSchema>;
 export type UpdateItemInput = z.infer<typeof updateItemInputSchema>;
 export type TrashItemInput = z.infer<typeof trashItemInputSchema>;
 export type UntrashItemInput = z.infer<typeof untrashItemInputSchema>;
+export type DownloadItemAttachmentInput = z.infer<typeof downloadItemAttachmentInputSchema>;
 export type DeleteItemInput = z.infer<typeof deleteItemInputSchema>;
 export type ShareItemInput = z.infer<typeof shareItemInputSchema>;
+export type ListItemMembersInput = z.infer<typeof listItemMembersInputSchema>;
+export type UpdateItemMemberInput = z.infer<typeof updateItemMemberInputSchema>;
+export type RemoveItemMemberInput = z.infer<typeof removeItemMemberInputSchema>;
 export type CreateItemAliasInput = z.infer<typeof createItemAliasInputSchema>;
 
 export async function listItemsHandler(
@@ -946,6 +977,28 @@ export async function untrashItemHandler(
   return asTextContent(out || "OK");
 }
 
+export async function downloadItemAttachmentHandler(
+  passCli: PassCliRunner,
+  { shareId, itemId, attachmentId, outputPath, confirm }: DownloadItemAttachmentInput,
+) {
+  requireWriteGate(confirm);
+  const { stdout, stderr } = await passCli([
+    "item",
+    "attachment",
+    "download",
+    "--share-id",
+    shareId,
+    "--item-id",
+    itemId,
+    "--attachment-id",
+    attachmentId,
+    "--output",
+    outputPath,
+  ]);
+  const out = joinStdoutStderr(stdout, stderr);
+  return asTextContent(out || "OK");
+}
+
 export async function deleteItemHandler(
   passCli: PassCliRunner,
   { shareId, itemId, confirm }: DeleteItemInput,
@@ -971,6 +1024,62 @@ export async function shareItemHandler(
   const args = ["item", "share", "--share-id", shareId, "--item-id", itemId, email];
   if (role) args.push("--role", role);
   const { stdout, stderr } = await passCli(args);
+  const out = joinStdoutStderr(stdout, stderr);
+  return asTextContent(out || "OK");
+}
+
+export async function listItemMembersHandler(
+  passCli: PassCliRunner,
+  { shareId, itemId, output }: ListItemMembersInput,
+) {
+  const { stdout } = await passCli([
+    "item",
+    "member",
+    "list",
+    "--share-id",
+    shareId,
+    "--item-id",
+    itemId,
+    "--output",
+    output,
+  ]);
+  return asTextContent(asJsonTextOrRaw(stdout));
+}
+
+export async function updateItemMemberHandler(
+  passCli: PassCliRunner,
+  { shareId, memberShareId, role, confirm }: UpdateItemMemberInput,
+) {
+  requireWriteGate(confirm);
+  const { stdout, stderr } = await passCli([
+    "item",
+    "member",
+    "update",
+    "--share-id",
+    shareId,
+    "--member-share-id",
+    memberShareId,
+    "--role",
+    role,
+  ]);
+  const out = joinStdoutStderr(stdout, stderr);
+  return asTextContent(out || "OK");
+}
+
+export async function removeItemMemberHandler(
+  passCli: PassCliRunner,
+  { shareId, memberShareId, confirm }: RemoveItemMemberInput,
+) {
+  requireWriteGate(confirm);
+  const { stdout, stderr } = await passCli([
+    "item",
+    "member",
+    "remove",
+    "--share-id",
+    shareId,
+    "--member-share-id",
+    memberShareId,
+  ]);
   const out = joinStdoutStderr(stdout, stderr);
   return asTextContent(out || "OK");
 }

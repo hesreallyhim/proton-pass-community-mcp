@@ -283,7 +283,7 @@ Input summary convention:
 | `view_session_info` | `pass-cli info`                        | Implemented                | `output?`                                              | Account/session info                                    |
 | `view_user_info`    | `pass-cli user info`                   | Implemented                | `output?`                                              | User profile                                            |
 | `update`            | `pass-cli update`                      | Out of Scope (Out-of-Band) | n/a                                                    | n/a                                                     |
-| `support`           | `pass-cli support`                     | Planned                    | none                                                   | Support guidance text                                   |
+| `support`           | `pass-cli support`                     | Implemented                | none                                                   | Support guidance text                                   |
 | `inject`            | `pass-cli inject`                      | Implemented                | `inFile`, `outFile?`, `fileMode?`, `force?`, `confirm` | Output path/status                                      |
 | `run`               | `pass-cli run`                         | Implemented                | `command[]`, `envFile[]?`, `noMasking?`, `confirm`     | Exit code/stdout/stderr summary                         |
 
@@ -312,14 +312,14 @@ Input summary convention:
 
 ### Item Write and Lifecycle
 
-| Tool           | Source                  | Status      | Input Summary                                                             | Output Summary           |
-| -------------- | ----------------------- | ----------- | ------------------------------------------------------------------------- | ------------------------ | -------------------------- | ------------- |
-| `update_item`  | `pass-cli item update`  | Implemented | required: `fields[]`, `confirm`; selector: `shareId                       | vaultName`; xor: `itemId | itemTitle`; optional: none | Update status |
-| `move_item`    | `pass-cli item move`    | Planned     | required: `confirm`; selector: source + destination + item selector (TBD) | Move status              |
-| `delete_item`  | `pass-cli item delete`  | Implemented | required: `shareId`, `itemId`, `confirm`; optional: none                  | Delete status            |
-| `share_item`   | `pass-cli item share`   | Implemented | required: `shareId`, `itemId`, `email`, `confirm`; optional: `role`       | Share status             |
-| `trash_item`   | `pass-cli item trash`   | Planned     | required: `confirm`; selector: item selector (TBD)                        | Trash status             |
-| `untrash_item` | `pass-cli item untrash` | Planned     | required: `confirm`; selector: item selector (TBD)                        | Restore status           |
+| Tool           | Source                  | Status      | Input Summary                                                                                                                                      | Output Summary |
+| -------------- | ----------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- |
+| `update_item`  | `pass-cli item update`  | Implemented | required: `fields[]`, `confirm`; selector: `shareId \| vaultName`; xor: `itemId \| itemTitle`                                                      | Update status  |
+| `move_item`    | `pass-cli item move`    | Implemented | required: `confirm`; source selector: `fromShareId \| fromVaultName`; destination selector: `toShareId \| toVaultName`; xor: `itemId \| itemTitle` | Move status    |
+| `delete_item`  | `pass-cli item delete`  | Implemented | required: `shareId`, `itemId`, `confirm`                                                                                                           | Delete status  |
+| `share_item`   | `pass-cli item share`   | Implemented | required: `shareId`, `itemId`, `email`, `confirm`; optional: `role`                                                                                | Share status   |
+| `trash_item`   | `pass-cli item trash`   | Implemented | required: `confirm`; selector: `shareId? \| vaultName?`; xor: `itemId \| itemTitle`                                                                | Trash status   |
+| `untrash_item` | `pass-cli item untrash` | Implemented | required: `confirm`; selector: `shareId? \| vaultName?`; xor: `itemId \| itemTitle`                                                                | Restore status |
 
 ### Item Creation
 
@@ -350,10 +350,10 @@ Notes:
 | Tool                       | Source                              | Status      | Input Summary                                                | Output Summary       |
 | -------------------------- | ----------------------------------- | ----------- | ------------------------------------------------------------ | -------------------- |
 | `create_item_alias`        | `pass-cli item alias create`        | Implemented | `shareId \| vaultName`, `prefix`, `output?`, `confirm`       | Alias item           |
-| `download_item_attachment` | `pass-cli item attachment download` | Planned     | `shareId`, `itemId`, `attachmentId`, `outputPath`, `confirm` | Download status/path |
-| `list_item_members`        | `pass-cli item member list`         | Planned     | `shareId`, `itemId`, `output?`                               | Member list          |
-| `update_item_member`       | `pass-cli item member update`       | Planned     | `shareId`, `memberShareId`, `role`, `confirm`                | Update status        |
-| `remove_item_member`       | `pass-cli item member remove`       | Planned     | `shareId`, `memberShareId`, `confirm`                        | Remove status        |
+| `download_item_attachment` | `pass-cli item attachment download` | Implemented | `shareId`, `itemId`, `attachmentId`, `outputPath`, `confirm` | Download status/path |
+| `list_item_members`        | `pass-cli item member list`         | Implemented | `shareId`, `itemId`, `output?`                               | Member list          |
+| `update_item_member`       | `pass-cli item member update`       | Implemented | `shareId`, `memberShareId`, `role`, `confirm`                | Update status        |
+| `remove_item_member`       | `pass-cli item member remove`       | Implemented | `shareId`, `memberShareId`, `confirm`                        | Remove status        |
 
 ### Share, Invite, Password, TOTP, User, Settings, SSH Agent
 
@@ -366,7 +366,7 @@ Notes:
 | `generate_random_password` | `pass-cli password generate random`      | Implemented                | generation flags                       | Password value/metadata   |
 | `generate_passphrase`      | `pass-cli password generate passphrase`  | Implemented                | generation flags                       | Passphrase value/metadata |
 | `score_password`           | `pass-cli password score`                | Implemented                | `password`                             | Strength report           |
-| `generate_totp`            | `pass-cli totp generate`                 | Planned                    | `secretOrUri`, `output?`               | TOTP value                |
+| `generate_totp`            | `pass-cli totp generate`                 | Implemented                | `secretOrUri`, `output?`               | TOTP value                |
 | `view_settings`            | `pass-cli settings view`                 | Implemented                | none                                   | Settings object           |
 | `set_default_vault`        | `pass-cli settings set default-vault`    | Implemented                | `vaultName \| shareId`, `confirm`      | Set status                |
 | `unset_default_vault`      | `pass-cli settings unset default-vault`  | Implemented                | `confirm`                              | Unset status              |
