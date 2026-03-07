@@ -168,7 +168,7 @@ Notes:
 
 ## Item Discovery Contract
 
-### `list_items` (planned v2 behavior)
+### `list_items` (implemented behavior)
 
 Input:
 
@@ -181,7 +181,7 @@ Output:
 
 1. `structuredContent: CursorPage<ItemRef>`.
 2. No full sensitive fields.
-3. Optional compatibility flag `includeRawItem=false` (default `false`) if temporary transition is needed.
+3. Reference-only output is the default and current policy (no full-item compatibility fallback mode).
 
 ### `search_items` (MCP-native, not direct CLI parity)
 
@@ -303,12 +303,12 @@ Input summary convention:
 
 ### Item Discovery and Read
 
-| Tool                 | Source               | Status                        | Input Summary                                                                            | Output Summary                 |
-| -------------------- | -------------------- | ----------------------------- | ---------------------------------------------------------------------------------------- | ------------------------------ |
-| `list_items`         | `pass-cli item list` | Implemented (needs v2 schema) | `vaultName \| shareId`, `filterType?`, `filterState?`, `sortBy?`, `pageSize?`, `cursor?` | Planned: `CursorPage<ItemRef>` |
-| `search_items`       | MCP-native           | Implemented (MCP-native)      | `query`, title-search params, selectors, filters, paging                                 | `CursorPage<ItemRef>`          |
-| `view_item`          | `pass-cli item view` | Implemented                   | `uri` or selector tuple, `field?`, `output?`                                             | Full item or selected field    |
-| `generate_item_totp` | `pass-cli item totp` | Implemented                   | `uri` or selector tuple, `field?`, `output?`                                             | TOTP value(s)                  |
+| Tool                 | Source               | Status                   | Input Summary                                                                            | Output Summary              |
+| -------------------- | -------------------- | ------------------------ | ---------------------------------------------------------------------------------------- | --------------------------- |
+| `list_items`         | `pass-cli item list` | Implemented              | `vaultName \| shareId`, `filterType?`, `filterState?`, `sortBy?`, `pageSize?`, `cursor?` | `CursorPage<ItemRef>`       |
+| `search_items`       | MCP-native           | Implemented (MCP-native) | `query`, title-search params, selectors, filters, paging                                 | `CursorPage<ItemRef>`       |
+| `view_item`          | `pass-cli item view` | Implemented              | `uri` or selector tuple, `field?`, `output?`                                             | Full item or selected field |
+| `generate_item_totp` | `pass-cli item totp` | Implemented              | `uri` or selector tuple, `field?`, `output?`                                             | TOTP value(s)               |
 
 ### Item Write and Lifecycle
 
@@ -382,11 +382,11 @@ Notes:
 
 ## Phased Delivery
 
-### Phase 1
+### Phase 1 (Completed)
 
-1. Finish `list_items` v2 reference contract and fix payload-shape handling (`{items:[...]}`).
-2. Add `filterType`, `filterState`, `sortBy` to `list_items`.
-3. Add `search_items` (title-only search).
+1. Finalized `list_items` reference contract with payload-shape normalization (`{items:[...]}`).
+2. Added `filterType`, `filterState`, `sortBy` support in `list_items`.
+3. Added `search_items` (title-only search).
 
 ### Phase 2
 
