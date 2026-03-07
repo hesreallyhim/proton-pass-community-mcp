@@ -1,0 +1,2661 @@
+{
+  "generatedAt": "2026-03-07T10:55:34.090Z",
+  "targets": ["src", "test"],
+  "cloc": {
+    "summary": {
+      "files": 28,
+      "blank": 607,
+      "comment": 27,
+      "code": 4846,
+      "loc": 5480
+    },
+    "byFile": {
+      "test/server.test.ts": {
+        "blank": 260,
+        "comment": 0,
+        "code": 2081,
+        "loc": 2341
+      },
+      "src/tools/item.ts": {
+        "blank": 128,
+        "comment": 2,
+        "code": 930,
+        "loc": 1060
+      },
+      "src/server/register-tools.ts": {
+        "blank": 6,
+        "comment": 0,
+        "code": 479,
+        "loc": 485
+      },
+      "src/tools/vault.ts": {
+        "blank": 31,
+        "comment": 0,
+        "code": 236,
+        "loc": 267
+      },
+      "src/pass-cli/version.ts": {
+        "blank": 19,
+        "comment": 0,
+        "code": 130,
+        "loc": 149
+      },
+      "src/tools/invite.ts": {
+        "blank": 19,
+        "comment": 0,
+        "code": 117,
+        "loc": 136
+      },
+      "src/tools/settings.ts": {
+        "blank": 17,
+        "comment": 0,
+        "code": 93,
+        "loc": 110
+      },
+      "src/tools/item-utils.ts": {
+        "blank": 15,
+        "comment": 24,
+        "code": 85,
+        "loc": 124
+      },
+      "src/tools/check-status.ts": {
+        "blank": 9,
+        "comment": 0,
+        "code": 80,
+        "loc": 89
+      },
+      "src/pass-cli/errors.ts": {
+        "blank": 8,
+        "comment": 0,
+        "code": 68,
+        "loc": 76
+      },
+      "src/server/register-resources.ts": {
+        "blank": 8,
+        "comment": 0,
+        "code": 64,
+        "loc": 72
+      },
+      "src/server.ts": { "blank": 8, "comment": 0, "code": 58, "loc": 66 },
+      "src/pass-cli/runner.ts": {
+        "blank": 7,
+        "comment": 0,
+        "code": 54,
+        "loc": 61
+      },
+      "src/tools/contents.ts": {
+        "blank": 7,
+        "comment": 0,
+        "code": 54,
+        "loc": 61
+      },
+      "src/tools/password.ts": {
+        "blank": 10,
+        "comment": 0,
+        "code": 53,
+        "loc": 63
+      },
+      "src/resources/item-create-templates.ts": {
+        "blank": 11,
+        "comment": 0,
+        "code": 47,
+        "loc": 58
+      },
+      "src/tools/pagination.ts": {
+        "blank": 9,
+        "comment": 0,
+        "code": 46,
+        "loc": 55
+      },
+      "src/cli-flags.ts": { "blank": 7, "comment": 0, "code": 44, "loc": 51 },
+      "src/tools/scope.ts": { "blank": 5, "comment": 0, "code": 22, "loc": 27 },
+      "src/pass-cli/output.ts": {
+        "blank": 3,
+        "comment": 0,
+        "code": 20,
+        "loc": 23
+      },
+      "src/tools/share.ts": { "blank": 6, "comment": 0, "code": 20, "loc": 26 },
+      "src/tools/session.ts": {
+        "blank": 5,
+        "comment": 0,
+        "code": 15,
+        "loc": 20
+      },
+      "src/tools/totp.ts": { "blank": 4, "comment": 0, "code": 15, "loc": 19 },
+      "src/index.ts": { "blank": 3, "comment": 0, "code": 13, "loc": 16 },
+      "src/tools/write-gate.ts": {
+        "blank": 0,
+        "comment": 0,
+        "code": 8,
+        "loc": 8
+      },
+      "src/tools/support.ts": { "blank": 1, "comment": 0, "code": 6, "loc": 7 },
+      "src/tools/schema-fragments.ts": {
+        "blank": 1,
+        "comment": 0,
+        "code": 5,
+        "loc": 6
+      },
+      "src/pass-cli/log.ts": { "blank": 0, "comment": 1, "code": 3, "loc": 4 }
+    }
+  },
+  "analysis": {
+    "summary": {
+      "filesAnalyzed": 28,
+      "functionCount": 278,
+      "parseErrors": 0,
+      "cyclomaticTotal": 638,
+      "cyclomaticAveragePerFunction": 2.29,
+      "llocTotal": 1855
+    },
+    "byFile": [
+      {
+        "file": "src/cli-flags.ts",
+        "sloc": 44,
+        "comment": 0,
+        "blank": 7,
+        "loc": 51,
+        "lloc": 26,
+        "cyclomatic": 18,
+        "functionCount": 4
+      },
+      {
+        "file": "src/index.ts",
+        "sloc": 13,
+        "comment": 0,
+        "blank": 3,
+        "loc": 16,
+        "lloc": 6,
+        "cyclomatic": 0,
+        "functionCount": 0
+      },
+      {
+        "file": "src/pass-cli/errors.ts",
+        "sloc": 68,
+        "comment": 0,
+        "blank": 8,
+        "loc": 76,
+        "lloc": 20,
+        "cyclomatic": 20,
+        "functionCount": 5
+      },
+      {
+        "file": "src/pass-cli/log.ts",
+        "sloc": 3,
+        "comment": 1,
+        "blank": 0,
+        "loc": 4,
+        "lloc": 2,
+        "cyclomatic": 1,
+        "functionCount": 1
+      },
+      {
+        "file": "src/pass-cli/output.ts",
+        "sloc": 20,
+        "comment": 0,
+        "blank": 3,
+        "loc": 23,
+        "lloc": 15,
+        "cyclomatic": 8,
+        "functionCount": 4
+      },
+      {
+        "file": "src/pass-cli/runner.ts",
+        "sloc": 54,
+        "comment": 0,
+        "blank": 7,
+        "loc": 61,
+        "lloc": 28,
+        "cyclomatic": 17,
+        "functionCount": 3
+      },
+      {
+        "file": "src/pass-cli/version.ts",
+        "sloc": 130,
+        "comment": 0,
+        "blank": 19,
+        "loc": 149,
+        "lloc": 45,
+        "cyclomatic": 26,
+        "functionCount": 5
+      },
+      {
+        "file": "src/resources/item-create-templates.ts",
+        "sloc": 47,
+        "comment": 0,
+        "blank": 11,
+        "loc": 58,
+        "lloc": 29,
+        "cyclomatic": 10,
+        "functionCount": 4
+      },
+      {
+        "file": "src/server/register-resources.ts",
+        "sloc": 64,
+        "comment": 0,
+        "blank": 8,
+        "loc": 72,
+        "lloc": 16,
+        "cyclomatic": 7,
+        "functionCount": 6
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "sloc": 479,
+        "comment": 0,
+        "blank": 6,
+        "loc": 485,
+        "lloc": 27,
+        "cyclomatic": 54,
+        "functionCount": 50
+      },
+      {
+        "file": "src/server.ts",
+        "sloc": 58,
+        "comment": 0,
+        "blank": 8,
+        "loc": 66,
+        "lloc": 42,
+        "cyclomatic": 6,
+        "functionCount": 2
+      },
+      {
+        "file": "src/tools/check-status.ts",
+        "sloc": 80,
+        "comment": 0,
+        "blank": 9,
+        "loc": 89,
+        "lloc": 24,
+        "cyclomatic": 14,
+        "functionCount": 2
+      },
+      {
+        "file": "src/tools/contents.ts",
+        "sloc": 54,
+        "comment": 0,
+        "blank": 7,
+        "loc": 61,
+        "lloc": 30,
+        "cyclomatic": 8,
+        "functionCount": 2
+      },
+      {
+        "file": "src/tools/invite.ts",
+        "sloc": 117,
+        "comment": 0,
+        "blank": 19,
+        "loc": 136,
+        "lloc": 47,
+        "cyclomatic": 9,
+        "functionCount": 5
+      },
+      {
+        "file": "src/tools/item-utils.ts",
+        "sloc": 85,
+        "comment": 24,
+        "blank": 15,
+        "loc": 124,
+        "lloc": 55,
+        "cyclomatic": 31,
+        "functionCount": 10
+      },
+      {
+        "file": "src/tools/item.ts",
+        "sloc": 930,
+        "comment": 2,
+        "blank": 128,
+        "loc": 1060,
+        "lloc": 459,
+        "cyclomatic": 199,
+        "functionCount": 37
+      },
+      {
+        "file": "src/tools/pagination.ts",
+        "sloc": 46,
+        "comment": 0,
+        "blank": 9,
+        "loc": 55,
+        "lloc": 31,
+        "cyclomatic": 14,
+        "functionCount": 4
+      },
+      {
+        "file": "src/tools/password.ts",
+        "sloc": 53,
+        "comment": 0,
+        "blank": 10,
+        "loc": 63,
+        "lloc": 36,
+        "cyclomatic": 11,
+        "functionCount": 3
+      },
+      {
+        "file": "src/tools/schema-fragments.ts",
+        "sloc": 5,
+        "comment": 0,
+        "blank": 1,
+        "loc": 6,
+        "lloc": 2,
+        "cyclomatic": 0,
+        "functionCount": 0
+      },
+      {
+        "file": "src/tools/scope.ts",
+        "sloc": 22,
+        "comment": 0,
+        "blank": 5,
+        "loc": 27,
+        "lloc": 13,
+        "cyclomatic": 5,
+        "functionCount": 3
+      },
+      {
+        "file": "src/tools/session.ts",
+        "sloc": 15,
+        "comment": 0,
+        "blank": 5,
+        "loc": 20,
+        "lloc": 11,
+        "cyclomatic": 2,
+        "functionCount": 2
+      },
+      {
+        "file": "src/tools/settings.ts",
+        "sloc": 93,
+        "comment": 0,
+        "blank": 17,
+        "loc": 110,
+        "lloc": 59,
+        "cyclomatic": 19,
+        "functionCount": 6
+      },
+      {
+        "file": "src/tools/share.ts",
+        "sloc": 20,
+        "comment": 0,
+        "blank": 6,
+        "loc": 26,
+        "lloc": 16,
+        "cyclomatic": 5,
+        "functionCount": 1
+      },
+      {
+        "file": "src/tools/support.ts",
+        "sloc": 6,
+        "comment": 0,
+        "blank": 1,
+        "loc": 7,
+        "lloc": 5,
+        "cyclomatic": 1,
+        "functionCount": 1
+      },
+      {
+        "file": "src/tools/totp.ts",
+        "sloc": 15,
+        "comment": 0,
+        "blank": 4,
+        "loc": 19,
+        "lloc": 8,
+        "cyclomatic": 1,
+        "functionCount": 1
+      },
+      {
+        "file": "src/tools/vault.ts",
+        "sloc": 236,
+        "comment": 0,
+        "blank": 31,
+        "loc": 267,
+        "lloc": 103,
+        "cyclomatic": 17,
+        "functionCount": 11
+      },
+      {
+        "file": "src/tools/write-gate.ts",
+        "sloc": 8,
+        "comment": 0,
+        "blank": 0,
+        "loc": 8,
+        "lloc": 5,
+        "cyclomatic": 3,
+        "functionCount": 1
+      },
+      {
+        "file": "test/server.test.ts",
+        "sloc": 2081,
+        "comment": 0,
+        "blank": 260,
+        "loc": 2341,
+        "lloc": 695,
+        "cyclomatic": 132,
+        "functionCount": 105
+      }
+    ],
+    "byFunction": [
+      {
+        "file": "src/cli-flags.ts",
+        "name": "parseBooleanFlagValue",
+        "cyclomatic": 9,
+        "lloc": 6,
+        "lineStart": 5,
+        "lineEnd": 14
+      },
+      {
+        "file": "src/cli-flags.ts",
+        "name": "parseStartupCliFlags",
+        "cyclomatic": 4,
+        "lloc": 11,
+        "lineStart": 16,
+        "lineEnd": 37
+      },
+      {
+        "file": "src/cli-flags.ts",
+        "name": "parseAllowVersionDriftEnv",
+        "cyclomatic": 2,
+        "lloc": 3,
+        "lineStart": 39,
+        "lineEnd": 42
+      },
+      {
+        "file": "src/cli-flags.ts",
+        "name": "resolveAllowVersionDrift",
+        "cyclomatic": 3,
+        "lloc": 1,
+        "lineStart": 44,
+        "lineEnd": 51
+      },
+      {
+        "file": "src/pass-cli/errors.ts",
+        "name": "<anonymous@8>",
+        "cyclomatic": 2,
+        "lloc": 2,
+        "lineStart": 8,
+        "lineEnd": 21
+      },
+      {
+        "file": "src/pass-cli/errors.ts",
+        "name": "classifyPassCliAuthErrorText",
+        "cyclomatic": 13,
+        "lloc": 6,
+        "lineStart": 24,
+        "lineEnd": 48
+      },
+      {
+        "file": "src/pass-cli/errors.ts",
+        "name": "asAuthErrorToolResult",
+        "cyclomatic": 1,
+        "lloc": 1,
+        "lineStart": 50,
+        "lineEnd": 61
+      },
+      {
+        "file": "src/pass-cli/errors.ts",
+        "name": "withAuthErrorHandling",
+        "cyclomatic": 1,
+        "lloc": 1,
+        "lineStart": 63,
+        "lineEnd": 76
+      },
+      {
+        "file": "src/pass-cli/errors.ts",
+        "name": "<anonymous@66>",
+        "cyclomatic": 3,
+        "lloc": 5,
+        "lineStart": 66,
+        "lineEnd": 75
+      },
+      {
+        "file": "src/pass-cli/log.ts",
+        "name": "logErr",
+        "cyclomatic": 1,
+        "lloc": 1,
+        "lineStart": 1,
+        "lineEnd": 4
+      },
+      {
+        "file": "src/pass-cli/output.ts",
+        "name": "asTextContent",
+        "cyclomatic": 1,
+        "lloc": 1,
+        "lineStart": 1,
+        "lineEnd": 3
+      },
+      {
+        "file": "src/pass-cli/output.ts",
+        "name": "joinStdoutStderr",
+        "cyclomatic": 1,
+        "lloc": 1,
+        "lineStart": 5,
+        "lineEnd": 7
+      },
+      {
+        "file": "src/pass-cli/output.ts",
+        "name": "asJsonTextOrRaw",
+        "cyclomatic": 4,
+        "lloc": 7,
+        "lineStart": 9,
+        "lineEnd": 18
+      },
+      {
+        "file": "src/pass-cli/output.ts",
+        "name": "asWriteResult",
+        "cyclomatic": 2,
+        "lloc": 2,
+        "lineStart": 20,
+        "lineEnd": 23
+      },
+      {
+        "file": "src/pass-cli/runner.ts",
+        "name": "sanitizeCliOutput",
+        "cyclomatic": 2,
+        "lloc": 4,
+        "lineStart": 23,
+        "lineEnd": 27
+      },
+      {
+        "file": "src/pass-cli/runner.ts",
+        "name": "createRunPassCli",
+        "cyclomatic": 1,
+        "lloc": 1,
+        "lineStart": 28,
+        "lineEnd": 59
+      },
+      {
+        "file": "src/pass-cli/runner.ts",
+        "name": "<anonymous@31>",
+        "cyclomatic": 14,
+        "lloc": 12,
+        "lineStart": 31,
+        "lineEnd": 58
+      },
+      {
+        "file": "src/pass-cli/version.ts",
+        "name": "parseSemver",
+        "cyclomatic": 4,
+        "lloc": 9,
+        "lineStart": 22,
+        "lineEnd": 35
+      },
+      {
+        "file": "src/pass-cli/version.ts",
+        "name": "<anonymous@30>",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 30,
+        "lineEnd": 30
+      },
+      {
+        "file": "src/pass-cli/version.ts",
+        "name": "evaluatePassCliCompatibility",
+        "cyclomatic": 9,
+        "lloc": 10,
+        "lineStart": 37,
+        "lineEnd": 80
+      },
+      {
+        "file": "src/pass-cli/version.ts",
+        "name": "getProjectBaselinePassCliVersion",
+        "cyclomatic": 1,
+        "lloc": 1,
+        "lineStart": 82,
+        "lineEnd": 84
+      },
+      {
+        "file": "src/pass-cli/version.ts",
+        "name": "checkPassCliVersion",
+        "cyclomatic": 11,
+        "lloc": 14,
+        "lineStart": 86,
+        "lineEnd": 149
+      },
+      {
+        "file": "src/resources/item-create-templates.ts",
+        "name": "loadSnapshot",
+        "cyclomatic": 7,
+        "lloc": 12,
+        "lineStart": 26,
+        "lineEnd": 44
+      },
+      {
+        "file": "src/resources/item-create-templates.ts",
+        "name": "getItemCreateTemplateSnapshot",
+        "cyclomatic": 1,
+        "lloc": 1,
+        "lineStart": 46,
+        "lineEnd": 48
+      },
+      {
+        "file": "src/resources/item-create-templates.ts",
+        "name": "listItemCreateTemplateTypes",
+        "cyclomatic": 1,
+        "lloc": 2,
+        "lineStart": 50,
+        "lineEnd": 53
+      },
+      {
+        "file": "src/resources/item-create-templates.ts",
+        "name": "getItemCreateTemplateByType",
+        "cyclomatic": 1,
+        "lloc": 2,
+        "lineStart": 55,
+        "lineEnd": 58
+      },
+      {
+        "file": "src/server/register-resources.ts",
+        "name": "makeJsonResource",
+        "cyclomatic": 1,
+        "lloc": 1,
+        "lineStart": 12,
+        "lineEnd": 22
+      },
+      {
+        "file": "src/server/register-resources.ts",
+        "name": "typeToResourceName",
+        "cyclomatic": 1,
+        "lloc": 1,
+        "lineStart": 24,
+        "lineEnd": 26
+      },
+      {
+        "file": "src/server/register-resources.ts",
+        "name": "registerResources",
+        "cyclomatic": 2,
+        "lloc": 7,
+        "lineStart": 28,
+        "lineEnd": 72
+      },
+      {
+        "file": "src/server/register-resources.ts",
+        "name": "<anonymous@38>",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 38,
+        "lineEnd": 38
+      },
+      {
+        "file": "src/server/register-resources.ts",
+        "name": "<anonymous@49>",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 49,
+        "lineEnd": 49
+      },
+      {
+        "file": "src/server/register-resources.ts",
+        "name": "<anonymous@62>",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 62,
+        "lineEnd": 69
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "registerToolDefinition",
+        "cyclomatic": 4,
+        "lloc": 6,
+        "lineStart": 123,
+        "lineEnd": 136
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "registerTools",
+        "cyclomatic": 2,
+        "lloc": 3,
+        "lineStart": 138,
+        "lineEnd": 485
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 148,
+        "lineEnd": 148
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 155,
+        "lineEnd": 155
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 162,
+        "lineEnd": 162
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 169,
+        "lineEnd": 169
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 176,
+        "lineEnd": 176
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 183,
+        "lineEnd": 183
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 190,
+        "lineEnd": 190
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 197,
+        "lineEnd": 197
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 204,
+        "lineEnd": 204
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 211,
+        "lineEnd": 211
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 218,
+        "lineEnd": 218
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 225,
+        "lineEnd": 225
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 232,
+        "lineEnd": 232
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 239,
+        "lineEnd": 239
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 246,
+        "lineEnd": 246
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 253,
+        "lineEnd": 253
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 259,
+        "lineEnd": 259
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 266,
+        "lineEnd": 266
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 273,
+        "lineEnd": 273
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 280,
+        "lineEnd": 280
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 287,
+        "lineEnd": 287
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 294,
+        "lineEnd": 294
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 301,
+        "lineEnd": 301
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 308,
+        "lineEnd": 308
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 315,
+        "lineEnd": 315
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 322,
+        "lineEnd": 322
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 329,
+        "lineEnd": 329
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 337,
+        "lineEnd": 337
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 345,
+        "lineEnd": 345
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 352,
+        "lineEnd": 352
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 359,
+        "lineEnd": 359
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 366,
+        "lineEnd": 366
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 373,
+        "lineEnd": 373
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 380,
+        "lineEnd": 380
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 387,
+        "lineEnd": 387
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 394,
+        "lineEnd": 394
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 401,
+        "lineEnd": 401
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 408,
+        "lineEnd": 408
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 415,
+        "lineEnd": 415
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 422,
+        "lineEnd": 422
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 429,
+        "lineEnd": 429
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 436,
+        "lineEnd": 436
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 443,
+        "lineEnd": 443
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 450,
+        "lineEnd": 450
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 457,
+        "lineEnd": 457
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 464,
+        "lineEnd": 464
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 471,
+        "lineEnd": 471
+      },
+      {
+        "file": "src/server/register-tools.ts",
+        "name": "handler",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 478,
+        "lineEnd": 478
+      },
+      {
+        "file": "src/server.ts",
+        "name": "createServer",
+        "cyclomatic": 2,
+        "lloc": 5,
+        "lineStart": 38,
+        "lineEnd": 51
+      },
+      {
+        "file": "src/server.ts",
+        "name": "startServer",
+        "cyclomatic": 4,
+        "lloc": 5,
+        "lineStart": 53,
+        "lineEnd": 66
+      },
+      {
+        "file": "src/tools/check-status.ts",
+        "name": "checkPassConnectivity",
+        "cyclomatic": 5,
+        "lloc": 7,
+        "lineStart": 15,
+        "lineEnd": 42
+      },
+      {
+        "file": "src/tools/check-status.ts",
+        "name": "checkStatusHandler",
+        "cyclomatic": 9,
+        "lloc": 10,
+        "lineStart": 44,
+        "lineEnd": 89
+      },
+      {
+        "file": "src/tools/contents.ts",
+        "name": "injectHandler",
+        "cyclomatic": 4,
+        "lloc": 10,
+        "lineStart": 34,
+        "lineEnd": 45
+      },
+      {
+        "file": "src/tools/contents.ts",
+        "name": "runHandler",
+        "cyclomatic": 4,
+        "lloc": 9,
+        "lineStart": 47,
+        "lineEnd": 61
+      },
+      {
+        "file": "src/tools/invite.ts",
+        "name": "toInviteRef",
+        "cyclomatic": 3,
+        "lloc": 6,
+        "lineStart": 26,
+        "lineEnd": 59
+      },
+      {
+        "file": "src/tools/invite.ts",
+        "name": "listInvitesHandler",
+        "cyclomatic": 3,
+        "lloc": 12,
+        "lineStart": 90,
+        "lineEnd": 118
+      },
+      {
+        "file": "src/tools/invite.ts",
+        "name": "<anonymous@107>",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 107,
+        "lineEnd": 107
+      },
+      {
+        "file": "src/tools/invite.ts",
+        "name": "inviteAcceptHandler",
+        "cyclomatic": 1,
+        "lloc": 3,
+        "lineStart": 120,
+        "lineEnd": 127
+      },
+      {
+        "file": "src/tools/invite.ts",
+        "name": "inviteRejectHandler",
+        "cyclomatic": 1,
+        "lloc": 3,
+        "lineStart": 129,
+        "lineEnd": 136
+      },
+      {
+        "file": "src/tools/item-utils.ts",
+        "name": "asRecord",
+        "cyclomatic": 4,
+        "lloc": 3,
+        "lineStart": 6,
+        "lineEnd": 11
+      },
+      {
+        "file": "src/tools/item-utils.ts",
+        "name": "asNonEmptyString",
+        "cyclomatic": 3,
+        "lloc": 4,
+        "lineStart": 16,
+        "lineEnd": 20
+      },
+      {
+        "file": "src/tools/item-utils.ts",
+        "name": "firstString",
+        "cyclomatic": 3,
+        "lloc": 5,
+        "lineStart": 25,
+        "lineEnd": 31
+      },
+      {
+        "file": "src/tools/item-utils.ts",
+        "name": "firstNestedString",
+        "cyclomatic": 4,
+        "lloc": 8,
+        "lineStart": 36,
+        "lineEnd": 48
+      },
+      {
+        "file": "src/tools/item-utils.ts",
+        "name": "parsePassUri",
+        "cyclomatic": 6,
+        "lloc": 9,
+        "lineStart": 53,
+        "lineEnd": 74
+      },
+      {
+        "file": "src/tools/item-utils.ts",
+        "name": "<anonymous@66>",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 66,
+        "lineEnd": 66
+      },
+      {
+        "file": "src/tools/item-utils.ts",
+        "name": "shortId",
+        "cyclomatic": 2,
+        "lloc": 1,
+        "lineStart": 79,
+        "lineEnd": 81
+      },
+      {
+        "file": "src/tools/item-utils.ts",
+        "name": "normalizeItemTypeKey",
+        "cyclomatic": 4,
+        "lloc": 8,
+        "lineStart": 86,
+        "lineEnd": 111
+      },
+      {
+        "file": "src/tools/item-utils.ts",
+        "name": "extractItemType",
+        "cyclomatic": 3,
+        "lloc": 8,
+        "lineStart": 116,
+        "lineEnd": 124
+      },
+      {
+        "file": "src/tools/item-utils.ts",
+        "name": "<anonymous@121>",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 121,
+        "lineEnd": 121
+      },
+      {
+        "file": "src/tools/item.ts",
+        "name": "toItemRef",
+        "cyclomatic": 11,
+        "lloc": 14,
+        "lineStart": 73,
+        "lineEnd": 120
+      },
+      {
+        "file": "src/tools/item.ts",
+        "name": "<anonymous@140>",
+        "cyclomatic": 1,
+        "lloc": 3,
+        "lineStart": 140,
+        "lineEnd": 144
+      },
+      {
+        "file": "src/tools/item.ts",
+        "name": "<anonymous@197>",
+        "cyclomatic": 2,
+        "lloc": 0,
+        "lineStart": 197,
+        "lineEnd": 197
+      },
+      {
+        "file": "src/tools/item.ts",
+        "name": "<anonymous@365>",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 365,
+        "lineEnd": 365
+      },
+      {
+        "file": "src/tools/item.ts",
+        "name": "<anonymous@368>",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 368,
+        "lineEnd": 368
+      },
+      {
+        "file": "src/tools/item.ts",
+        "name": "<anonymous@371>",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 371,
+        "lineEnd": 371
+      },
+      {
+        "file": "src/tools/item.ts",
+        "name": "<anonymous@392>",
+        "cyclomatic": 2,
+        "lloc": 0,
+        "lineStart": 392,
+        "lineEnd": 392
+      },
+      {
+        "file": "src/tools/item.ts",
+        "name": "<anonymous@395>",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 395,
+        "lineEnd": 395
+      },
+      {
+        "file": "src/tools/item.ts",
+        "name": "<anonymous@407>",
+        "cyclomatic": 2,
+        "lloc": 0,
+        "lineStart": 407,
+        "lineEnd": 407
+      },
+      {
+        "file": "src/tools/item.ts",
+        "name": "<anonymous@410>",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 410,
+        "lineEnd": 410
+      },
+      {
+        "file": "src/tools/item.ts",
+        "name": "<anonymous@469>",
+        "cyclomatic": 2,
+        "lloc": 0,
+        "lineStart": 469,
+        "lineEnd": 469
+      },
+      {
+        "file": "src/tools/item.ts",
+        "name": "listItemsHandler",
+        "cyclomatic": 16,
+        "lloc": 32,
+        "lineStart": 498,
+        "lineEnd": 545
+      },
+      {
+        "file": "src/tools/item.ts",
+        "name": "<anonymous@534>",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 534,
+        "lineEnd": 534
+      },
+      {
+        "file": "src/tools/item.ts",
+        "name": "matchesQuery",
+        "cyclomatic": 5,
+        "lloc": 7,
+        "lineStart": 547,
+        "lineEnd": 564
+      },
+      {
+        "file": "src/tools/item.ts",
+        "name": "searchItemsHandler",
+        "cyclomatic": 10,
+        "lloc": 27,
+        "lineStart": 566,
+        "lineEnd": 634
+      },
+      {
+        "file": "src/tools/item.ts",
+        "name": "<anonymous@607>",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 607,
+        "lineEnd": 607
+      },
+      {
+        "file": "src/tools/item.ts",
+        "name": "<anonymous@608>",
+        "cyclomatic": 2,
+        "lloc": 0,
+        "lineStart": 608,
+        "lineEnd": 616
+      },
+      {
+        "file": "src/tools/item.ts",
+        "name": "viewItemHandler",
+        "cyclomatic": 19,
+        "lloc": 25,
+        "lineStart": 636,
+        "lineEnd": 668
+      },
+      {
+        "file": "src/tools/item.ts",
+        "name": "itemTotpHandler",
+        "cyclomatic": 19,
+        "lloc": 25,
+        "lineStart": 670,
+        "lineEnd": 702
+      },
+      {
+        "file": "src/tools/item.ts",
+        "name": "createLoginItemHandler",
+        "cyclomatic": 11,
+        "lloc": 25,
+        "lineStart": 704,
+        "lineEnd": 730
+      },
+      {
+        "file": "src/tools/item.ts",
+        "name": "createLoginItemFromTemplateHandler",
+        "cyclomatic": 5,
+        "lloc": 12,
+        "lineStart": 732,
+        "lineEnd": 749
+      },
+      {
+        "file": "src/tools/item.ts",
+        "name": "createNoteItemHandler",
+        "cyclomatic": 6,
+        "lloc": 14,
+        "lineStart": 751,
+        "lineEnd": 766
+      },
+      {
+        "file": "src/tools/item.ts",
+        "name": "createCreditCardItemHandler",
+        "cyclomatic": 11,
+        "lloc": 24,
+        "lineStart": 768,
+        "lineEnd": 791
+      },
+      {
+        "file": "src/tools/item.ts",
+        "name": "createWifiItemHandler",
+        "cyclomatic": 8,
+        "lloc": 18,
+        "lineStart": 793,
+        "lineEnd": 810
+      },
+      {
+        "file": "src/tools/item.ts",
+        "name": "createCustomItemHandler",
+        "cyclomatic": 5,
+        "lloc": 11,
+        "lineStart": 812,
+        "lineEnd": 827
+      },
+      {
+        "file": "src/tools/item.ts",
+        "name": "createIdentityItemHandler",
+        "cyclomatic": 5,
+        "lloc": 11,
+        "lineStart": 829,
+        "lineEnd": 844
+      },
+      {
+        "file": "src/tools/item.ts",
+        "name": "moveItemHandler",
+        "cyclomatic": 7,
+        "lloc": 25,
+        "lineStart": 846,
+        "lineEnd": 879
+      },
+      {
+        "file": "src/tools/item.ts",
+        "name": "updateItemHandler",
+        "cyclomatic": 11,
+        "lloc": 19,
+        "lineStart": 881,
+        "lineEnd": 901
+      },
+      {
+        "file": "src/tools/item.ts",
+        "name": "trashItemHandler",
+        "cyclomatic": 10,
+        "lloc": 17,
+        "lineStart": 903,
+        "lineEnd": 921
+      },
+      {
+        "file": "src/tools/item.ts",
+        "name": "untrashItemHandler",
+        "cyclomatic": 10,
+        "lloc": 17,
+        "lineStart": 923,
+        "lineEnd": 941
+      },
+      {
+        "file": "src/tools/item.ts",
+        "name": "downloadItemAttachmentHandler",
+        "cyclomatic": 1,
+        "lloc": 3,
+        "lineStart": 943,
+        "lineEnd": 962
+      },
+      {
+        "file": "src/tools/item.ts",
+        "name": "deleteItemHandler",
+        "cyclomatic": 1,
+        "lloc": 3,
+        "lineStart": 964,
+        "lineEnd": 978
+      },
+      {
+        "file": "src/tools/item.ts",
+        "name": "shareItemHandler",
+        "cyclomatic": 2,
+        "lloc": 6,
+        "lineStart": 980,
+        "lineEnd": 989
+      },
+      {
+        "file": "src/tools/item.ts",
+        "name": "listItemMembersHandler",
+        "cyclomatic": 1,
+        "lloc": 2,
+        "lineStart": 991,
+        "lineEnd": 1007
+      },
+      {
+        "file": "src/tools/item.ts",
+        "name": "updateItemMemberHandler",
+        "cyclomatic": 1,
+        "lloc": 3,
+        "lineStart": 1009,
+        "lineEnd": 1026
+      },
+      {
+        "file": "src/tools/item.ts",
+        "name": "removeItemMemberHandler",
+        "cyclomatic": 1,
+        "lloc": 3,
+        "lineStart": 1028,
+        "lineEnd": 1043
+      },
+      {
+        "file": "src/tools/item.ts",
+        "name": "createItemAliasHandler",
+        "cyclomatic": 5,
+        "lloc": 12,
+        "lineStart": 1045,
+        "lineEnd": 1060
+      },
+      {
+        "file": "src/tools/pagination.ts",
+        "name": "parseCursor",
+        "cyclomatic": 4,
+        "lloc": 8,
+        "lineStart": 3,
+        "lineEnd": 14
+      },
+      {
+        "file": "src/tools/pagination.ts",
+        "name": "extractArrayFromParsed",
+        "cyclomatic": 6,
+        "lloc": 13,
+        "lineStart": 16,
+        "lineEnd": 33
+      },
+      {
+        "file": "src/tools/pagination.ts",
+        "name": "<anonymous@27>",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 27,
+        "lineEnd": 27
+      },
+      {
+        "file": "src/tools/pagination.ts",
+        "name": "paginateRefs",
+        "cyclomatic": 3,
+        "lloc": 6,
+        "lineStart": 35,
+        "lineEnd": 55
+      },
+      {
+        "file": "src/tools/password.ts",
+        "name": "generateRandomPasswordHandler",
+        "cyclomatic": 5,
+        "lloc": 11,
+        "lineStart": 29,
+        "lineEnd": 41
+      },
+      {
+        "file": "src/tools/password.ts",
+        "name": "generatePassphraseHandler",
+        "cyclomatic": 5,
+        "lloc": 11,
+        "lineStart": 43,
+        "lineEnd": 55
+      },
+      {
+        "file": "src/tools/password.ts",
+        "name": "scorePasswordHandler",
+        "cyclomatic": 1,
+        "lloc": 2,
+        "lineStart": 57,
+        "lineEnd": 63
+      },
+      {
+        "file": "src/tools/scope.ts",
+        "name": "requireExactlyOneScope",
+        "cyclomatic": 1,
+        "lloc": 1,
+        "lineStart": 8,
+        "lineEnd": 10
+      },
+      {
+        "file": "src/tools/scope.ts",
+        "name": "assertExactlyOneScope",
+        "cyclomatic": 2,
+        "lloc": 2,
+        "lineStart": 17,
+        "lineEnd": 21
+      },
+      {
+        "file": "src/tools/scope.ts",
+        "name": "appendScopeArgs",
+        "cyclomatic": 2,
+        "lloc": 4,
+        "lineStart": 23,
+        "lineEnd": 27
+      },
+      {
+        "file": "src/tools/session.ts",
+        "name": "viewSessionInfoHandler",
+        "cyclomatic": 1,
+        "lloc": 2,
+        "lineStart": 12,
+        "lineEnd": 15
+      },
+      {
+        "file": "src/tools/session.ts",
+        "name": "viewUserInfoHandler",
+        "cyclomatic": 1,
+        "lloc": 2,
+        "lineStart": 17,
+        "lineEnd": 20
+      },
+      {
+        "file": "src/tools/settings.ts",
+        "name": "normalizeSettingKey",
+        "cyclomatic": 1,
+        "lloc": 1,
+        "lineStart": 12,
+        "lineEnd": 18
+      },
+      {
+        "file": "src/tools/settings.ts",
+        "name": "normalizeSettingValue",
+        "cyclomatic": 6,
+        "lloc": 7,
+        "lineStart": 20,
+        "lineEnd": 28
+      },
+      {
+        "file": "src/tools/settings.ts",
+        "name": "parseSettingsFromText",
+        "cyclomatic": 6,
+        "lloc": 11,
+        "lineStart": 30,
+        "lineEnd": 43
+      },
+      {
+        "file": "src/tools/settings.ts",
+        "name": "viewSettingsHandler",
+        "cyclomatic": 4,
+        "lloc": 14,
+        "lineStart": 60,
+        "lineEnd": 89
+      },
+      {
+        "file": "src/tools/settings.ts",
+        "name": "settingsSetDefaultVaultHandler",
+        "cyclomatic": 1,
+        "lloc": 5,
+        "lineStart": 91,
+        "lineEnd": 101
+      },
+      {
+        "file": "src/tools/settings.ts",
+        "name": "settingsUnsetDefaultVaultHandler",
+        "cyclomatic": 1,
+        "lloc": 3,
+        "lineStart": 103,
+        "lineEnd": 110
+      },
+      {
+        "file": "src/tools/share.ts",
+        "name": "listSharesHandler",
+        "cyclomatic": 5,
+        "lloc": 10,
+        "lineStart": 14,
+        "lineEnd": 26
+      },
+      {
+        "file": "src/tools/support.ts",
+        "name": "supportHandler",
+        "cyclomatic": 1,
+        "lloc": 2,
+        "lineStart": 4,
+        "lineEnd": 7
+      },
+      {
+        "file": "src/tools/totp.ts",
+        "name": "generateTotpHandler",
+        "cyclomatic": 1,
+        "lloc": 2,
+        "lineStart": 13,
+        "lineEnd": 19
+      },
+      {
+        "file": "src/tools/vault.ts",
+        "name": "toVaultMemberRef",
+        "cyclomatic": 3,
+        "lloc": 6,
+        "lineStart": 114,
+        "lineEnd": 140
+      },
+      {
+        "file": "src/tools/vault.ts",
+        "name": "listVaultsHandler",
+        "cyclomatic": 1,
+        "lloc": 2,
+        "lineStart": 142,
+        "lineEnd": 145
+      },
+      {
+        "file": "src/tools/vault.ts",
+        "name": "listVaultMembersHandler",
+        "cyclomatic": 4,
+        "lloc": 15,
+        "lineStart": 147,
+        "lineEnd": 186
+      },
+      {
+        "file": "src/tools/vault.ts",
+        "name": "<anonymous@174>",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 174,
+        "lineEnd": 174
+      },
+      {
+        "file": "src/tools/vault.ts",
+        "name": "createVaultHandler",
+        "cyclomatic": 1,
+        "lloc": 3,
+        "lineStart": 188,
+        "lineEnd": 195
+      },
+      {
+        "file": "src/tools/vault.ts",
+        "name": "updateVaultHandler",
+        "cyclomatic": 1,
+        "lloc": 6,
+        "lineStart": 197,
+        "lineEnd": 207
+      },
+      {
+        "file": "src/tools/vault.ts",
+        "name": "shareVaultHandler",
+        "cyclomatic": 2,
+        "lloc": 8,
+        "lineStart": 209,
+        "lineEnd": 220
+      },
+      {
+        "file": "src/tools/vault.ts",
+        "name": "deleteVaultHandler",
+        "cyclomatic": 1,
+        "lloc": 5,
+        "lineStart": 222,
+        "lineEnd": 231
+      },
+      {
+        "file": "src/tools/vault.ts",
+        "name": "updateVaultMemberHandler",
+        "cyclomatic": 1,
+        "lloc": 6,
+        "lineStart": 233,
+        "lineEnd": 243
+      },
+      {
+        "file": "src/tools/vault.ts",
+        "name": "removeVaultMemberHandler",
+        "cyclomatic": 1,
+        "lloc": 6,
+        "lineStart": 245,
+        "lineEnd": 255
+      },
+      {
+        "file": "src/tools/vault.ts",
+        "name": "transferVaultHandler",
+        "cyclomatic": 1,
+        "lloc": 6,
+        "lineStart": 257,
+        "lineEnd": 267
+      },
+      {
+        "file": "src/tools/write-gate.ts",
+        "name": "requireWriteGate",
+        "cyclomatic": 3,
+        "lloc": 4,
+        "lineStart": 1,
+        "lineEnd": 8
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@76>",
+        "cyclomatic": 3,
+        "lloc": 7,
+        "lineStart": 76,
+        "lineEnd": 84
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "makeRunner",
+        "cyclomatic": 1,
+        "lloc": 2,
+        "lineStart": 86,
+        "lineEnd": 99
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@94>",
+        "cyclomatic": 2,
+        "lloc": 3,
+        "lineStart": 94,
+        "lineEnd": 97
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@101>",
+        "cyclomatic": 1,
+        "lloc": 15,
+        "lineStart": 101,
+        "lineEnd": 294
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@102>",
+        "cyclomatic": 1,
+        "lloc": 1,
+        "lineStart": 102,
+        "lineEnd": 104
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@106>",
+        "cyclomatic": 1,
+        "lloc": 1,
+        "lineStart": 106,
+        "lineEnd": 108
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@110>",
+        "cyclomatic": 1,
+        "lloc": 1,
+        "lineStart": 110,
+        "lineEnd": 112
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@114>",
+        "cyclomatic": 1,
+        "lloc": 2,
+        "lineStart": 114,
+        "lineEnd": 121
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@123>",
+        "cyclomatic": 1,
+        "lloc": 5,
+        "lineStart": 123,
+        "lineEnd": 155
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@157>",
+        "cyclomatic": 1,
+        "lloc": 4,
+        "lineStart": 157,
+        "lineEnd": 166
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@163>",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 163,
+        "lineEnd": 163
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@168>",
+        "cyclomatic": 1,
+        "lloc": 6,
+        "lineStart": 168,
+        "lineEnd": 177
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@174>",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 174,
+        "lineEnd": 174
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@179>",
+        "cyclomatic": 1,
+        "lloc": 4,
+        "lineStart": 179,
+        "lineEnd": 194
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@196>",
+        "cyclomatic": 1,
+        "lloc": 5,
+        "lineStart": 196,
+        "lineEnd": 203
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@198>",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 198,
+        "lineEnd": 198
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@201>",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 201,
+        "lineEnd": 201
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@202>",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 202,
+        "lineEnd": 202
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@205>",
+        "cyclomatic": 1,
+        "lloc": 7,
+        "lineStart": 205,
+        "lineEnd": 227
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@229>",
+        "cyclomatic": 2,
+        "lloc": 10,
+        "lineStart": 229,
+        "lineEnd": 250
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@252>",
+        "cyclomatic": 1,
+        "lloc": 3,
+        "lineStart": 252,
+        "lineEnd": 258
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@260>",
+        "cyclomatic": 1,
+        "lloc": 4,
+        "lineStart": 260,
+        "lineEnd": 267
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@269>",
+        "cyclomatic": 2,
+        "lloc": 8,
+        "lineStart": 269,
+        "lineEnd": 287
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@289>",
+        "cyclomatic": 1,
+        "lloc": 3,
+        "lineStart": 289,
+        "lineEnd": 293
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@296>",
+        "cyclomatic": 1,
+        "lloc": 41,
+        "lineStart": 296,
+        "lineEnd": 1161
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@297>",
+        "cyclomatic": 1,
+        "lloc": 4,
+        "lineStart": 297,
+        "lineEnd": 303
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@305>",
+        "cyclomatic": 1,
+        "lloc": 4,
+        "lineStart": 305,
+        "lineEnd": 311
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@313>",
+        "cyclomatic": 1,
+        "lloc": 6,
+        "lineStart": 313,
+        "lineEnd": 321
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@323>",
+        "cyclomatic": 1,
+        "lloc": 5,
+        "lineStart": 323,
+        "lineEnd": 332
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@324>",
+        "cyclomatic": 1,
+        "lloc": 1,
+        "lineStart": 324,
+        "lineEnd": 326
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@334>",
+        "cyclomatic": 1,
+        "lloc": 7,
+        "lineStart": 334,
+        "lineEnd": 347
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@335>",
+        "cyclomatic": 3,
+        "lloc": 5,
+        "lineStart": 335,
+        "lineEnd": 339
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@349>",
+        "cyclomatic": 1,
+        "lloc": 6,
+        "lineStart": 349,
+        "lineEnd": 359
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@350>",
+        "cyclomatic": 1,
+        "lloc": 1,
+        "lineStart": 350,
+        "lineEnd": 352
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@361>",
+        "cyclomatic": 1,
+        "lloc": 7,
+        "lineStart": 361,
+        "lineEnd": 373
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@362>",
+        "cyclomatic": 2,
+        "lloc": 3,
+        "lineStart": 362,
+        "lineEnd": 365
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@375>",
+        "cyclomatic": 1,
+        "lloc": 6,
+        "lineStart": 375,
+        "lineEnd": 387
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@376>",
+        "cyclomatic": 3,
+        "lloc": 5,
+        "lineStart": 376,
+        "lineEnd": 380
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@389>",
+        "cyclomatic": 1,
+        "lloc": 6,
+        "lineStart": 389,
+        "lineEnd": 401
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@390>",
+        "cyclomatic": 3,
+        "lloc": 5,
+        "lineStart": 390,
+        "lineEnd": 394
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@403>",
+        "cyclomatic": 1,
+        "lloc": 4,
+        "lineStart": 403,
+        "lineEnd": 408
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@410>",
+        "cyclomatic": 1,
+        "lloc": 4,
+        "lineStart": 410,
+        "lineEnd": 416
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@418>",
+        "cyclomatic": 1,
+        "lloc": 4,
+        "lineStart": 418,
+        "lineEnd": 424
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@426>",
+        "cyclomatic": 1,
+        "lloc": 4,
+        "lineStart": 426,
+        "lineEnd": 432
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@434>",
+        "cyclomatic": 1,
+        "lloc": 2,
+        "lineStart": 434,
+        "lineEnd": 444
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@446>",
+        "cyclomatic": 1,
+        "lloc": 4,
+        "lineStart": 446,
+        "lineEnd": 458
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@460>",
+        "cyclomatic": 1,
+        "lloc": 3,
+        "lineStart": 460,
+        "lineEnd": 475
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@477>",
+        "cyclomatic": 1,
+        "lloc": 12,
+        "lineStart": 477,
+        "lineEnd": 521
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@523>",
+        "cyclomatic": 1,
+        "lloc": 2,
+        "lineStart": 523,
+        "lineEnd": 531
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@533>",
+        "cyclomatic": 1,
+        "lloc": 3,
+        "lineStart": 533,
+        "lineEnd": 538
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@540>",
+        "cyclomatic": 1,
+        "lloc": 3,
+        "lineStart": 540,
+        "lineEnd": 548
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@550>",
+        "cyclomatic": 1,
+        "lloc": 12,
+        "lineStart": 550,
+        "lineEnd": 608
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@610>",
+        "cyclomatic": 1,
+        "lloc": 3,
+        "lineStart": 610,
+        "lineEnd": 617
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@619>",
+        "cyclomatic": 1,
+        "lloc": 2,
+        "lineStart": 619,
+        "lineEnd": 624
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@626>",
+        "cyclomatic": 1,
+        "lloc": 2,
+        "lineStart": 626,
+        "lineEnd": 631
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@633>",
+        "cyclomatic": 1,
+        "lloc": 5,
+        "lineStart": 633,
+        "lineEnd": 660
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@662>",
+        "cyclomatic": 1,
+        "lloc": 14,
+        "lineStart": 662,
+        "lineEnd": 701
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@663>",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 663,
+        "lineEnd": 674
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@703>",
+        "cyclomatic": 1,
+        "lloc": 13,
+        "lineStart": 703,
+        "lineEnd": 727
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@704>",
+        "cyclomatic": 1,
+        "lloc": 0,
+        "lineStart": 704,
+        "lineEnd": 707
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@729>",
+        "cyclomatic": 1,
+        "lloc": 5,
+        "lineStart": 729,
+        "lineEnd": 759
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@761>",
+        "cyclomatic": 1,
+        "lloc": 8,
+        "lineStart": 761,
+        "lineEnd": 788
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@790>",
+        "cyclomatic": 1,
+        "lloc": 6,
+        "lineStart": 790,
+        "lineEnd": 820
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@822>",
+        "cyclomatic": 1,
+        "lloc": 5,
+        "lineStart": 822,
+        "lineEnd": 839
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@841>",
+        "cyclomatic": 1,
+        "lloc": 2,
+        "lineStart": 841,
+        "lineEnd": 851
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@853>",
+        "cyclomatic": 1,
+        "lloc": 2,
+        "lineStart": 853,
+        "lineEnd": 863
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@865>",
+        "cyclomatic": 1,
+        "lloc": 11,
+        "lineStart": 865,
+        "lineEnd": 901
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@903>",
+        "cyclomatic": 1,
+        "lloc": 7,
+        "lineStart": 903,
+        "lineEnd": 938
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@940>",
+        "cyclomatic": 1,
+        "lloc": 2,
+        "lineStart": 940,
+        "lineEnd": 953
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@955>",
+        "cyclomatic": 1,
+        "lloc": 5,
+        "lineStart": 955,
+        "lineEnd": 988
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@990>",
+        "cyclomatic": 1,
+        "lloc": 5,
+        "lineStart": 990,
+        "lineEnd": 1026
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@1028>",
+        "cyclomatic": 1,
+        "lloc": 7,
+        "lineStart": 1028,
+        "lineEnd": 1077
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@1079>",
+        "cyclomatic": 1,
+        "lloc": 10,
+        "lineStart": 1079,
+        "lineEnd": 1143
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@1080>",
+        "cyclomatic": 3,
+        "lloc": 3,
+        "lineStart": 1080,
+        "lineEnd": 1085
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@1145>",
+        "cyclomatic": 1,
+        "lloc": 4,
+        "lineStart": 1145,
+        "lineEnd": 1160
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@1163>",
+        "cyclomatic": 1,
+        "lloc": 20,
+        "lineStart": 1163,
+        "lineEnd": 2014
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@1164>",
+        "cyclomatic": 1,
+        "lloc": 6,
+        "lineStart": 1164,
+        "lineEnd": 1176
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@1178>",
+        "cyclomatic": 1,
+        "lloc": 7,
+        "lineStart": 1178,
+        "lineEnd": 1217
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@1219>",
+        "cyclomatic": 1,
+        "lloc": 7,
+        "lineStart": 1219,
+        "lineEnd": 1230
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@1232>",
+        "cyclomatic": 1,
+        "lloc": 7,
+        "lineStart": 1232,
+        "lineEnd": 1273
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@1275>",
+        "cyclomatic": 1,
+        "lloc": 5,
+        "lineStart": 1275,
+        "lineEnd": 1293
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@1295>",
+        "cyclomatic": 1,
+        "lloc": 7,
+        "lineStart": 1295,
+        "lineEnd": 1341
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@1343>",
+        "cyclomatic": 1,
+        "lloc": 7,
+        "lineStart": 1343,
+        "lineEnd": 1410
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@1412>",
+        "cyclomatic": 1,
+        "lloc": 7,
+        "lineStart": 1412,
+        "lineEnd": 1459
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@1461>",
+        "cyclomatic": 1,
+        "lloc": 9,
+        "lineStart": 1461,
+        "lineEnd": 1555
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@1557>",
+        "cyclomatic": 1,
+        "lloc": 7,
+        "lineStart": 1557,
+        "lineEnd": 1593
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@1595>",
+        "cyclomatic": 1,
+        "lloc": 9,
+        "lineStart": 1595,
+        "lineEnd": 1656
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@1658>",
+        "cyclomatic": 1,
+        "lloc": 11,
+        "lineStart": 1658,
+        "lineEnd": 1728
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@1730>",
+        "cyclomatic": 1,
+        "lloc": 5,
+        "lineStart": 1730,
+        "lineEnd": 1742
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@1744>",
+        "cyclomatic": 1,
+        "lloc": 11,
+        "lineStart": 1744,
+        "lineEnd": 1828
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@1746>",
+        "cyclomatic": 4,
+        "lloc": 3,
+        "lineStart": 1746,
+        "lineEnd": 1751
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@1830>",
+        "cyclomatic": 1,
+        "lloc": 6,
+        "lineStart": 1830,
+        "lineEnd": 1868
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@1870>",
+        "cyclomatic": 1,
+        "lloc": 5,
+        "lineStart": 1870,
+        "lineEnd": 1902
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@1904>",
+        "cyclomatic": 1,
+        "lloc": 5,
+        "lineStart": 1904,
+        "lineEnd": 1933
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@1935>",
+        "cyclomatic": 1,
+        "lloc": 4,
+        "lineStart": 1935,
+        "lineEnd": 1958
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@1960>",
+        "cyclomatic": 1,
+        "lloc": 7,
+        "lineStart": 1960,
+        "lineEnd": 1983
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@1985>",
+        "cyclomatic": 1,
+        "lloc": 7,
+        "lineStart": 1985,
+        "lineEnd": 2013
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@2016>",
+        "cyclomatic": 1,
+        "lloc": 5,
+        "lineStart": 2016,
+        "lineEnd": 2341
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@2017>",
+        "cyclomatic": 1,
+        "lloc": 3,
+        "lineStart": 2017,
+        "lineEnd": 2021
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@2023>",
+        "cyclomatic": 3,
+        "lloc": 20,
+        "lineStart": 2023,
+        "lineEnd": 2066
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@2068>",
+        "cyclomatic": 1,
+        "lloc": 90,
+        "lineStart": 2068,
+        "lineEnd": 2304
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@2070>",
+        "cyclomatic": 9,
+        "lloc": 9,
+        "lineStart": 2070,
+        "lineEnd": 2084
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@2306>",
+        "cyclomatic": 1,
+        "lloc": 7,
+        "lineStart": 2306,
+        "lineEnd": 2325
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@2307>",
+        "cyclomatic": 1,
+        "lloc": 1,
+        "lineStart": 2307,
+        "lineEnd": 2309
+      },
+      {
+        "file": "test/server.test.ts",
+        "name": "<anonymous@2327>",
+        "cyclomatic": 1,
+        "lloc": 6,
+        "lineStart": 2327,
+        "lineEnd": 2340
+      }
+    ]
+  }
+}
