@@ -3,4 +3,10 @@
 Status: Accepted  
 Date: 2026-03-06
 
-During throwaway-account validation, we confirmed `pass-cli item create <type> --get-template` and `--from-template` support for multiple item types (`login`, `note`, `credit-card`, `wifi`, `custom`, `identity`), while upstream docs remain login-centric for explicit template schema examples. Decision: record a committed template snapshot artifact and expose it as MCP resources (`pass://templates/item-create` and `pass://templates/item-create/<type>`) for testing/discovery, and add a weekly CI drift check against the snapshot to detect upstream CLI contract changes. We intentionally defer expanding non-login template create tools until we finalize the MCP creation-tool strategy and per-type schema design.
+During throwaway-account validation, we confirmed `pass-cli item create <type> --get-template` and `--from-template` support for multiple item types (`login`, `note`, `credit-card`, `wifi`, `custom`, `identity`), while upstream docs remain login-centric for explicit template schema examples. Decision: record a committed template snapshot artifact and expose it as MCP resources (`pass://templates/item-create` and `pass://templates/item-create/<type>`) for testing/discovery, and run CI drift checks against the snapshot to detect upstream CLI contract changes. We intentionally defer expanding non-login template create tools until we finalize the MCP creation-tool strategy and per-type schema design.
+
+Update (2026-03-07):
+
+1. Scheduled template-drift execution was disabled.
+2. Drift workflow remains available via manual dispatch.
+3. Upstream release-tag watch remains the primary automated signal for potential follow-up drift triage.

@@ -174,11 +174,16 @@ This repository includes a manual workflow template:
 
 It is `workflow_dispatch` only and intended as an opt-in smoke/integration job for the throwaway account.
 
-This repository also includes a scheduled drift check workflow:
+This repository also includes a manual drift check workflow:
 
 - `.github/workflows/pass-cli-template-drift-weekly.yml`
 
-It runs weekly (Monday) and checks whether `item create <type> --get-template` output drifts from the committed snapshot artifact.
+It is `workflow_dispatch` only and checks whether `item create <type> --get-template` output drifts from the committed snapshot artifact.
+
+Automation policy note:
+
+1. Upstream version/tag change detection is handled by `.github/workflows/upstream-pass-cli-watch.yml`.
+2. Template drift checks are now opt-in/manual to avoid long-lived weekly secrets operations.
 
 Required GitHub Actions secrets:
 
