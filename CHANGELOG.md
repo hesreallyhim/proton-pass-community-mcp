@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.3.0](https://github.com/hesreallyhim/proton-pass-community-mcp/compare/v0.2.0...v0.3.0) (2026-03-07)
+
+
+### Features
+
+* register CRUD loop tools for vault and item flows ([6761a04](https://github.com/hesreallyhim/proton-pass-community-mcp/commit/6761a046b008451744de90d2a3a6ac0ad4f4b238))
+
+
+### Bug Fixes
+
+* make preflight account compare bash-3 compatible ([9864b5c](https://github.com/hesreallyhim/proton-pass-community-mcp/commit/9864b5c54ae5bbbeee9b1a24c2dd5e087e9957ab))
+
 ## [0.2.0](https://github.com/hesreallyhim/proton-pass-community-mcp/compare/v0.1.0...v0.2.0) (2026-03-06)
 
 
