@@ -128,6 +128,27 @@ npm run build
 npm run dev
 ```
 
+## Anonymized Demo Shell (Docker)
+
+Use this when recording demos and you want a neutral workspace path in tooling metadata:
+
+```bash
+npm run demo:shell
+```
+
+This launches a container with the project mounted at `/workspace/project`.
+
+To run a single command instead of an interactive shell:
+
+```bash
+npm run demo:shell -- npm run check
+```
+
+Notes:
+
+- Shell prompt aliases/PS1 tweaks only change terminal display; they do not change real working-directory metadata emitted by tools.
+- For true path anonymization in logs, run the host/tooling process from inside this containerized workspace.
+
 ## MCP Client Configuration
 
 Example MCP server config using command-line args:
