@@ -31,6 +31,9 @@ Environment variables:
 Disposable test account workflow:
 
 - Use `scripts/pass-dev.sh` to run Proton Pass CLI with repo-local session isolation.
+- Shorthand aliases:
+  - `scripts/pass ...` (shell wrapper)
+  - `npm run pass -- ...` (npm script alias)
 - `scripts/pass-dev.sh` defaults to `PROTON_PASS_KEY_PROVIDER=fs` and avoids keyring/keychain access unless explicitly overridden.
 - Use `scripts/pass-dev-preflight.sh` to assert the authenticated account before integration/destructive testing.
 - Full local + CI workflow is documented in `docs/testing/TEST_ACCOUNT_WORKFLOW.md`.
