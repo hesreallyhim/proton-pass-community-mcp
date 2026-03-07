@@ -1,10 +1,10 @@
-import { asJsonTextOrRaw, asTextContent } from "../pass-cli/output.js";
-import type { PassCliRunner } from "../pass-cli/runner.js";
-import { extractArrayFromParsed, paginateRefs } from "./pagination.js";
-import { DEFAULT_ITEM_LIST_PAGE_SIZE } from "./item-constants.js";
-import { matchesQuery } from "./item-query.js";
-import { toItemRef } from "./item-refs.js";
-import type { ListItemsInput, SearchItemsInput } from "./item-schemas-list.js";
+import { asJsonTextOrRaw, asTextContent } from "../../pass-cli/output.js";
+import type { PassCliRunner } from "../../pass-cli/runner.js";
+import { extractArrayFromParsed, paginateRefs } from "../shared/pagination.js";
+import { DEFAULT_ITEM_LIST_PAGE_SIZE } from "./constants.js";
+import { matchesQuery } from "./query.js";
+import { toItemRef } from "./refs.js";
+import type { ListItemsInput, SearchItemsInput } from "./schemas-list.js";
 
 export async function listItemsHandler(
   passCli: PassCliRunner,

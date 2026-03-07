@@ -5,7 +5,7 @@ import {
   firstString,
   parsePassUri,
   shortId,
-} from "./item-utils.js";
+} from "../shared/item-utils.js";
 
 export type ItemRef = {
   id: string;

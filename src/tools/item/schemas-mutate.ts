@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { confirmInput } from "./schema-fragments.js";
+import { confirmInput } from "../shared/schema-fragments.js";
 
 export const moveItemInputSchema = z
   .object({

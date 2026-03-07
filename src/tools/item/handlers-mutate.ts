@@ -1,6 +1,6 @@
-import { asWriteResult } from "../pass-cli/output.js";
-import type { PassCliRunner } from "../pass-cli/runner.js";
-import { appendOptionalScopeArgs, appendRequiredItemSelectorArgs } from "./item-handler-helpers.js";
+import { asWriteResult } from "../../pass-cli/output.js";
+import type { PassCliRunner } from "../../pass-cli/runner.js";
+import { appendOptionalScopeArgs, appendRequiredItemSelectorArgs } from "./handler-helpers.js";
 import type {
   DeleteItemInput,
   DownloadItemAttachmentInput,
@@ -8,8 +8,8 @@ import type {
   TrashItemInput,
   UntrashItemInput,
   UpdateItemInput,
-} from "./item-schemas-mutate.js";
-import { requireWriteGate } from "./write-gate.js";
+} from "./schemas-mutate.js";
+import { requireWriteGate } from "../shared/write-gate.js";
 
 export async function moveItemHandler(passCli: PassCliRunner, input: MoveItemInput) {
   requireWriteGate(input.confirm);

@@ -1,4 +1,4 @@
-import type { ItemTotpInput, ViewItemInput } from "./item-schemas-view.js";
+import type { ItemTotpInput, ViewItemInput } from "./schemas-view.js";
 
 export function ensureSingleOptionalScope(shareId?: string, vaultName?: string): void {
   if (shareId && vaultName) {

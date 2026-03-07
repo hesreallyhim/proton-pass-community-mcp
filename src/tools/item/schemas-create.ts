@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { WIFI_SECURITY_OPTIONS } from "./item-constants.js";
-import { confirmInput } from "./schema-fragments.js";
+import { WIFI_SECURITY_OPTIONS } from "./constants.js";
+import { confirmInput } from "../shared/schema-fragments.js";
 
 export const createLoginItemInputSchema = z.object({
   shareId: z.string().max(100).optional().describe("Share ID for the new item"),

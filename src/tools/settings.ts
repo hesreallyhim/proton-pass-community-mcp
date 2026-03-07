@@ -2,10 +2,10 @@ import { z } from "zod";
 
 import { asJsonTextOrRaw, asTextContent, asWriteResult } from "../pass-cli/output.js";
 import type { PassCliRunner } from "../pass-cli/runner.js";
-import { asRecord } from "./item-utils.js";
-import { confirmInput } from "./schema-fragments.js";
-import { appendScopeArgs, scopeRefinement } from "./scope.js";
-import { requireWriteGate } from "./write-gate.js";
+import { asRecord } from "./shared/item-utils.js";
+import { confirmInput } from "./shared/schema-fragments.js";
+import { appendScopeArgs, scopeRefinement } from "./shared/scope.js";
+import { requireWriteGate } from "./shared/write-gate.js";
 
 type ParsedSettings = Record<string, string | null>;
 

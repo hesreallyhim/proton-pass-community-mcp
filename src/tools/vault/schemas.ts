@@ -1,8 +1,8 @@
 import { z } from "zod";
 
-import { confirmInput } from "./schema-fragments.js";
-import { scopeRefinement } from "./scope.js";
-import { MAX_VAULT_MEMBER_PAGE_SIZE, VAULT_MEMBER_ROLE_OPTIONS } from "./vault-constants.js";
+import { confirmInput } from "../shared/schema-fragments.js";
+import { scopeRefinement } from "../shared/scope.js";
+import { MAX_VAULT_MEMBER_PAGE_SIZE, VAULT_MEMBER_ROLE_OPTIONS } from "./constants.js";
 
 export const listVaultsInputSchema = z.object({
   output: z.enum(["json", "human"]).default("json").describe("Output format"),

@@ -1,7 +1,7 @@
 import { z } from "zod";
 
-import { SHARE_ROLE_OPTIONS } from "./item-constants.js";
-import { confirmInput } from "./schema-fragments.js";
+import { SHARE_ROLE_OPTIONS } from "./constants.js";
+import { confirmInput } from "../shared/schema-fragments.js";
 
 export const shareItemInputSchema = z.object({
   shareId: z.string().max(100).describe("Share ID containing the item"),

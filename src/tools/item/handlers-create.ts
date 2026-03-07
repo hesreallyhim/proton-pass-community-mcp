@@ -1,6 +1,6 @@
-import { asJsonTextOrRaw, asTextContent, joinStdoutStderr } from "../pass-cli/output.js";
-import type { PassCliRunner } from "../pass-cli/runner.js";
-import { appendOptionalScopeArgs } from "./item-handler-helpers.js";
+import { asJsonTextOrRaw, asTextContent, joinStdoutStderr } from "../../pass-cli/output.js";
+import type { PassCliRunner } from "../../pass-cli/runner.js";
+import { appendOptionalScopeArgs } from "./handler-helpers.js";
 import type {
   CreateCreditCardItemInput,
   CreateCustomItemInput,
@@ -10,8 +10,8 @@ import type {
   CreateLoginItemInput,
   CreateNoteItemInput,
   CreateWifiItemInput,
-} from "./item-schemas-create.js";
-import { requireWriteGate } from "./write-gate.js";
+} from "./schemas-create.js";
+import { requireWriteGate } from "../shared/write-gate.js";
 
 export async function createLoginItemHandler(passCli: PassCliRunner, input: CreateLoginItemInput) {
   requireWriteGate(input.confirm);
