@@ -1,9 +1,7 @@
-name: Pass CLI Template Drift (Weekly)
+name: Pass CLI Template Drift (Manual)
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 9 * * 1"
 
 permissions:
   contents: read

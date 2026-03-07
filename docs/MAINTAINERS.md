@@ -30,6 +30,11 @@ Important constraint:
 2. It does not determine contract/behavior compatibility changes.
 3. It only reports that upstream references moved.
 
+Template drift workflow policy:
+
+1. `.github/workflows/pass-cli-template-drift-weekly.yml` is manual-dispatch only.
+2. Use it when upstream watch (or other signals) indicate follow-up CLI contract verification is warranted.
+
 ## Maintainer CTA When Upstream Watch Fails
 
 1. Review workflow output and confirm the new SHA/version.
