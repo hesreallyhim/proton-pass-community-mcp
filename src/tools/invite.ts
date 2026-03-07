@@ -2,10 +2,10 @@ import { z } from "zod";
 
 import { asJsonTextOrRaw, asTextContent, asWriteResult } from "../pass-cli/output.js";
 import type { PassCliRunner } from "../pass-cli/runner.js";
-import { asRecord, firstString } from "./item-utils.js";
-import { extractArrayFromParsed, paginateRefs } from "./pagination.js";
-import { confirmInput } from "./schema-fragments.js";
-import { requireWriteGate } from "./write-gate.js";
+import { asRecord, firstString } from "./shared/item-utils.js";
+import { extractArrayFromParsed, paginateRefs } from "./shared/pagination.js";
+import { confirmInput } from "./shared/schema-fragments.js";
+import { requireWriteGate } from "./shared/write-gate.js";
 
 const DEFAULT_INVITE_PAGE_SIZE = 100;
 const MAX_INVITE_PAGE_SIZE = 250;

@@ -2,8 +2,8 @@ import { z } from "zod";
 
 import { asWriteResult } from "../pass-cli/output.js";
 import type { PassCliRunner } from "../pass-cli/runner.js";
-import { confirmInput } from "./schema-fragments.js";
-import { requireWriteGate } from "./write-gate.js";
+import { confirmInput } from "./shared/schema-fragments.js";
+import { requireWriteGate } from "./shared/write-gate.js";
 
 export const injectInputSchema = z.object({
   inFile: z.string().min(1).max(4096).describe("Path to template input file"),

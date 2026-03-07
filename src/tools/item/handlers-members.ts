@@ -1,12 +1,12 @@
-import { asJsonTextOrRaw, asTextContent, asWriteResult } from "../pass-cli/output.js";
-import type { PassCliRunner } from "../pass-cli/runner.js";
+import { asJsonTextOrRaw, asTextContent, asWriteResult } from "../../pass-cli/output.js";
+import type { PassCliRunner } from "../../pass-cli/runner.js";
 import type {
   ListItemMembersInput,
   RemoveItemMemberInput,
   ShareItemInput,
   UpdateItemMemberInput,
-} from "./item-schemas-members.js";
-import { requireWriteGate } from "./write-gate.js";
+} from "./schemas-members.js";
+import { requireWriteGate } from "../shared/write-gate.js";
 
 export async function shareItemHandler(
   passCli: PassCliRunner,

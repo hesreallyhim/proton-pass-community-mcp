@@ -33,7 +33,7 @@ export * from "./tools/share.js";
 export * from "./tools/support.js";
 export * from "./tools/totp.js";
 export * from "./tools/vault.js";
-export * from "./tools/write-gate.js";
+export * from "./tools/shared/write-gate.js";
 
 export function createServer(
   deps: { runPassCli?: PassCliRunner; versionPolicy?: PassCliVersionPolicy } = {},

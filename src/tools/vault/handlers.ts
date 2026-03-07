@@ -1,9 +1,9 @@
-import { asJsonTextOrRaw, asTextContent, asWriteResult } from "../pass-cli/output.js";
-import type { PassCliRunner } from "../pass-cli/runner.js";
-import { extractArrayFromParsed, paginateRefs } from "./pagination.js";
-import { appendScopeArgs } from "./scope.js";
-import { DEFAULT_VAULT_MEMBER_PAGE_SIZE } from "./vault-constants.js";
-import { toVaultMemberRef } from "./vault-refs.js";
+import { asJsonTextOrRaw, asTextContent, asWriteResult } from "../../pass-cli/output.js";
+import type { PassCliRunner } from "../../pass-cli/runner.js";
+import { extractArrayFromParsed, paginateRefs } from "../shared/pagination.js";
+import { appendScopeArgs } from "../shared/scope.js";
+import { DEFAULT_VAULT_MEMBER_PAGE_SIZE } from "./constants.js";
+import { toVaultMemberRef } from "./refs.js";
 import type {
   CreateVaultInput,
   DeleteVaultInput,
@@ -14,8 +14,8 @@ import type {
   TransferVaultInput,
   UpdateVaultInput,
   UpdateVaultMemberInput,
-} from "./vault-schemas.js";
-import { requireWriteGate } from "./write-gate.js";
+} from "./schemas.js";
+import { requireWriteGate } from "../shared/write-gate.js";
 
 export async function listVaultsHandler(passCli: PassCliRunner, { output }: ListVaultsInput) {
   const { stdout } = await passCli(["vault", "list", "--output", output]);

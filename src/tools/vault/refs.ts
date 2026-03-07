@@ -1,4 +1,4 @@
-import { asRecord, firstString } from "./item-utils.js";
+import { asRecord, firstString } from "../shared/item-utils.js";
 
 export type VaultMemberRef = {
   id: string;

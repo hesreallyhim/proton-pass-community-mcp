@@ -18,7 +18,7 @@ import {
   SHARE_ID_SCOPE_DESCRIPTION,
   SORT_BY_DESCRIPTION,
   VAULT_NAME_SCOPE_DESCRIPTION,
-} from "./item-constants.js";
+} from "./constants.js";
 
 export const listItemsInputSchema = z
   .object({

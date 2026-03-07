@@ -1,7 +1,7 @@
-import { asJsonTextOrRaw, asTextContent } from "../pass-cli/output.js";
-import type { PassCliRunner } from "../pass-cli/runner.js";
-import { buildViewLikeArgs } from "./item-handler-helpers.js";
-import type { ItemTotpInput, ViewItemInput } from "./item-schemas-view.js";
+import { asJsonTextOrRaw, asTextContent } from "../../pass-cli/output.js";
+import type { PassCliRunner } from "../../pass-cli/runner.js";
+import { buildViewLikeArgs } from "./handler-helpers.js";
+import type { ItemTotpInput, ViewItemInput } from "./schemas-view.js";
 
 export async function viewItemHandler(passCli: PassCliRunner, input: ViewItemInput) {
   const args = buildViewLikeArgs("view", input);
