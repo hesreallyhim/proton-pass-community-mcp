@@ -1,6 +1,11 @@
 import { z } from "zod";
 
-import { asJsonTextOrRaw, asTextContent, joinStdoutStderr } from "../pass-cli/output.js";
+import {
+  asJsonTextOrRaw,
+  asTextContent,
+  asWriteResult,
+  joinStdoutStderr,
+} from "../pass-cli/output.js";
 import type { PassCliRunner } from "../pass-cli/runner.js";
 import {
   asRecord,
@@ -10,6 +15,8 @@ import {
   parsePassUri,
   shortId,
 } from "./item-utils.js";
+import { extractArrayFromParsed, paginateRefs } from "./pagination.js";
+import { confirmInput } from "./schema-fragments.js";
 import { requireWriteGate } from "./write-gate.js";
 
 const DEFAULT_ITEM_LIST_PAGE_SIZE = 100;
@@ -63,19 +70,6 @@ export type ItemRef = {
   uri: string | null;
 };
 
-function parseCursor(cursor?: string): number {
-  if (!cursor) return 0;
-  if (!/^\d+$/.test(cursor)) {
-    throw new Error('Invalid cursor. Expected a non-negative integer string (example: "100").');
-  }
-
-  const parsed = Number(cursor);
-  if (!Number.isSafeInteger(parsed)) {
-    throw new Error("Invalid cursor. Value is too large.");
-  }
-  return parsed;
-}
-
 function toItemRef(rawItem: unknown, index: number): ItemRef {
   const item = asRecord(rawItem);
   if (!item) {
@@ -123,14 +117,6 @@ function toItemRef(rawItem: unknown, index: number): ItemRef {
     modify_time: firstString(item, ["modify_time", "updated_at"]),
     uri: derivedUri ?? null,
   };
-}
-
-function extractRawItemList(parsed: unknown): unknown[] | null {
-  if (Array.isArray(parsed)) return parsed;
-  const parsedObj = asRecord(parsed);
-  if (!parsedObj) return null;
-  const items = parsedObj.items;
-  return Array.isArray(items) ? items : null;
 }
 
 export const listItemsInputSchema = z
@@ -226,7 +212,7 @@ export const createLoginItemInputSchema = z.object({
     .optional()
     .describe('Set to "true" to auto-generate, or pass generator options'),
   output: z.enum(["json", "human"]).default("json").describe("Output format"),
-  confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+  confirm: confirmInput,
 });
 
 export const loginItemTemplateSchema = z
@@ -244,7 +230,7 @@ export const createLoginItemFromTemplateInputSchema = z.object({
   vaultName: z.string().max(255).optional().describe("Vault name for the new item"),
   template: loginItemTemplateSchema.describe("Login template payload"),
   output: z.enum(["json", "human"]).default("json").describe("Output format"),
-  confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+  confirm: confirmInput,
 });
 
 export const createNoteItemInputSchema = z.object({
@@ -252,7 +238,7 @@ export const createNoteItemInputSchema = z.object({
   vaultName: z.string().max(255).optional().describe("Vault name for the new item"),
   title: z.string().max(255).describe("Title for the new note item"),
   note: z.string().max(10000).optional().describe("Optional note content"),
-  confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+  confirm: confirmInput,
 });
 
 export const createCreditCardItemInputSchema = z.object({
@@ -269,7 +255,7 @@ export const createCreditCardItemInputSchema = z.object({
     .describe("Expiration date (YYYY-MM)"),
   pin: z.string().max(64).optional().describe("Card PIN"),
   note: z.string().max(10000).optional().describe("Optional note content"),
-  confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+  confirm: confirmInput,
 });
 
 export const createWifiItemInputSchema = z.object({
@@ -287,7 +273,7 @@ export const createWifiItemInputSchema = z.object({
     .optional()
     .describe("WiFi security type: wpa, wpa2, wpa3, wep, open, none"),
   note: z.string().max(10000).optional().describe("Optional note content"),
-  confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+  confirm: confirmInput,
 });
 
 const customTemplateFieldSchema = z
@@ -317,7 +303,7 @@ export const createCustomItemInputSchema = z.object({
   shareId: z.string().max(100).optional().describe("Share ID for the new item"),
   vaultName: z.string().max(255).optional().describe("Vault name for the new item"),
   template: customItemTemplateSchema.describe("Custom item template payload"),
-  confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+  confirm: confirmInput,
 });
 
 export const identityItemTemplateSchema = z
@@ -363,7 +349,7 @@ export const createIdentityItemInputSchema = z.object({
   shareId: z.string().max(100).optional().describe("Share ID for the new item"),
   vaultName: z.string().max(255).optional().describe("Vault name for the new item"),
   template: identityItemTemplateSchema.describe("Identity item template payload"),
-  confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+  confirm: confirmInput,
 });
 
 export const moveItemInputSchema = z
@@ -374,7 +360,7 @@ export const moveItemInputSchema = z
     toVaultName: z.string().max(255).optional().describe("Destination vault name"),
     itemId: z.string().max(100).optional().describe("Item ID to move"),
     itemTitle: z.string().max(255).optional().describe("Item title to move"),
-    confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+    confirm: confirmInput,
   })
   .refine((input) => Boolean(input.fromShareId) !== Boolean(input.fromVaultName), {
     message: "Provide exactly one of fromShareId or fromVaultName.",
@@ -392,7 +378,7 @@ export const updateItemInputSchema = z.object({
   itemId: z.string().max(100).optional().describe("Item ID to update"),
   itemTitle: z.string().max(255).optional().describe("Item title to update"),
   fields: z.array(z.string().max(1024)).min(1).describe("Fields to update (key=value pairs)"),
-  confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+  confirm: confirmInput,
 });
 
 export const trashItemInputSchema = z
@@ -401,7 +387,7 @@ export const trashItemInputSchema = z
     vaultName: z.string().max(255).optional().describe("Vault name containing the item"),
     itemId: z.string().max(100).optional().describe("Item ID to trash"),
     itemTitle: z.string().max(255).optional().describe("Item title to trash"),
-    confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+    confirm: confirmInput,
   })
   .refine((input) => !(input.shareId && input.vaultName), {
     message: "Provide only one of shareId or vaultName.",
@@ -416,7 +402,7 @@ export const untrashItemInputSchema = z
     vaultName: z.string().max(255).optional().describe("Vault name containing the item"),
     itemId: z.string().max(100).optional().describe("Item ID to restore"),
     itemTitle: z.string().max(255).optional().describe("Item title to restore"),
-    confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+    confirm: confirmInput,
   })
   .refine((input) => !(input.shareId && input.vaultName), {
     message: "Provide only one of shareId or vaultName.",
@@ -430,13 +416,13 @@ export const downloadItemAttachmentInputSchema = z.object({
   itemId: z.string().max(100).describe("Item ID containing the attachment"),
   attachmentId: z.string().max(100).describe("Attachment ID to download"),
   outputPath: z.string().min(1).max(4096).describe("Output path for downloaded attachment"),
-  confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+  confirm: confirmInput,
 });
 
 export const deleteItemInputSchema = z.object({
   shareId: z.string().max(100).describe("Share ID containing the item to delete"),
   itemId: z.string().max(100).describe("Item ID to delete"),
-  confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+  confirm: confirmInput,
 });
 
 const SHARE_ROLE_OPTIONS = ["viewer", "editor", "manager"] as const;
@@ -446,7 +432,7 @@ export const shareItemInputSchema = z.object({
   itemId: z.string().max(100).describe("Item ID to share"),
   email: z.string().email().max(320).describe("Email of the user to invite"),
   role: z.enum(SHARE_ROLE_OPTIONS).optional().describe("Role for the invited user"),
-  confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+  confirm: confirmInput,
 });
 
 export const listItemMembersInputSchema = z.object({
@@ -459,13 +445,13 @@ export const updateItemMemberInputSchema = z.object({
   shareId: z.string().max(100).describe("Share ID containing the item"),
   memberShareId: z.string().max(100).describe("Member share ID"),
   role: z.enum(SHARE_ROLE_OPTIONS).describe("Role for the member"),
-  confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+  confirm: confirmInput,
 });
 
 export const removeItemMemberInputSchema = z.object({
   shareId: z.string().max(100).describe("Share ID containing the item"),
   memberShareId: z.string().max(100).describe("Member share ID"),
-  confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+  confirm: confirmInput,
 });
 
 export const createItemAliasInputSchema = z
@@ -478,7 +464,7 @@ export const createItemAliasInputSchema = z
       .describe("Vault name where alias item will be created"),
     prefix: z.string().min(1).max(255).describe("Alias prefix"),
     output: z.enum(["json", "human"]).default("json").describe("Output format"),
-    confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+    confirm: confirmInput,
   })
   .refine((input) => !(input.shareId && input.vaultName), {
     message: "Provide only one of shareId or vaultName.",
@@ -541,25 +527,15 @@ export async function listItemsHandler(
     return asTextContent(asJsonTextOrRaw(stdout));
   }
 
-  const rawItems = extractRawItemList(parsed);
+  const rawItems = extractArrayFromParsed(parsed, ["items"]);
   if (!rawItems) {
     return asTextContent(asJsonTextOrRaw(stdout));
   }
   const refs = rawItems.map((item, index) => toItemRef(item, index));
-
-  const start = parseCursor(cursor);
-  const size = pageSize ?? DEFAULT_ITEM_LIST_PAGE_SIZE;
-  const end = start + size;
-  const items = refs.slice(start, end);
-  const nextCursor = end < refs.length ? String(end) : null;
+  const page = paginateRefs(refs, cursor, pageSize, DEFAULT_ITEM_LIST_PAGE_SIZE);
 
   const structuredContent = {
-    items,
-    pageSize: size,
-    cursor: String(start),
-    returned: items.length,
-    total: refs.length,
-    nextCursor,
+    ...page,
   };
 
   return {
@@ -624,7 +600,7 @@ export async function searchItemsHandler(
     return asTextContent(asJsonTextOrRaw(stdout));
   }
 
-  const rawItems = extractRawItemList(parsed);
+  const rawItems = extractArrayFromParsed(parsed, ["items"]);
   if (!rawItems) {
     return asTextContent(asJsonTextOrRaw(stdout));
   }
@@ -640,19 +616,10 @@ export async function searchItemsHandler(
       : false,
   );
 
-  const start = parseCursor(cursor);
-  const size = pageSize ?? DEFAULT_ITEM_LIST_PAGE_SIZE;
-  const end = start + size;
-  const items = filtered.slice(start, end);
-  const nextCursor = end < filtered.length ? String(end) : null;
+  const page = paginateRefs(filtered, cursor, pageSize, DEFAULT_ITEM_LIST_PAGE_SIZE);
 
   const structuredContent = {
-    items,
-    pageSize: size,
-    cursor: String(start),
-    returned: items.length,
-    total: filtered.length,
-    nextCursor,
+    ...page,
     queryMeta: {
       field,
       match,
@@ -908,8 +875,7 @@ export async function moveItemHandler(passCli: PassCliRunner, input: MoveItemInp
   else args.push("--to-vault-name", input.toVaultName!);
 
   const { stdout, stderr } = await passCli(args);
-  const out = joinStdoutStderr(stdout, stderr);
-  return asTextContent(out || "OK");
+  return asWriteResult(stdout, stderr);
 }
 
 export async function updateItemHandler(
@@ -931,8 +897,7 @@ export async function updateItemHandler(
   for (const field of fields) args.push("--field", field);
 
   const { stdout, stderr } = await passCli(args);
-  const out = joinStdoutStderr(stdout, stderr);
-  return asTextContent(out || "OK");
+  return asWriteResult(stdout, stderr);
 }
 
 export async function trashItemHandler(
@@ -952,8 +917,7 @@ export async function trashItemHandler(
   else args.push("--item-title", itemTitle!);
 
   const { stdout, stderr } = await passCli(args);
-  const out = joinStdoutStderr(stdout, stderr);
-  return asTextContent(out || "OK");
+  return asWriteResult(stdout, stderr);
 }
 
 export async function untrashItemHandler(
@@ -973,8 +937,7 @@ export async function untrashItemHandler(
   else args.push("--item-title", itemTitle!);
 
   const { stdout, stderr } = await passCli(args);
-  const out = joinStdoutStderr(stdout, stderr);
-  return asTextContent(out || "OK");
+  return asWriteResult(stdout, stderr);
 }
 
 export async function downloadItemAttachmentHandler(
@@ -995,8 +958,7 @@ export async function downloadItemAttachmentHandler(
     "--output",
     outputPath,
   ]);
-  const out = joinStdoutStderr(stdout, stderr);
-  return asTextContent(out || "OK");
+  return asWriteResult(stdout, stderr);
 }
 
 export async function deleteItemHandler(
@@ -1012,8 +974,7 @@ export async function deleteItemHandler(
     "--item-id",
     itemId,
   ]);
-  const out = joinStdoutStderr(stdout, stderr);
-  return asTextContent(out || "OK");
+  return asWriteResult(stdout, stderr);
 }
 
 export async function shareItemHandler(
@@ -1024,8 +985,7 @@ export async function shareItemHandler(
   const args = ["item", "share", "--share-id", shareId, "--item-id", itemId, email];
   if (role) args.push("--role", role);
   const { stdout, stderr } = await passCli(args);
-  const out = joinStdoutStderr(stdout, stderr);
-  return asTextContent(out || "OK");
+  return asWriteResult(stdout, stderr);
 }
 
 export async function listItemMembersHandler(
@@ -1062,8 +1022,7 @@ export async function updateItemMemberHandler(
     "--role",
     role,
   ]);
-  const out = joinStdoutStderr(stdout, stderr);
-  return asTextContent(out || "OK");
+  return asWriteResult(stdout, stderr);
 }
 
 export async function removeItemMemberHandler(
@@ -1080,8 +1039,7 @@ export async function removeItemMemberHandler(
     "--member-share-id",
     memberShareId,
   ]);
-  const out = joinStdoutStderr(stdout, stderr);
-  return asTextContent(out || "OK");
+  return asWriteResult(stdout, stderr);
 }
 
 export async function createItemAliasHandler(

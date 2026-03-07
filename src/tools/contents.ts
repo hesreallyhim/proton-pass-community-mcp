@@ -1,7 +1,8 @@
 import { z } from "zod";
 
-import { asTextContent, joinStdoutStderr } from "../pass-cli/output.js";
+import { asWriteResult } from "../pass-cli/output.js";
 import type { PassCliRunner } from "../pass-cli/runner.js";
+import { confirmInput } from "./schema-fragments.js";
 import { requireWriteGate } from "./write-gate.js";
 
 export const injectInputSchema = z.object({
@@ -13,7 +14,7 @@ export const injectInputSchema = z.object({
     .optional()
     .describe("Unix file mode (e.g. 0600)"),
   force: z.boolean().optional().describe("Overwrite output file if it exists"),
-  confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+  confirm: confirmInput,
 });
 
 export const runInputSchema = z.object({
@@ -24,7 +25,7 @@ export const runInputSchema = z.object({
     .optional()
     .describe("dotenv files to load in order"),
   noMasking: z.boolean().optional().describe("Disable output masking of secret values"),
-  confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+  confirm: confirmInput,
 });
 
 export type InjectInput = z.infer<typeof injectInputSchema>;
@@ -40,8 +41,7 @@ export async function injectHandler(
   if (fileMode) args.push("--file-mode", fileMode);
   if (force) args.push("--force");
   const { stdout, stderr } = await passCli(args);
-  const out = joinStdoutStderr(stdout, stderr);
-  return asTextContent(out || "OK");
+  return asWriteResult(stdout, stderr);
 }
 
 export async function runHandler(
@@ -57,6 +57,5 @@ export async function runHandler(
   args.push("--", ...command);
 
   const { stdout, stderr } = await passCli(args);
-  const out = joinStdoutStderr(stdout, stderr);
-  return asTextContent(out || "OK");
+  return asWriteResult(stdout, stderr);
 }

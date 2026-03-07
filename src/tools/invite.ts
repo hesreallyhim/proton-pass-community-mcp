@@ -1,8 +1,10 @@
 import { z } from "zod";
 
-import { asJsonTextOrRaw, asTextContent, joinStdoutStderr } from "../pass-cli/output.js";
+import { asJsonTextOrRaw, asTextContent, asWriteResult } from "../pass-cli/output.js";
 import type { PassCliRunner } from "../pass-cli/runner.js";
 import { asRecord, firstString } from "./item-utils.js";
+import { extractArrayFromParsed, paginateRefs } from "./pagination.js";
+import { confirmInput } from "./schema-fragments.js";
 import { requireWriteGate } from "./write-gate.js";
 
 const DEFAULT_INVITE_PAGE_SIZE = 100;
@@ -20,19 +22,6 @@ export type InviteRef = {
   state: string | null;
   create_time: string | null;
 };
-
-function parseCursor(cursor?: string): number {
-  if (!cursor) return 0;
-  if (!/^\d+$/.test(cursor)) {
-    throw new Error('Invalid cursor. Expected a non-negative integer string (example: "100").');
-  }
-
-  const parsed = Number(cursor);
-  if (!Number.isSafeInteger(parsed)) {
-    throw new Error("Invalid cursor. Value is too large.");
-  }
-  return parsed;
-}
 
 function toInviteRef(rawInvite: unknown, index: number): InviteRef {
   const invite = asRecord(rawInvite);
@@ -69,25 +58,6 @@ function toInviteRef(rawInvite: unknown, index: number): InviteRef {
   };
 }
 
-function extractRawInviteList(parsed: unknown): unknown[] | null {
-  if (Array.isArray(parsed)) return parsed;
-  const parsedObj = asRecord(parsed);
-  if (!parsedObj) return null;
-
-  const commonKeys = ["invites", "invitations", "items", "results"];
-  for (const key of commonKeys) {
-    const value = parsedObj[key];
-    if (Array.isArray(value)) return value;
-  }
-
-  const arrayValues = Object.values(parsedObj).filter((value) => Array.isArray(value));
-  if (arrayValues.length === 1) {
-    return arrayValues[0] as unknown[];
-  }
-
-  return null;
-}
-
 export const listInvitesInputSchema = z
   .object({
     pageSize: z
@@ -102,7 +72,6 @@ export const listInvitesInputSchema = z
   .default({});
 
 const inviteTokenInput = z.string().min(1).max(4096).describe("Invitation token");
-const confirmInput = z.boolean().optional().describe("Must be true to execute the write operation");
 
 export const inviteAcceptInputSchema = z.object({
   inviteToken: inviteTokenInput,
@@ -131,25 +100,15 @@ export async function listInvitesHandler(
     return asTextContent(asJsonTextOrRaw(stdout));
   }
 
-  const rawInvites = extractRawInviteList(parsed);
+  const rawInvites = extractArrayFromParsed(parsed, ["invites", "invitations", "items", "results"]);
   if (!rawInvites) {
     return asTextContent(asJsonTextOrRaw(stdout));
   }
   const refs = rawInvites.map((invite, index) => toInviteRef(invite, index));
-
-  const start = parseCursor(cursor);
-  const size = pageSize ?? DEFAULT_INVITE_PAGE_SIZE;
-  const end = start + size;
-  const items = refs.slice(start, end);
-  const nextCursor = end < refs.length ? String(end) : null;
+  const page = paginateRefs(refs, cursor, pageSize, DEFAULT_INVITE_PAGE_SIZE);
 
   const structuredContent = {
-    items,
-    pageSize: size,
-    cursor: String(start),
-    returned: items.length,
-    total: refs.length,
-    nextCursor,
+    ...page,
   };
 
   return {
@@ -164,8 +123,7 @@ export async function inviteAcceptHandler(
 ) {
   requireWriteGate(confirm);
   const { stdout, stderr } = await passCli(["invite", "accept", "--invite-token", inviteToken]);
-  const out = joinStdoutStderr(stdout, stderr);
-  return asTextContent(out || "OK");
+  return asWriteResult(stdout, stderr);
 }
 
 export async function inviteRejectHandler(
@@ -174,6 +132,5 @@ export async function inviteRejectHandler(
 ) {
   requireWriteGate(confirm);
   const { stdout, stderr } = await passCli(["invite", "reject", "--invite-token", inviteToken]);
-  const out = joinStdoutStderr(stdout, stderr);
-  return asTextContent(out || "OK");
+  return asWriteResult(stdout, stderr);
 }

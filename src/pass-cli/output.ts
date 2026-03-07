@@ -16,3 +16,8 @@ export function asJsonTextOrRaw(text: string): string {
     return trimmed;
   }
 }
+
+export function asWriteResult(stdout: string, stderr: string) {
+  const out = joinStdoutStderr(stdout, stderr);
+  return asTextContent(out || "OK");
+}

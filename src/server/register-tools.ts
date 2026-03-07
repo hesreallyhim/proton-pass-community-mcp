@@ -10,8 +10,6 @@ import {
   createCreditCardItemInputSchema,
   createCustomItemHandler,
   createCustomItemInputSchema,
-  downloadItemAttachmentHandler,
-  downloadItemAttachmentInputSchema,
   createIdentityItemHandler,
   createIdentityItemInputSchema,
   createItemAliasHandler,
@@ -20,34 +18,36 @@ import {
   createLoginItemFromTemplateInputSchema,
   createLoginItemHandler,
   createLoginItemInputSchema,
-  moveItemHandler,
-  moveItemInputSchema,
   createNoteItemHandler,
   createNoteItemInputSchema,
-  trashItemHandler,
-  trashItemInputSchema,
-  untrashItemHandler,
-  untrashItemInputSchema,
   createWifiItemHandler,
   createWifiItemInputSchema,
   deleteItemHandler,
   deleteItemInputSchema,
+  downloadItemAttachmentHandler,
+  downloadItemAttachmentInputSchema,
   itemTotpHandler,
   itemTotpInputSchema,
   listItemMembersHandler,
   listItemMembersInputSchema,
   listItemsHandler,
   listItemsInputSchema,
+  moveItemHandler,
+  moveItemInputSchema,
   removeItemMemberHandler,
   removeItemMemberInputSchema,
   searchItemsHandler,
   searchItemsInputSchema,
   shareItemHandler,
   shareItemInputSchema,
-  updateItemMemberHandler,
-  updateItemMemberInputSchema,
+  trashItemHandler,
+  trashItemInputSchema,
+  untrashItemHandler,
+  untrashItemInputSchema,
   updateItemHandler,
   updateItemInputSchema,
+  updateItemMemberHandler,
+  updateItemMemberInputSchema,
   viewItemHandler,
   viewItemInputSchema,
 } from "../tools/item.js";
@@ -93,449 +93,393 @@ import {
   listVaultsInputSchema,
   removeVaultMemberHandler,
   removeVaultMemberInputSchema,
-  updateVaultMemberHandler,
-  updateVaultMemberInputSchema,
-  updateVaultHandler,
-  updateVaultInputSchema,
   shareVaultHandler,
   shareVaultInputSchema,
   transferVaultHandler,
   transferVaultInputSchema,
+  updateVaultHandler,
+  updateVaultInputSchema,
+  updateVaultMemberHandler,
+  updateVaultMemberInputSchema,
 } from "../tools/vault.js";
+
+type ToolDefinition =
+  | {
+      kind: "no-input";
+      name: string;
+      description: string;
+      handler: () => Promise<any>;
+      auth?: boolean;
+    }
+  | {
+      kind: "input";
+      name: string;
+      description: string;
+      inputSchema: any;
+      handler: (input: any) => Promise<any>;
+      auth?: boolean;
+    };
+
+function registerToolDefinition(server: McpServer, tool: ToolDefinition): void {
+  if (tool.kind === "input") {
+    const handler = tool.auth === false ? tool.handler : withAuthErrorHandling(tool.handler);
+    server.registerTool(
+      tool.name,
+      { description: tool.description, inputSchema: tool.inputSchema as any },
+      handler as any,
+    );
+    return;
+  }
+
+  const handler = tool.auth === false ? tool.handler : withAuthErrorHandling(tool.handler);
+  server.registerTool(tool.name, { description: tool.description }, handler as any);
+}
 
 export function registerTools(
   server: McpServer,
   passCli: PassCliRunner,
   versionPolicy: PassCliVersionPolicy = {},
 ) {
-  server.registerTool(
-    "view_session_info",
+  const tools: ToolDefinition[] = [
     {
+      kind: "no-input",
+      name: "view_session_info",
       description: "View current Proton Pass session/account summary from pass-cli info.",
+      handler: () => viewSessionInfoHandler(passCli),
     },
-    withAuthErrorHandling(async () => viewSessionInfoHandler(passCli)),
-  );
-
-  server.registerTool(
-    "check_status",
     {
+      kind: "no-input",
+      name: "check_status",
       description:
         "Run preflight checks for connectivity/authentication and CLI version compatibility.",
+      handler: () => checkStatusHandler(passCli, versionPolicy),
+      auth: false,
     },
-    async () => checkStatusHandler(passCli, versionPolicy),
-  );
-
-  server.registerTool(
-    "support",
     {
+      kind: "no-input",
+      name: "support",
       description: "Display Proton Pass CLI support guidance text.",
+      handler: () => supportHandler(passCli),
     },
-    withAuthErrorHandling(async () => supportHandler(passCli)),
-  );
-
-  server.registerTool(
-    "inject",
     {
+      kind: "input",
+      name: "inject",
       description: "Inject secrets from Proton Pass references into a template file.",
       inputSchema: injectInputSchema,
+      handler: (input) => injectHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => injectHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "run",
     {
+      kind: "input",
+      name: "run",
       description: "Run a command with Proton Pass secret references resolved in environment.",
       inputSchema: runInputSchema,
+      handler: (input) => runHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => runHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "view_user_info",
     {
+      kind: "input",
+      name: "view_user_info",
       description: "View Proton user profile/account details from pass-cli user info.",
       inputSchema: viewUserInfoInputSchema,
+      handler: (input) => viewUserInfoHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => viewUserInfoHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "list_vaults",
     {
+      kind: "input",
+      name: "list_vaults",
       description: "List vaults accessible to the current authenticated user.",
       inputSchema: listVaultsInputSchema,
+      handler: (input) => listVaultsHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => listVaultsHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "create_vault",
     {
+      kind: "input",
+      name: "create_vault",
       description: "Create a new vault.",
       inputSchema: createVaultInputSchema,
+      handler: (input) => createVaultHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => createVaultHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "update_vault",
     {
+      kind: "input",
+      name: "update_vault",
       description: "Update a vault by share ID or vault name.",
       inputSchema: updateVaultInputSchema,
+      handler: (input) => updateVaultHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => updateVaultHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "share_vault",
     {
+      kind: "input",
+      name: "share_vault",
       description: "Share a vault with a user.",
       inputSchema: shareVaultInputSchema,
+      handler: (input) => shareVaultHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => shareVaultHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "transfer_vault",
     {
+      kind: "input",
+      name: "transfer_vault",
       description: "Transfer vault ownership to a member.",
       inputSchema: transferVaultInputSchema,
+      handler: (input) => transferVaultHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => transferVaultHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "delete_vault",
     {
+      kind: "input",
+      name: "delete_vault",
       description: "Delete a vault by share ID or vault name.",
       inputSchema: deleteVaultInputSchema,
+      handler: (input) => deleteVaultHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => deleteVaultHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "list_shares",
     {
+      kind: "input",
+      name: "list_shares",
       description: "List shares accessible to the current authenticated user.",
       inputSchema: listSharesInputSchema,
+      handler: (input) => listSharesHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => listSharesHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "list_invites",
     {
+      kind: "input",
+      name: "list_invites",
       description: "List pending invitations accessible to the current authenticated user.",
       inputSchema: listInvitesInputSchema,
+      handler: (input) => listInvitesHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => listInvitesHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "accept_invite",
     {
+      kind: "input",
+      name: "accept_invite",
       description: "Accept an invitation token.",
       inputSchema: inviteAcceptInputSchema,
+      handler: (input) => inviteAcceptHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => inviteAcceptHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "reject_invite",
     {
+      kind: "input",
+      name: "reject_invite",
       description: "Reject an invitation token.",
       inputSchema: inviteRejectInputSchema,
+      handler: (input) => inviteRejectHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => inviteRejectHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "view_settings",
     {
+      kind: "no-input",
+      name: "view_settings",
       description: "View current Proton Pass CLI settings.",
+      handler: () => viewSettingsHandler(passCli),
     },
-    withAuthErrorHandling(async () => viewSettingsHandler(passCli)),
-  );
-
-  server.registerTool(
-    "set_default_vault",
     {
+      kind: "input",
+      name: "set_default_vault",
       description: "Set default vault by share ID or vault name.",
       inputSchema: settingsSetDefaultVaultInputSchema,
+      handler: (input) => settingsSetDefaultVaultHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => settingsSetDefaultVaultHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "unset_default_vault",
     {
+      kind: "input",
+      name: "unset_default_vault",
       description: "Unset default vault setting.",
       inputSchema: settingsUnsetDefaultVaultInputSchema,
+      handler: (input) => settingsUnsetDefaultVaultHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => settingsUnsetDefaultVaultHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "generate_random_password",
     {
+      kind: "input",
+      name: "generate_random_password",
       description: "Generate a random password.",
       inputSchema: generateRandomPasswordInputSchema,
+      handler: (input) => generateRandomPasswordHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => generateRandomPasswordHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "generate_passphrase",
     {
+      kind: "input",
+      name: "generate_passphrase",
       description: "Generate a passphrase.",
       inputSchema: generatePassphraseInputSchema,
+      handler: (input) => generatePassphraseHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => generatePassphraseHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "score_password",
     {
+      kind: "input",
+      name: "score_password",
       description: "Score password strength.",
       inputSchema: scorePasswordInputSchema,
+      handler: (input) => scorePasswordHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => scorePasswordHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "generate_totp",
     {
+      kind: "input",
+      name: "generate_totp",
       description: "Generate a TOTP token from a secret or otpauth URI.",
       inputSchema: generateTotpInputSchema,
+      handler: (input) => generateTotpHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => generateTotpHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "list_vault_members",
     {
+      kind: "input",
+      name: "list_vault_members",
       description: "List members for a vault by share ID or vault name.",
       inputSchema: listVaultMembersInputSchema,
+      handler: (input) => listVaultMembersHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => listVaultMembersHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "update_vault_member",
     {
+      kind: "input",
+      name: "update_vault_member",
       description: "Update a vault member role.",
       inputSchema: updateVaultMemberInputSchema,
+      handler: (input) => updateVaultMemberHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => updateVaultMemberHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "remove_vault_member",
     {
+      kind: "input",
+      name: "remove_vault_member",
       description: "Remove a member from a vault.",
       inputSchema: removeVaultMemberInputSchema,
+      handler: (input) => removeVaultMemberHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => removeVaultMemberHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "list_items",
     {
+      kind: "input",
+      name: "list_items",
       description: "List items for a vault or share with MCP pagination support for JSON output.",
       inputSchema: listItemsInputSchema,
+      handler: (input) => listItemsHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => listItemsHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "view_item",
     {
+      kind: "input",
+      name: "view_item",
       description:
         "View a specific item by URI or selectors, optionally returning a specific field.",
       inputSchema: viewItemInputSchema,
+      handler: (input) => viewItemHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => viewItemHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "generate_item_totp",
     {
+      kind: "input",
+      name: "generate_item_totp",
       description:
         "Generate TOTP code(s) for an item by URI or selectors, optionally targeting a specific field.",
       inputSchema: itemTotpInputSchema,
+      handler: (input) => itemTotpHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => itemTotpHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "create_login_item",
     {
+      kind: "input",
+      name: "create_login_item",
       description: "Create a login item in a vault or share.",
       inputSchema: createLoginItemInputSchema,
+      handler: (input) => createLoginItemHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => createLoginItemHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "create_login_item_from_template",
     {
+      kind: "input",
+      name: "create_login_item_from_template",
       description: "Create a login item from template JSON.",
       inputSchema: createLoginItemFromTemplateInputSchema,
+      handler: (input) => createLoginItemFromTemplateHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => createLoginItemFromTemplateHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "create_note_item",
     {
+      kind: "input",
+      name: "create_note_item",
       description: "Create a note item in a vault or share.",
       inputSchema: createNoteItemInputSchema,
+      handler: (input) => createNoteItemHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => createNoteItemHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "create_credit_card_item",
     {
+      kind: "input",
+      name: "create_credit_card_item",
       description: "Create a credit card item in a vault or share.",
       inputSchema: createCreditCardItemInputSchema,
+      handler: (input) => createCreditCardItemHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => createCreditCardItemHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "create_wifi_item",
     {
+      kind: "input",
+      name: "create_wifi_item",
       description: "Create a WiFi item in a vault or share.",
       inputSchema: createWifiItemInputSchema,
+      handler: (input) => createWifiItemHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => createWifiItemHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "create_custom_item",
     {
+      kind: "input",
+      name: "create_custom_item",
       description: "Create a custom item from template payload in a vault or share.",
       inputSchema: createCustomItemInputSchema,
+      handler: (input) => createCustomItemHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => createCustomItemHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "create_identity_item",
     {
+      kind: "input",
+      name: "create_identity_item",
       description: "Create an identity item from template payload in a vault or share.",
       inputSchema: createIdentityItemInputSchema,
+      handler: (input) => createIdentityItemHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => createIdentityItemHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "move_item",
     {
+      kind: "input",
+      name: "move_item",
       description: "Move an item from one vault to another.",
       inputSchema: moveItemInputSchema,
+      handler: (input) => moveItemHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => moveItemHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "update_item",
     {
+      kind: "input",
+      name: "update_item",
       description: "Update an item using selectors and field assignments.",
       inputSchema: updateItemInputSchema,
+      handler: (input) => updateItemHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => updateItemHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "trash_item",
     {
+      kind: "input",
+      name: "trash_item",
       description: "Move an item to trash by selectors.",
       inputSchema: trashItemInputSchema,
+      handler: (input) => trashItemHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => trashItemHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "untrash_item",
     {
+      kind: "input",
+      name: "untrash_item",
       description: "Restore an item from trash by selectors.",
       inputSchema: untrashItemInputSchema,
+      handler: (input) => untrashItemHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => untrashItemHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "delete_item",
     {
+      kind: "input",
+      name: "delete_item",
       description: "Delete an item by share ID and item ID.",
       inputSchema: deleteItemInputSchema,
+      handler: (input) => deleteItemHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => deleteItemHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "download_item_attachment",
     {
+      kind: "input",
+      name: "download_item_attachment",
       description: "Download an item attachment to a local path.",
       inputSchema: downloadItemAttachmentInputSchema,
+      handler: (input) => downloadItemAttachmentHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => downloadItemAttachmentHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "create_item_alias",
     {
+      kind: "input",
+      name: "create_item_alias",
       description: "Create an email alias item.",
       inputSchema: createItemAliasInputSchema,
+      handler: (input) => createItemAliasHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => createItemAliasHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "list_item_members",
     {
+      kind: "input",
+      name: "list_item_members",
       description: "List item members.",
       inputSchema: listItemMembersInputSchema,
+      handler: (input) => listItemMembersHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => listItemMembersHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "update_item_member",
     {
+      kind: "input",
+      name: "update_item_member",
       description: "Update an item member role.",
       inputSchema: updateItemMemberInputSchema,
+      handler: (input) => updateItemMemberHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => updateItemMemberHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "remove_item_member",
     {
+      kind: "input",
+      name: "remove_item_member",
       description: "Remove an item member.",
       inputSchema: removeItemMemberInputSchema,
+      handler: (input) => removeItemMemberHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => removeItemMemberHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "share_item",
     {
+      kind: "input",
+      name: "share_item",
       description: "Share an item with a user.",
       inputSchema: shareItemInputSchema,
+      handler: (input) => shareItemHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => shareItemHandler(passCli, input)),
-  );
-
-  server.registerTool(
-    "search_items",
     {
+      kind: "input",
+      name: "search_items",
       description: "Search items by title with MCP pagination support for JSON output.",
       inputSchema: searchItemsInputSchema,
+      handler: (input) => searchItemsHandler(passCli, input),
     },
-    withAuthErrorHandling(async (input) => searchItemsHandler(passCli, input)),
-  );
+  ];
+
+  for (const tool of tools) {
+    registerToolDefinition(server, tool);
+  }
 }
