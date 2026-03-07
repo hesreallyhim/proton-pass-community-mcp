@@ -56,7 +56,7 @@ Status: Partially complete; sufficient for current release scope.
 
 Completed:
 
-1. Write gate + explicit confirmation model captured in `docs/TOOL_SCHEMA_PLAN.md` and enforced in tests (`test/server.test.ts`).
+1. Write gate + explicit confirmation model captured in `docs/TOOL_SCHEMA_PLAN.md` and enforced in the contract test suite (`test/server/*.test.ts`).
 2. `ItemRef` contract set to reference-only list/search output (no nested secret-bearing fields).
 
 Remaining:
