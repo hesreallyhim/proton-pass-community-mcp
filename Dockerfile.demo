@@ -1,0 +1,18 @@
+FROM node:24-bookworm-slim
+
+ARG USERNAME=demo
+ARG UID=1000
+ARG GID=1000
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends bash ca-certificates git \
+  && rm -rf /var/lib/apt/lists/*
+
+RUN groupadd --gid "${GID}" "${USERNAME}" \
+  && useradd --uid "${UID}" --gid "${GID}" --create-home --shell /bin/bash "${USERNAME}"
+
+USER "${USERNAME}"
+WORKDIR /workspace/project
+
+# Entry command is intentionally lightweight. Source is bind-mounted at runtime.
+CMD ["bash"]

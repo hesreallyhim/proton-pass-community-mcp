@@ -34,6 +34,7 @@ Disposable test account workflow:
 - Shorthand aliases:
   - `scripts/pass ...` (shell wrapper)
   - `npm run pass -- ...` (npm script alias)
+- For anonymized demo sessions, use `npm run demo:shell` (container path: `/workspace/project`).
 - `scripts/pass-dev.sh` defaults to `PROTON_PASS_KEY_PROVIDER=fs` and avoids keyring/keychain access unless explicitly overridden.
 - Use `scripts/pass-dev-preflight.sh` to assert the authenticated account before integration/destructive testing.
 - Full local + CI workflow is documented in `docs/testing/TEST_ACCOUNT_WORKFLOW.md`.

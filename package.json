@@ -35,6 +35,7 @@
     "coverage": "vitest run --coverage",
     "mcp:inspect": "npm run build && mcp-inspector --transport stdio -- node dist/index.js",
     "mcp:inspect:smoke": "npm run build && node scripts/inspector-smoke.mjs",
+    "demo:shell": "scripts/demo-shell.sh",
     "pass": "scripts/pass",
     "pass:dev": "scripts/pass-dev.sh",
     "pass:dev:login:web": "scripts/pass-dev.sh login",
