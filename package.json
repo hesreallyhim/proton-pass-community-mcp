@@ -46,6 +46,9 @@
     "pass:dev:template:probe": "node scripts/probe-item-create-template-contract.mjs --run",
     "pass:dev:template:probe:additional-properties": "node scripts/probe-item-create-template-additional-properties.mjs --run",
     "docs:sync:pass-cli": "scripts/sync-pass-cli-docs.sh",
+    "analyze:loc": "cloc --json --include-ext=ts,tsx,js,mjs,cjs src test",
+    "analyze:complexity": "node scripts/complexity-report.mjs",
+    "analyze:complexity:json": "node scripts/complexity-report.mjs --json-out docs/testing/complexity-report.json",
     "check:upstream:pass-cli": "node scripts/check-pass-cli-upstream.mjs",
     "check": "npm run lint && npm run format:check && npm run typecheck && npm run coverage",
     "prepare": "husky"
@@ -61,6 +64,7 @@
     "@eslint/js": "^10.0.1",
     "@modelcontextprotocol/inspector": "^0.21.1",
     "@vitest/coverage-v8": "^4.0.18",
+    "cloc": "^2.6.0-cloc",
     "eslint": "^10.0.2",
     "globals": "^17.4.0",
     "husky": "^9.1.7",
