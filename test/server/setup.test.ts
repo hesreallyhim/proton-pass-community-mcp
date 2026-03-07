@@ -83,7 +83,6 @@ describe("server setup", () => {
 
     await tools.view_session_info.handler();
     await tools.check_status.handler();
-    await tools.support.handler();
     await tools.inject.handler({ inFile: "template.env", confirm: true });
     await tools.run.handler({ command: ["echo", "hello"], confirm: true });
     await tools.view_user_info.handler({ output: "json" });
@@ -266,7 +265,6 @@ describe("server setup", () => {
     expect(tools.generate_passphrase).toBeDefined();
     expect(tools.score_password).toBeDefined();
     expect(tools.generate_totp).toBeDefined();
-    expect(tools.support).toBeDefined();
     expect(tools.inject).toBeDefined();
     expect(tools.run).toBeDefined();
     expect(tools.update_vault_member).toBeDefined();
@@ -293,7 +291,7 @@ describe("server setup", () => {
     expect(tools.remove_item_member).toBeDefined();
     expect(tools.create_item_alias).toBeDefined();
 
-    expect(runner).toHaveBeenCalledTimes(49);
+    expect(runner).toHaveBeenCalledTimes(48);
   });
 
   it("registered tool handlers return standardized auth error payloads", async () => {

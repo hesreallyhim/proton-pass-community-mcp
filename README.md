@@ -20,7 +20,6 @@ As this project is in its initial stages, it exposes the following tools:
 | `view_session_info`               | Session/account status from `pass-cli info`      |
 | `view_user_info`                  | User account details from `pass-cli user info`   |
 | `check_status`                    | Check user authentication status and CLI version |
-| `support`                         | Show Proton Pass CLI support guidance            |
 | `inject`                          | Inject secrets into template files               |
 | `run`                             | Run commands with secret references resolved     |
 | `list_vaults`                     | List vaults                                      |

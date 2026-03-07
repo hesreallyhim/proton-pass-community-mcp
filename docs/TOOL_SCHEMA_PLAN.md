@@ -283,7 +283,7 @@ Input summary convention:
 | `view_session_info` | `pass-cli info`                        | Implemented                | `output?`                                              | Account/session info                                    |
 | `view_user_info`    | `pass-cli user info`                   | Implemented                | `output?`                                              | User profile                                            |
 | `update`            | `pass-cli update`                      | Out of Scope (Out-of-Band) | n/a                                                    | n/a                                                     |
-| `support`           | `pass-cli support`                     | Implemented                | none                                                   | Support guidance text                                   |
+| `support`           | `pass-cli support`                     | Out of Scope (Out-of-Band) | n/a                                                    | n/a                                                     |
 | `inject`            | `pass-cli inject`                      | Implemented                | `inFile`, `outFile?`, `fileMode?`, `force?`, `confirm` | Output path/status                                      |
 | `run`               | `pass-cli run`                         | Implemented                | `command[]`, `envFile[]?`, `noMasking?`, `confirm`     | Exit code/stdout/stderr summary                         |
 
