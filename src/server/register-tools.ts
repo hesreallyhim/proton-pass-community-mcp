@@ -103,22 +103,43 @@ import {
   updateVaultMemberInputSchema,
 } from "../tools/vault.js";
 
-type ToolDefinition =
-  | {
-      kind: "no-input";
-      name: string;
-      description: string;
-      handler: () => Promise<any>;
-      auth?: boolean;
-    }
-  | {
-      kind: "input";
-      name: string;
-      description: string;
-      inputSchema: any;
-      handler: (input: any) => Promise<any>;
-      auth?: boolean;
-    };
+type NoInputTool = {
+  kind: "no-input";
+  name: string;
+  description: string;
+  handler: () => Promise<any>;
+  auth?: boolean;
+};
+
+type InputTool = {
+  kind: "input";
+  name: string;
+  description: string;
+  inputSchema: any;
+  handler: (input: any) => Promise<any>;
+  auth?: boolean;
+};
+
+type ToolDefinition = NoInputTool | InputTool;
+
+function noInputTool(
+  name: string,
+  description: string,
+  handler: () => Promise<any>,
+  auth = true,
+): NoInputTool {
+  return { kind: "no-input", name, description, handler, auth };
+}
+
+function inputTool(
+  name: string,
+  description: string,
+  inputSchema: any,
+  handler: (input: any) => Promise<any>,
+  auth = true,
+): InputTool {
+  return { kind: "input", name, description, inputSchema, handler, auth };
+}
 
 function registerToolDefinition(server: McpServer, tool: ToolDefinition): void {
   if (tool.kind === "input") {
@@ -141,342 +162,263 @@ export function registerTools(
   versionPolicy: PassCliVersionPolicy = {},
 ) {
   const tools: ToolDefinition[] = [
-    {
-      kind: "no-input",
-      name: "view_session_info",
-      description: "View current Proton Pass session/account summary from pass-cli info.",
-      handler: () => viewSessionInfoHandler(passCli),
-    },
-    {
-      kind: "no-input",
-      name: "check_status",
-      description:
-        "Run preflight checks for connectivity/authentication and CLI version compatibility.",
-      handler: () => checkStatusHandler(passCli, versionPolicy),
-      auth: false,
-    },
-    {
-      kind: "no-input",
-      name: "support",
-      description: "Display Proton Pass CLI support guidance text.",
-      handler: () => supportHandler(passCli),
-    },
-    {
-      kind: "input",
-      name: "inject",
-      description: "Inject secrets from Proton Pass references into a template file.",
-      inputSchema: injectInputSchema,
-      handler: (input) => injectHandler(passCli, input),
-    },
-    {
-      kind: "input",
-      name: "run",
-      description: "Run a command with Proton Pass secret references resolved in environment.",
-      inputSchema: runInputSchema,
-      handler: (input) => runHandler(passCli, input),
-    },
-    {
-      kind: "input",
-      name: "view_user_info",
-      description: "View Proton user profile/account details from pass-cli user info.",
-      inputSchema: viewUserInfoInputSchema,
-      handler: (input) => viewUserInfoHandler(passCli, input),
-    },
-    {
-      kind: "input",
-      name: "list_vaults",
-      description: "List vaults accessible to the current authenticated user.",
-      inputSchema: listVaultsInputSchema,
-      handler: (input) => listVaultsHandler(passCli, input),
-    },
-    {
-      kind: "input",
-      name: "create_vault",
-      description: "Create a new vault.",
-      inputSchema: createVaultInputSchema,
-      handler: (input) => createVaultHandler(passCli, input),
-    },
-    {
-      kind: "input",
-      name: "update_vault",
-      description: "Update a vault by share ID or vault name.",
-      inputSchema: updateVaultInputSchema,
-      handler: (input) => updateVaultHandler(passCli, input),
-    },
-    {
-      kind: "input",
-      name: "share_vault",
-      description: "Share a vault with a user.",
-      inputSchema: shareVaultInputSchema,
-      handler: (input) => shareVaultHandler(passCli, input),
-    },
-    {
-      kind: "input",
-      name: "transfer_vault",
-      description: "Transfer vault ownership to a member.",
-      inputSchema: transferVaultInputSchema,
-      handler: (input) => transferVaultHandler(passCli, input),
-    },
-    {
-      kind: "input",
-      name: "delete_vault",
-      description: "Delete a vault by share ID or vault name.",
-      inputSchema: deleteVaultInputSchema,
-      handler: (input) => deleteVaultHandler(passCli, input),
-    },
-    {
-      kind: "input",
-      name: "list_shares",
-      description: "List shares accessible to the current authenticated user.",
-      inputSchema: listSharesInputSchema,
-      handler: (input) => listSharesHandler(passCli, input),
-    },
-    {
-      kind: "input",
-      name: "list_invites",
-      description: "List pending invitations accessible to the current authenticated user.",
-      inputSchema: listInvitesInputSchema,
-      handler: (input) => listInvitesHandler(passCli, input),
-    },
-    {
-      kind: "input",
-      name: "accept_invite",
-      description: "Accept an invitation token.",
-      inputSchema: inviteAcceptInputSchema,
-      handler: (input) => inviteAcceptHandler(passCli, input),
-    },
-    {
-      kind: "input",
-      name: "reject_invite",
-      description: "Reject an invitation token.",
-      inputSchema: inviteRejectInputSchema,
-      handler: (input) => inviteRejectHandler(passCli, input),
-    },
-    {
-      kind: "no-input",
-      name: "view_settings",
-      description: "View current Proton Pass CLI settings.",
-      handler: () => viewSettingsHandler(passCli),
-    },
-    {
-      kind: "input",
-      name: "set_default_vault",
-      description: "Set default vault by share ID or vault name.",
-      inputSchema: settingsSetDefaultVaultInputSchema,
-      handler: (input) => settingsSetDefaultVaultHandler(passCli, input),
-    },
-    {
-      kind: "input",
-      name: "unset_default_vault",
-      description: "Unset default vault setting.",
-      inputSchema: settingsUnsetDefaultVaultInputSchema,
-      handler: (input) => settingsUnsetDefaultVaultHandler(passCli, input),
-    },
-    {
-      kind: "input",
-      name: "generate_random_password",
-      description: "Generate a random password.",
-      inputSchema: generateRandomPasswordInputSchema,
-      handler: (input) => generateRandomPasswordHandler(passCli, input),
-    },
-    {
-      kind: "input",
-      name: "generate_passphrase",
-      description: "Generate a passphrase.",
-      inputSchema: generatePassphraseInputSchema,
-      handler: (input) => generatePassphraseHandler(passCli, input),
-    },
-    {
-      kind: "input",
-      name: "score_password",
-      description: "Score password strength.",
-      inputSchema: scorePasswordInputSchema,
-      handler: (input) => scorePasswordHandler(passCli, input),
-    },
-    {
-      kind: "input",
-      name: "generate_totp",
-      description: "Generate a TOTP token from a secret or otpauth URI.",
-      inputSchema: generateTotpInputSchema,
-      handler: (input) => generateTotpHandler(passCli, input),
-    },
-    {
-      kind: "input",
-      name: "list_vault_members",
-      description: "List members for a vault by share ID or vault name.",
-      inputSchema: listVaultMembersInputSchema,
-      handler: (input) => listVaultMembersHandler(passCli, input),
-    },
-    {
-      kind: "input",
-      name: "update_vault_member",
-      description: "Update a vault member role.",
-      inputSchema: updateVaultMemberInputSchema,
-      handler: (input) => updateVaultMemberHandler(passCli, input),
-    },
-    {
-      kind: "input",
-      name: "remove_vault_member",
-      description: "Remove a member from a vault.",
-      inputSchema: removeVaultMemberInputSchema,
-      handler: (input) => removeVaultMemberHandler(passCli, input),
-    },
-    {
-      kind: "input",
-      name: "list_items",
-      description: "List items for a vault or share with MCP pagination support for JSON output.",
-      inputSchema: listItemsInputSchema,
-      handler: (input) => listItemsHandler(passCli, input),
-    },
-    {
-      kind: "input",
-      name: "view_item",
-      description:
-        "View a specific item by URI or selectors, optionally returning a specific field.",
-      inputSchema: viewItemInputSchema,
-      handler: (input) => viewItemHandler(passCli, input),
-    },
-    {
-      kind: "input",
-      name: "generate_item_totp",
-      description:
-        "Generate TOTP code(s) for an item by URI or selectors, optionally targeting a specific field.",
-      inputSchema: itemTotpInputSchema,
-      handler: (input) => itemTotpHandler(passCli, input),
-    },
-    {
-      kind: "input",
-      name: "create_login_item",
-      description: "Create a login item in a vault or share.",
-      inputSchema: createLoginItemInputSchema,
-      handler: (input) => createLoginItemHandler(passCli, input),
-    },
-    {
-      kind: "input",
-      name: "create_login_item_from_template",
-      description: "Create a login item from template JSON.",
-      inputSchema: createLoginItemFromTemplateInputSchema,
-      handler: (input) => createLoginItemFromTemplateHandler(passCli, input),
-    },
-    {
-      kind: "input",
-      name: "create_note_item",
-      description: "Create a note item in a vault or share.",
-      inputSchema: createNoteItemInputSchema,
-      handler: (input) => createNoteItemHandler(passCli, input),
-    },
-    {
-      kind: "input",
-      name: "create_credit_card_item",
-      description: "Create a credit card item in a vault or share.",
-      inputSchema: createCreditCardItemInputSchema,
-      handler: (input) => createCreditCardItemHandler(passCli, input),
-    },
-    {
-      kind: "input",
-      name: "create_wifi_item",
-      description: "Create a WiFi item in a vault or share.",
-      inputSchema: createWifiItemInputSchema,
-      handler: (input) => createWifiItemHandler(passCli, input),
-    },
-    {
-      kind: "input",
-      name: "create_custom_item",
-      description: "Create a custom item from template payload in a vault or share.",
-      inputSchema: createCustomItemInputSchema,
-      handler: (input) => createCustomItemHandler(passCli, input),
-    },
-    {
-      kind: "input",
-      name: "create_identity_item",
-      description: "Create an identity item from template payload in a vault or share.",
-      inputSchema: createIdentityItemInputSchema,
-      handler: (input) => createIdentityItemHandler(passCli, input),
-    },
-    {
-      kind: "input",
-      name: "move_item",
-      description: "Move an item from one vault to another.",
-      inputSchema: moveItemInputSchema,
-      handler: (input) => moveItemHandler(passCli, input),
-    },
-    {
-      kind: "input",
-      name: "update_item",
-      description: "Update an item using selectors and field assignments.",
-      inputSchema: updateItemInputSchema,
-      handler: (input) => updateItemHandler(passCli, input),
-    },
-    {
-      kind: "input",
-      name: "trash_item",
-      description: "Move an item to trash by selectors.",
-      inputSchema: trashItemInputSchema,
-      handler: (input) => trashItemHandler(passCli, input),
-    },
-    {
-      kind: "input",
-      name: "untrash_item",
-      description: "Restore an item from trash by selectors.",
-      inputSchema: untrashItemInputSchema,
-      handler: (input) => untrashItemHandler(passCli, input),
-    },
-    {
-      kind: "input",
-      name: "delete_item",
-      description: "Delete an item by share ID and item ID.",
-      inputSchema: deleteItemInputSchema,
-      handler: (input) => deleteItemHandler(passCli, input),
-    },
-    {
-      kind: "input",
-      name: "download_item_attachment",
-      description: "Download an item attachment to a local path.",
-      inputSchema: downloadItemAttachmentInputSchema,
-      handler: (input) => downloadItemAttachmentHandler(passCli, input),
-    },
-    {
-      kind: "input",
-      name: "create_item_alias",
-      description: "Create an email alias item.",
-      inputSchema: createItemAliasInputSchema,
-      handler: (input) => createItemAliasHandler(passCli, input),
-    },
-    {
-      kind: "input",
-      name: "list_item_members",
-      description: "List item members.",
-      inputSchema: listItemMembersInputSchema,
-      handler: (input) => listItemMembersHandler(passCli, input),
-    },
-    {
-      kind: "input",
-      name: "update_item_member",
-      description: "Update an item member role.",
-      inputSchema: updateItemMemberInputSchema,
-      handler: (input) => updateItemMemberHandler(passCli, input),
-    },
-    {
-      kind: "input",
-      name: "remove_item_member",
-      description: "Remove an item member.",
-      inputSchema: removeItemMemberInputSchema,
-      handler: (input) => removeItemMemberHandler(passCli, input),
-    },
-    {
-      kind: "input",
-      name: "share_item",
-      description: "Share an item with a user.",
-      inputSchema: shareItemInputSchema,
-      handler: (input) => shareItemHandler(passCli, input),
-    },
-    {
-      kind: "input",
-      name: "search_items",
-      description: "Search items by title with MCP pagination support for JSON output.",
-      inputSchema: searchItemsInputSchema,
-      handler: (input) => searchItemsHandler(passCli, input),
-    },
+    noInputTool(
+      "view_session_info",
+      "View current Proton Pass session/account summary from pass-cli info.",
+      () => viewSessionInfoHandler(passCli),
+    ),
+    noInputTool(
+      "check_status",
+      "Run preflight checks for connectivity/authentication and CLI version compatibility.",
+      () => checkStatusHandler(passCli, versionPolicy),
+      false,
+    ),
+    noInputTool("support", "Display Proton Pass CLI support guidance text.", () =>
+      supportHandler(passCli),
+    ),
+    inputTool(
+      "inject",
+      "Inject secrets from Proton Pass references into a template file.",
+      injectInputSchema,
+      (input) => injectHandler(passCli, input),
+    ),
+    inputTool(
+      "run",
+      "Run a command with Proton Pass secret references resolved in environment.",
+      runInputSchema,
+      (input) => runHandler(passCli, input),
+    ),
+    inputTool(
+      "view_user_info",
+      "View Proton user profile/account details from pass-cli user info.",
+      viewUserInfoInputSchema,
+      (input) => viewUserInfoHandler(passCli, input),
+    ),
+    inputTool(
+      "list_vaults",
+      "List vaults accessible to the current authenticated user.",
+      listVaultsInputSchema,
+      (input) => listVaultsHandler(passCli, input),
+    ),
+    inputTool("create_vault", "Create a new vault.", createVaultInputSchema, (input) =>
+      createVaultHandler(passCli, input),
+    ),
+    inputTool(
+      "update_vault",
+      "Update a vault by share ID or vault name.",
+      updateVaultInputSchema,
+      (input) => updateVaultHandler(passCli, input),
+    ),
+    inputTool("share_vault", "Share a vault with a user.", shareVaultInputSchema, (input) =>
+      shareVaultHandler(passCli, input),
+    ),
+    inputTool(
+      "transfer_vault",
+      "Transfer vault ownership to a member.",
+      transferVaultInputSchema,
+      (input) => transferVaultHandler(passCli, input),
+    ),
+    inputTool(
+      "delete_vault",
+      "Delete a vault by share ID or vault name.",
+      deleteVaultInputSchema,
+      (input) => deleteVaultHandler(passCli, input),
+    ),
+    inputTool(
+      "list_shares",
+      "List shares accessible to the current authenticated user.",
+      listSharesInputSchema,
+      (input) => listSharesHandler(passCli, input),
+    ),
+    inputTool(
+      "list_invites",
+      "List pending invitations accessible to the current authenticated user.",
+      listInvitesInputSchema,
+      (input) => listInvitesHandler(passCli, input),
+    ),
+    inputTool("accept_invite", "Accept an invitation token.", inviteAcceptInputSchema, (input) =>
+      inviteAcceptHandler(passCli, input),
+    ),
+    inputTool("reject_invite", "Reject an invitation token.", inviteRejectInputSchema, (input) =>
+      inviteRejectHandler(passCli, input),
+    ),
+    noInputTool("view_settings", "View current Proton Pass CLI settings.", () =>
+      viewSettingsHandler(passCli),
+    ),
+    inputTool(
+      "set_default_vault",
+      "Set default vault by share ID or vault name.",
+      settingsSetDefaultVaultInputSchema,
+      (input) => settingsSetDefaultVaultHandler(passCli, input),
+    ),
+    inputTool(
+      "unset_default_vault",
+      "Unset default vault setting.",
+      settingsUnsetDefaultVaultInputSchema,
+      (input) => settingsUnsetDefaultVaultHandler(passCli, input),
+    ),
+    inputTool(
+      "generate_random_password",
+      "Generate a random password.",
+      generateRandomPasswordInputSchema,
+      (input) => generateRandomPasswordHandler(passCli, input),
+    ),
+    inputTool(
+      "generate_passphrase",
+      "Generate a passphrase.",
+      generatePassphraseInputSchema,
+      (input) => generatePassphraseHandler(passCli, input),
+    ),
+    inputTool("score_password", "Score password strength.", scorePasswordInputSchema, (input) =>
+      scorePasswordHandler(passCli, input),
+    ),
+    inputTool(
+      "generate_totp",
+      "Generate a TOTP token from a secret or otpauth URI.",
+      generateTotpInputSchema,
+      (input) => generateTotpHandler(passCli, input),
+    ),
+    inputTool(
+      "list_vault_members",
+      "List members for a vault by share ID or vault name.",
+      listVaultMembersInputSchema,
+      (input) => listVaultMembersHandler(passCli, input),
+    ),
+    inputTool(
+      "update_vault_member",
+      "Update a vault member role.",
+      updateVaultMemberInputSchema,
+      (input) => updateVaultMemberHandler(passCli, input),
+    ),
+    inputTool(
+      "remove_vault_member",
+      "Remove a member from a vault.",
+      removeVaultMemberInputSchema,
+      (input) => removeVaultMemberHandler(passCli, input),
+    ),
+    inputTool(
+      "list_items",
+      "List items for a vault or share with MCP pagination support for JSON output.",
+      listItemsInputSchema,
+      (input) => listItemsHandler(passCli, input),
+    ),
+    inputTool(
+      "view_item",
+      "View a specific item by URI or selectors, optionally returning a specific field.",
+      viewItemInputSchema,
+      (input) => viewItemHandler(passCli, input),
+    ),
+    inputTool(
+      "generate_item_totp",
+      "Generate TOTP code(s) for an item by URI or selectors, optionally targeting a specific field.",
+      itemTotpInputSchema,
+      (input) => itemTotpHandler(passCli, input),
+    ),
+    inputTool(
+      "create_login_item",
+      "Create a login item in a vault or share.",
+      createLoginItemInputSchema,
+      (input) => createLoginItemHandler(passCli, input),
+    ),
+    inputTool(
+      "create_login_item_from_template",
+      "Create a login item from template JSON.",
+      createLoginItemFromTemplateInputSchema,
+      (input) => createLoginItemFromTemplateHandler(passCli, input),
+    ),
+    inputTool(
+      "create_note_item",
+      "Create a note item in a vault or share.",
+      createNoteItemInputSchema,
+      (input) => createNoteItemHandler(passCli, input),
+    ),
+    inputTool(
+      "create_credit_card_item",
+      "Create a credit card item in a vault or share.",
+      createCreditCardItemInputSchema,
+      (input) => createCreditCardItemHandler(passCli, input),
+    ),
+    inputTool(
+      "create_wifi_item",
+      "Create a WiFi item in a vault or share.",
+      createWifiItemInputSchema,
+      (input) => createWifiItemHandler(passCli, input),
+    ),
+    inputTool(
+      "create_custom_item",
+      "Create a custom item from template payload in a vault or share.",
+      createCustomItemInputSchema,
+      (input) => createCustomItemHandler(passCli, input),
+    ),
+    inputTool(
+      "create_identity_item",
+      "Create an identity item from template payload in a vault or share.",
+      createIdentityItemInputSchema,
+      (input) => createIdentityItemHandler(passCli, input),
+    ),
+    inputTool(
+      "move_item",
+      "Move an item from one vault to another.",
+      moveItemInputSchema,
+      (input) => moveItemHandler(passCli, input),
+    ),
+    inputTool(
+      "update_item",
+      "Update an item using selectors and field assignments.",
+      updateItemInputSchema,
+      (input) => updateItemHandler(passCli, input),
+    ),
+    inputTool("trash_item", "Move an item to trash by selectors.", trashItemInputSchema, (input) =>
+      trashItemHandler(passCli, input),
+    ),
+    inputTool(
+      "untrash_item",
+      "Restore an item from trash by selectors.",
+      untrashItemInputSchema,
+      (input) => untrashItemHandler(passCli, input),
+    ),
+    inputTool(
+      "delete_item",
+      "Delete an item by share ID and item ID.",
+      deleteItemInputSchema,
+      (input) => deleteItemHandler(passCli, input),
+    ),
+    inputTool(
+      "download_item_attachment",
+      "Download an item attachment to a local path.",
+      downloadItemAttachmentInputSchema,
+      (input) => downloadItemAttachmentHandler(passCli, input),
+    ),
+    inputTool(
+      "create_item_alias",
+      "Create an email alias item.",
+      createItemAliasInputSchema,
+      (input) => createItemAliasHandler(passCli, input),
+    ),
+    inputTool("list_item_members", "List item members.", listItemMembersInputSchema, (input) =>
+      listItemMembersHandler(passCli, input),
+    ),
+    inputTool(
+      "update_item_member",
+      "Update an item member role.",
+      updateItemMemberInputSchema,
+      (input) => updateItemMemberHandler(passCli, input),
+    ),
+    inputTool(
+      "remove_item_member",
+      "Remove an item member.",
+      removeItemMemberInputSchema,
+      (input) => removeItemMemberHandler(passCli, input),
+    ),
+    inputTool("share_item", "Share an item with a user.", shareItemInputSchema, (input) =>
+      shareItemHandler(passCli, input),
+    ),
+    inputTool(
+      "search_items",
+      "Search items by title with MCP pagination support for JSON output.",
+      searchItemsInputSchema,
+      (input) => searchItemsHandler(passCli, input),
+    ),
   ];
 
   for (const tool of tools) {
