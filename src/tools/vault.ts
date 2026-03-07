@@ -1,8 +1,11 @@
 import { z } from "zod";
 
-import { asJsonTextOrRaw, asTextContent, joinStdoutStderr } from "../pass-cli/output.js";
+import { asJsonTextOrRaw, asTextContent, asWriteResult } from "../pass-cli/output.js";
 import type { PassCliRunner } from "../pass-cli/runner.js";
 import { asRecord, firstString } from "./item-utils.js";
+import { extractArrayFromParsed, paginateRefs } from "./pagination.js";
+import { confirmInput } from "./schema-fragments.js";
+import { appendScopeArgs, scopeRefinement } from "./scope.js";
 import { requireWriteGate } from "./write-gate.js";
 
 const DEFAULT_VAULT_MEMBER_PAGE_SIZE = 100;
@@ -29,20 +32,11 @@ export const listVaultMembersInputSchema = z
       .optional()
       .describe("Pagination cursor from a previous response's nextCursor"),
   })
-  .refine(
-    (input) => {
-      const hasShareId = Boolean(input.shareId);
-      const hasVaultName = Boolean(input.vaultName);
-      return hasShareId !== hasVaultName;
-    },
-    {
-      message: "Provide exactly one of shareId or vaultName.",
-    },
-  );
+  .refine(scopeRefinement.check, { message: scopeRefinement.message });
 
 export const createVaultInputSchema = z.object({
   name: z.string().max(255).describe("Name for the new vault"),
-  confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+  confirm: confirmInput,
 });
 
 const VAULT_MEMBER_ROLE_OPTIONS = ["viewer", "editor", "manager"] as const;
@@ -51,13 +45,13 @@ export const updateVaultInputSchema = z.object({
   shareId: z.string().max(100).optional().describe("Share ID of the vault to update"),
   vaultName: z.string().max(255).optional().describe("Name of the vault to update"),
   newName: z.string().max(255).describe("New name for the vault"),
-  confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+  confirm: confirmInput,
 });
 
 export const deleteVaultInputSchema = z.object({
   shareId: z.string().max(100).optional().describe("Share ID of the vault to delete"),
   vaultName: z.string().max(255).optional().describe("Name of the vault to delete"),
-  confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+  confirm: confirmInput,
 });
 
 export const shareVaultInputSchema = z
@@ -66,18 +60,9 @@ export const shareVaultInputSchema = z
     vaultName: z.string().max(255).optional().describe("Name of the vault to share"),
     email: z.string().email().max(320).describe("Email of the user to invite"),
     role: z.enum(VAULT_MEMBER_ROLE_OPTIONS).optional().describe("Role for the invited user"),
-    confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+    confirm: confirmInput,
   })
-  .refine(
-    (input) => {
-      const hasShareId = Boolean(input.shareId);
-      const hasVaultName = Boolean(input.vaultName);
-      return hasShareId !== hasVaultName;
-    },
-    {
-      message: "Provide exactly one of shareId or vaultName.",
-    },
-  );
+  .refine(scopeRefinement.check, { message: scopeRefinement.message });
 
 export const updateVaultMemberInputSchema = z
   .object({
@@ -85,54 +70,27 @@ export const updateVaultMemberInputSchema = z
     vaultName: z.string().max(255).optional().describe("Name of the vault"),
     memberShareId: z.string().max(100).describe("Member share ID to update"),
     role: z.enum(VAULT_MEMBER_ROLE_OPTIONS).describe("Role to assign"),
-    confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+    confirm: confirmInput,
   })
-  .refine(
-    (input) => {
-      const hasShareId = Boolean(input.shareId);
-      const hasVaultName = Boolean(input.vaultName);
-      return hasShareId !== hasVaultName;
-    },
-    {
-      message: "Provide exactly one of shareId or vaultName.",
-    },
-  );
+  .refine(scopeRefinement.check, { message: scopeRefinement.message });
 
 export const transferVaultInputSchema = z
   .object({
     shareId: z.string().max(100).optional().describe("Share ID of the vault"),
     vaultName: z.string().max(255).optional().describe("Name of the vault"),
     memberShareId: z.string().max(100).describe("Member share ID that will become owner"),
-    confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+    confirm: confirmInput,
   })
-  .refine(
-    (input) => {
-      const hasShareId = Boolean(input.shareId);
-      const hasVaultName = Boolean(input.vaultName);
-      return hasShareId !== hasVaultName;
-    },
-    {
-      message: "Provide exactly one of shareId or vaultName.",
-    },
-  );
+  .refine(scopeRefinement.check, { message: scopeRefinement.message });
 
 export const removeVaultMemberInputSchema = z
   .object({
     shareId: z.string().max(100).optional().describe("Share ID of the vault"),
     vaultName: z.string().max(255).optional().describe("Name of the vault"),
     memberShareId: z.string().max(100).describe("Member share ID to remove"),
-    confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+    confirm: confirmInput,
   })
-  .refine(
-    (input) => {
-      const hasShareId = Boolean(input.shareId);
-      const hasVaultName = Boolean(input.vaultName);
-      return hasShareId !== hasVaultName;
-    },
-    {
-      message: "Provide exactly one of shareId or vaultName.",
-    },
-  );
+  .refine(scopeRefinement.check, { message: scopeRefinement.message });
 
 export type ListVaultsInput = z.infer<typeof listVaultsInputSchema>;
 export type ListVaultMembersInput = z.infer<typeof listVaultMembersInputSchema>;
@@ -152,19 +110,6 @@ export type VaultMemberRef = {
   state: string | null;
   create_time: string | null;
 };
-
-function parseCursor(cursor?: string): number {
-  if (!cursor) return 0;
-  if (!/^\d+$/.test(cursor)) {
-    throw new Error('Invalid cursor. Expected a non-negative integer string (example: "100").');
-  }
-
-  const parsed = Number(cursor);
-  if (!Number.isSafeInteger(parsed)) {
-    throw new Error("Invalid cursor. Value is too large.");
-  }
-  return parsed;
-}
 
 function toVaultMemberRef(rawMember: unknown, index: number): VaultMemberRef {
   const member = asRecord(rawMember);
@@ -194,25 +139,6 @@ function toVaultMemberRef(rawMember: unknown, index: number): VaultMemberRef {
   };
 }
 
-function extractRawVaultMembers(parsed: unknown): unknown[] | null {
-  if (Array.isArray(parsed)) return parsed;
-  const parsedObj = asRecord(parsed);
-  if (!parsedObj) return null;
-
-  const commonKeys = ["members", "vault_members", "users", "items", "results"];
-  for (const key of commonKeys) {
-    const value = parsedObj[key];
-    if (Array.isArray(value)) return value;
-  }
-
-  const arrayValues = Object.values(parsedObj).filter((value) => Array.isArray(value));
-  if (arrayValues.length === 1) {
-    return arrayValues[0] as unknown[];
-  }
-
-  return null;
-}
-
 export async function listVaultsHandler(passCli: PassCliRunner, { output }: ListVaultsInput) {
   const { stdout } = await passCli(["vault", "list", "--output", output]);
   return asTextContent(asJsonTextOrRaw(stdout));
@@ -222,13 +148,8 @@ export async function listVaultMembersHandler(
   passCli: PassCliRunner,
   { shareId, vaultName, pageSize, cursor }: ListVaultMembersInput,
 ) {
-  if (!!shareId === !!vaultName) {
-    throw new Error("Provide exactly one of shareId or vaultName.");
-  }
-
   const args = ["vault", "member", "list"];
-  if (shareId) args.push("--share-id", shareId);
-  else args.push("--vault-name", vaultName!);
+  appendScopeArgs(args, { shareId, vaultName });
   args.push("--output", "json");
 
   const { stdout } = await passCli(args);
@@ -240,26 +161,22 @@ export async function listVaultMembersHandler(
     return asTextContent(asJsonTextOrRaw(stdout));
   }
 
-  const rawMembers = extractRawVaultMembers(parsed);
+  const rawMembers = extractArrayFromParsed(parsed, [
+    "members",
+    "vault_members",
+    "users",
+    "items",
+    "results",
+  ]);
   if (!rawMembers) {
     return asTextContent(asJsonTextOrRaw(stdout));
   }
   const refs = rawMembers.map((member, index) => toVaultMemberRef(member, index));
-
-  const start = parseCursor(cursor);
-  const size = pageSize ?? DEFAULT_VAULT_MEMBER_PAGE_SIZE;
-  const end = start + size;
-  const items = refs.slice(start, end);
-  const nextCursor = end < refs.length ? String(end) : null;
+  const page = paginateRefs(refs, cursor, pageSize, DEFAULT_VAULT_MEMBER_PAGE_SIZE);
 
   const structuredContent = {
     scope: shareId ? { shareId } : { vaultName: vaultName! },
-    items,
-    pageSize: size,
-    cursor: String(start),
-    returned: items.length,
-    total: refs.length,
-    nextCursor,
+    ...page,
   };
 
   return {
@@ -274,8 +191,7 @@ export async function createVaultHandler(
 ) {
   requireWriteGate(confirm);
   const { stdout, stderr } = await passCli(["vault", "create", "--name", name]);
-  const out = joinStdoutStderr(stdout, stderr);
-  return asTextContent(out || "OK");
+  return asWriteResult(stdout, stderr);
 }
 
 export async function updateVaultHandler(
@@ -283,14 +199,11 @@ export async function updateVaultHandler(
   { shareId, vaultName, newName, confirm }: UpdateVaultInput,
 ) {
   requireWriteGate(confirm);
-  if (!!shareId === !!vaultName) throw new Error("Provide exactly one of shareId or vaultName.");
   const args = ["vault", "update"];
-  if (shareId) args.push("--share-id", shareId);
-  else args.push("--vault-name", vaultName!);
+  appendScopeArgs(args, { shareId, vaultName });
   args.push("--name", newName);
   const { stdout, stderr } = await passCli(args);
-  const out = joinStdoutStderr(stdout, stderr);
-  return asTextContent(out || "OK");
+  return asWriteResult(stdout, stderr);
 }
 
 export async function shareVaultHandler(
@@ -298,15 +211,12 @@ export async function shareVaultHandler(
   { shareId, vaultName, email, role, confirm }: ShareVaultInput,
 ) {
   requireWriteGate(confirm);
-  if (!!shareId === !!vaultName) throw new Error("Provide exactly one of shareId or vaultName.");
   const args = ["vault", "share"];
-  if (shareId) args.push("--share-id", shareId);
-  else args.push("--vault-name", vaultName!);
+  appendScopeArgs(args, { shareId, vaultName });
   args.push(email);
   if (role) args.push("--role", role);
   const { stdout, stderr } = await passCli(args);
-  const out = joinStdoutStderr(stdout, stderr);
-  return asTextContent(out || "OK");
+  return asWriteResult(stdout, stderr);
 }
 
 export async function deleteVaultHandler(
@@ -314,13 +224,10 @@ export async function deleteVaultHandler(
   { shareId, vaultName, confirm }: DeleteVaultInput,
 ) {
   requireWriteGate(confirm);
-  if (!!shareId === !!vaultName) throw new Error("Provide exactly one of shareId or vaultName.");
   const args = ["vault", "delete"];
-  if (shareId) args.push("--share-id", shareId);
-  else args.push("--vault-name", vaultName!);
+  appendScopeArgs(args, { shareId, vaultName });
   const { stdout, stderr } = await passCli(args);
-  const out = joinStdoutStderr(stdout, stderr);
-  return asTextContent(out || "OK");
+  return asWriteResult(stdout, stderr);
 }
 
 export async function updateVaultMemberHandler(
@@ -328,14 +235,11 @@ export async function updateVaultMemberHandler(
   { shareId, vaultName, memberShareId, role, confirm }: UpdateVaultMemberInput,
 ) {
   requireWriteGate(confirm);
-  if (!!shareId === !!vaultName) throw new Error("Provide exactly one of shareId or vaultName.");
   const args = ["vault", "member", "update"];
-  if (shareId) args.push("--share-id", shareId);
-  else args.push("--vault-name", vaultName!);
+  appendScopeArgs(args, { shareId, vaultName });
   args.push("--member-share-id", memberShareId, "--role", role);
   const { stdout, stderr } = await passCli(args);
-  const out = joinStdoutStderr(stdout, stderr);
-  return asTextContent(out || "OK");
+  return asWriteResult(stdout, stderr);
 }
 
 export async function removeVaultMemberHandler(
@@ -343,14 +247,11 @@ export async function removeVaultMemberHandler(
   { shareId, vaultName, memberShareId, confirm }: RemoveVaultMemberInput,
 ) {
   requireWriteGate(confirm);
-  if (!!shareId === !!vaultName) throw new Error("Provide exactly one of shareId or vaultName.");
   const args = ["vault", "member", "remove"];
-  if (shareId) args.push("--share-id", shareId);
-  else args.push("--vault-name", vaultName!);
+  appendScopeArgs(args, { shareId, vaultName });
   args.push("--member-share-id", memberShareId);
   const { stdout, stderr } = await passCli(args);
-  const out = joinStdoutStderr(stdout, stderr);
-  return asTextContent(out || "OK");
+  return asWriteResult(stdout, stderr);
 }
 
 export async function transferVaultHandler(
@@ -358,12 +259,9 @@ export async function transferVaultHandler(
   { shareId, vaultName, memberShareId, confirm }: TransferVaultInput,
 ) {
   requireWriteGate(confirm);
-  if (!!shareId === !!vaultName) throw new Error("Provide exactly one of shareId or vaultName.");
   const args = ["vault", "transfer"];
-  if (shareId) args.push("--share-id", shareId);
-  else args.push("--vault-name", vaultName!);
+  appendScopeArgs(args, { shareId, vaultName });
   args.push(memberShareId);
   const { stdout, stderr } = await passCli(args);
-  const out = joinStdoutStderr(stdout, stderr);
-  return asTextContent(out || "OK");
+  return asWriteResult(stdout, stderr);
 }

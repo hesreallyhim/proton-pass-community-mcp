@@ -1,8 +1,10 @@
 import { z } from "zod";
 
-import { asJsonTextOrRaw, asTextContent, joinStdoutStderr } from "../pass-cli/output.js";
+import { asJsonTextOrRaw, asTextContent, asWriteResult } from "../pass-cli/output.js";
 import type { PassCliRunner } from "../pass-cli/runner.js";
 import { asRecord } from "./item-utils.js";
+import { confirmInput } from "./schema-fragments.js";
+import { appendScopeArgs, scopeRefinement } from "./scope.js";
 import { requireWriteGate } from "./write-gate.js";
 
 type ParsedSettings = Record<string, string | null>;
@@ -44,21 +46,12 @@ export const settingsSetDefaultVaultInputSchema = z
   .object({
     shareId: z.string().max(100).optional().describe("Share ID of the vault to set as default"),
     vaultName: z.string().max(255).optional().describe("Vault name to set as default"),
-    confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+    confirm: confirmInput,
   })
-  .refine(
-    (input) => {
-      const hasShareId = Boolean(input.shareId);
-      const hasVaultName = Boolean(input.vaultName);
-      return hasShareId !== hasVaultName;
-    },
-    {
-      message: "Provide exactly one of shareId or vaultName.",
-    },
-  );
+  .refine(scopeRefinement.check, { message: scopeRefinement.message });
 
 export const settingsUnsetDefaultVaultInputSchema = z.object({
-  confirm: z.boolean().optional().describe("Must be true to execute the write operation"),
+  confirm: confirmInput,
 });
 
 export type SettingsSetDefaultVaultInput = z.infer<typeof settingsSetDefaultVaultInputSchema>;
@@ -100,17 +93,11 @@ export async function settingsSetDefaultVaultHandler(
   { shareId, vaultName, confirm }: SettingsSetDefaultVaultInput,
 ) {
   requireWriteGate(confirm);
-  if (!!shareId === !!vaultName) {
-    throw new Error("Provide exactly one of shareId or vaultName.");
-  }
-
   const args = ["settings", "set", "default-vault"];
-  if (shareId) args.push("--share-id", shareId);
-  else args.push("--vault-name", vaultName!);
+  appendScopeArgs(args, { shareId, vaultName });
 
   const { stdout, stderr } = await passCli(args);
-  const out = joinStdoutStderr(stdout, stderr);
-  return asTextContent(out || "OK");
+  return asWriteResult(stdout, stderr);
 }
 
 export async function settingsUnsetDefaultVaultHandler(
@@ -119,6 +106,5 @@ export async function settingsUnsetDefaultVaultHandler(
 ) {
   requireWriteGate(confirm);
   const { stdout, stderr } = await passCli(["settings", "unset", "default-vault"]);
-  const out = joinStdoutStderr(stdout, stderr);
-  return asTextContent(out || "OK");
+  return asWriteResult(stdout, stderr);
 }

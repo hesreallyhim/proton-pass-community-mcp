@@ -2,6 +2,8 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { asRecord } from "../tools/item-utils.js";
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SNAPSHOT_PATH = join(
   __dirname,
@@ -20,11 +22,6 @@ type ItemCreateTemplatesSnapshot = {
 };
 
 let snapshotCache: ItemCreateTemplatesSnapshot | null = null;
-
-function asRecord(value: unknown): Record<string, unknown> | null {
-  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
-  return value as Record<string, unknown>;
-}
 
 function loadSnapshot(): ItemCreateTemplatesSnapshot {
   if (snapshotCache) return snapshotCache;
