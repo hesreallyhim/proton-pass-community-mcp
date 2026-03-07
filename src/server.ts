@@ -30,7 +30,6 @@ export * from "./tools/password.js";
 export * from "./tools/session.js";
 export * from "./tools/settings.js";
 export * from "./tools/share.js";
-export * from "./tools/support.js";
 export * from "./tools/totp.js";
 export * from "./tools/vault.js";
 export * from "./tools/shared/write-gate.js";

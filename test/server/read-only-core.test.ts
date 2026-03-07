@@ -10,7 +10,6 @@ import {
   listVaultsHandler,
   parseSemver,
   PassCliAuthError,
-  supportHandler,
   viewSessionInfoHandler,
   viewSettingsHandler,
   viewUserInfoHandler,
@@ -27,14 +26,6 @@ describe("read-only handlers", () => {
 
     expect(runner).toHaveBeenCalledWith(["info"]);
     expect(result).toEqual({ content: [{ type: "text", text: "hello" }] });
-  });
-
-  it("supportHandler returns support output", async () => {
-    const runner = makeRunner({ stdout: "Reach to us if you need help\n", stderr: "" });
-    const result = await supportHandler(runner);
-
-    expect(runner).toHaveBeenCalledWith(["support"]);
-    expect(result).toEqual({ content: [{ type: "text", text: "Reach to us if you need help" }] });
   });
 
   it("checkPassCliVersion parses and evaluates compatibility", async () => {

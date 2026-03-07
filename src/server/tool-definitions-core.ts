@@ -31,7 +31,6 @@ import {
   viewSettingsHandler,
 } from "../tools/settings.js";
 import { listSharesHandler, listSharesInputSchema } from "../tools/share.js";
-import { supportHandler } from "../tools/support.js";
 import { generateTotpHandler, generateTotpInputSchema } from "../tools/totp.js";
 import {
   createVaultHandler,
@@ -70,9 +69,6 @@ export function createCoreToolDefinitions(
       "Run preflight checks for connectivity/authentication and CLI version compatibility.",
       () => checkStatusHandler(passCli, versionPolicy),
       false,
-    ),
-    noInputTool("support", "Display Proton Pass CLI support guidance text.", () =>
-      supportHandler(passCli),
     ),
     inputTool(
       "inject",
