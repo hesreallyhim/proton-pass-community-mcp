@@ -49,6 +49,7 @@
     "analyze:loc": "cloc --json --include-ext=ts,tsx,js,mjs,cjs src test",
     "analyze:complexity": "node scripts/complexity-report.mjs",
     "analyze:complexity:json": "node scripts/complexity-report.mjs --json-out docs/testing/complexity-report.json",
+    "check:complexity-thresholds": "node scripts/check-complexity-thresholds.mjs",
     "check:upstream:pass-cli": "node scripts/check-pass-cli-upstream.mjs",
     "check": "npm run lint && npm run format:check && npm run typecheck && npm run coverage",
     "prepare": "husky"
