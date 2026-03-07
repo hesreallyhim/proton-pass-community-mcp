@@ -2,6 +2,9 @@
 
 <br />
 
+[![CI](https://github.com/hesreallyhim/proton-pass-community-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/hesreallyhim/proton-pass-community-mcp/actions/workflows/ci.yml)
+[![Production Hygiene](https://github.com/hesreallyhim/proton-pass-community-mcp/actions/workflows/production-hygiene.yml/badge.svg)](https://github.com/hesreallyhim/proton-pass-community-mcp/actions/workflows/production-hygiene.yml)
+
 `proton-pass-community-mcp` is an MCP server that wraps selected commands from the Proton Pass CLI (`pass-cli`).
 
 It is an independent community project. It is not affiliated with or endorsed by Proton AG.
