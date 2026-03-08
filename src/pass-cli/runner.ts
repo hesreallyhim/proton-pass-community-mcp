@@ -21,6 +21,27 @@ type ExecFileAsyncLike = (
 const MAX_ERROR_OUTPUT_LENGTH = 500;
 type OutputSemantics = "none" | "format" | "path";
 
+/**
+ * Output-flag policy table for wrapped pass-cli subcommands.
+ *
+ * Why this exists:
+ * - Not every pass-cli subcommand accepts "--output".
+ * - For commands that do accept output *format*, MCP policy is to enforce JSON.
+ * - Some commands use "--output" for a different meaning (for example file path),
+ *   which must be preserved and never rewritten as a format flag.
+ *
+ * Semantics:
+ * - "format": command accepts "--output {human|json}" -> runner enforces "--output json".
+ * - "path": command uses "--output <path>" -> runner leaves args untouched.
+ * - "none": command does not support output format -> runner strips only accidental
+ *   "--output human|json" pairs.
+ *
+ * Maintenance:
+ * - Keep this table aligned with the project baseline pass-cli version.
+ * - When adding/changing a wrapped command, confirm semantics from
+ *   `pass-cli <subcommand> --help` and update the prefixes below.
+ * - The helper tests in `test/server/helpers.test.ts` must be updated with any table changes.
+ */
 const FORMAT_OUTPUT_COMMAND_PREFIXES: readonly (readonly string[])[] = [
   ["info"],
   ["user", "info"],
