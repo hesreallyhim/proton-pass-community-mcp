@@ -11,6 +11,7 @@ import {
   createRunPassCli,
   evaluatePassCliCompatibility,
   logErr,
+  normalizePassCliArgs,
   parseSemver,
   PassCliAuthError,
   requireWriteGate,
@@ -138,7 +139,7 @@ describe("helpers", () => {
     expect(execImpl).toHaveBeenCalledTimes(1);
     expect(execImpl).toHaveBeenCalledWith(
       "custom-pass-cli",
-      ["info"],
+      ["info", "--output", "json"],
       expect.objectContaining({
         env: process.env,
         maxBuffer: 10 * 1024 * 1024,
@@ -146,6 +147,79 @@ describe("helpers", () => {
       }),
     );
     expect(result).toEqual({ stdout: "ok", stderr: "warn" });
+  });
+
+  it("normalizes output flags by command policy", () => {
+    expect(
+      normalizePassCliArgs(["item", "create", "login", "--title", "GitHub", "--output", "json"]),
+    ).toEqual(["item", "create", "login", "--title", "GitHub"]);
+
+    expect(normalizePassCliArgs(["item", "list", "--share-id", "s1"])).toEqual([
+      "item",
+      "list",
+      "--share-id",
+      "s1",
+      "--output",
+      "json",
+    ]);
+
+    expect(normalizePassCliArgs(["item", "list", "--output", "human", "--", "Work"])).toEqual([
+      "item",
+      "list",
+      "--output",
+      "json",
+      "--",
+      "Work",
+    ]);
+
+    expect(
+      normalizePassCliArgs([
+        "item",
+        "attachment",
+        "download",
+        "--share-id",
+        "s1",
+        "--item-id",
+        "i1",
+        "--attachment-id",
+        "a1",
+        "--output",
+        "/tmp/file.bin",
+      ]),
+    ).toEqual([
+      "item",
+      "attachment",
+      "download",
+      "--share-id",
+      "s1",
+      "--item-id",
+      "i1",
+      "--attachment-id",
+      "a1",
+      "--output",
+      "/tmp/file.bin",
+    ]);
+  });
+
+  it("createRunPassCli applies output normalization before execution", async () => {
+    const execImpl = vi.fn().mockResolvedValue({ stdout: "{}", stderr: "" });
+    const run = createRunPassCli(execImpl as any);
+
+    await run(["item", "create", "login", "--title", "Example", "--output", "json"]);
+    await run(["item", "list", "--share-id", "s1"]);
+
+    expect(execImpl).toHaveBeenNthCalledWith(
+      1,
+      "pass-cli",
+      ["item", "create", "login", "--title", "Example"],
+      expect.any(Object),
+    );
+    expect(execImpl).toHaveBeenNthCalledWith(
+      2,
+      "pass-cli",
+      ["item", "list", "--share-id", "s1", "--output", "json"],
+      expect.any(Object),
+    );
   });
 
   it("wraps pass-cli failures with stdout/stderr and cause", async () => {
