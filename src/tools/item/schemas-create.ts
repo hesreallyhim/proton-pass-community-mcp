@@ -16,7 +16,6 @@ export const createLoginItemInputSchema = z.object({
     .max(100)
     .optional()
     .describe('Set to "true" to auto-generate, or pass generator options'),
-  output: z.enum(["json", "human"]).default("json").describe("Output format"),
   confirm: confirmInput,
 });
 
@@ -34,7 +33,6 @@ export const createLoginItemFromTemplateInputSchema = z.object({
   shareId: z.string().max(100).optional().describe("Share ID for the new item"),
   vaultName: z.string().max(255).optional().describe("Vault name for the new item"),
   template: loginItemTemplateSchema.describe("Login template payload"),
-  output: z.enum(["json", "human"]).default("json").describe("Output format"),
   confirm: confirmInput,
 });
 

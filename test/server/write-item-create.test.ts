@@ -24,7 +24,6 @@ describe("write handlers", () => {
         shareId: "s1",
         vaultName: "Work",
         title: "GitHub",
-        output: "json",
         confirm: true,
       }),
     ).rejects.toThrow("Provide only one of shareId or vaultName");
@@ -33,7 +32,6 @@ describe("write handlers", () => {
       shareId: "s1",
       title: "GitHub",
       generatePassword: "true",
-      output: "json",
       confirm: true,
     });
 
@@ -45,7 +43,6 @@ describe("write handlers", () => {
       password: "p",
       url: "https://example.com",
       generatePassword: "length=20",
-      output: "human",
       confirm: true,
     });
 
@@ -89,7 +86,6 @@ describe("write handlers", () => {
         shareId: "s1",
         vaultName: "Work",
         template: { title: "Demo", urls: ["https://example.com"] },
-        output: "json",
         confirm: true,
       }),
     ).rejects.toThrow("Provide only one of shareId or vaultName");
@@ -97,7 +93,6 @@ describe("write handlers", () => {
     await createLoginItemFromTemplateHandler(runner, {
       shareId: "s1",
       template: { title: "Demo", urls: ["https://example.com"] },
-      output: "json",
       confirm: true,
     });
 
@@ -109,7 +104,6 @@ describe("write handlers", () => {
     await createLoginItemFromTemplateHandler(runner, {
       vaultName: "Work",
       template: { title: "Demo", urls: ["https://example.com"] },
-      output: "human",
       confirm: true,
     });
 
