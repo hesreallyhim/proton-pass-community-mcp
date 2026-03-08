@@ -1,6 +1,6 @@
 {
   "name": "proton-pass-community-mcp",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "description": "Unofficial MCP server that integrates with the Proton Pass CLI",
   "license": "GPL-3.0-or-later",
   "author": "Really Him",
