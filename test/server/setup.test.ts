@@ -142,7 +142,6 @@ describe("server setup", () => {
       title: "GitHub",
       username: "octocat",
       password: "s3cr3t",
-      output: "json",
       confirm: true,
     });
     await tools.create_login_item_from_template.handler({
@@ -151,7 +150,6 @@ describe("server setup", () => {
         title: "Demo Note",
         urls: ["https://example.com"],
       },
-      output: "json",
       confirm: true,
     });
     await tools.create_note_item.handler({
