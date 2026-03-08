@@ -1,5 +1,44 @@
 # Changelog
 
+## [1.0.0](https://github.com/hesreallyhim/proton-pass-community-mcp/compare/v0.3.0...v1.0.0) (2026-03-08)
+
+
+### ⚠ BREAKING CHANGES
+
+* remove support tool from mcp surface
+* remove default-format MCP tools
+* rename template tool to login-only contract
+* normalize MCP tool names to verb-first ordering
+
+### Features
+
+* add inject and run tools ([d0b565e](https://github.com/hesreallyhim/proton-pass-community-mcp/commit/d0b565eccd9d86a8c26f8c7e1ec156683a5cca9e))
+* add invite_accept and invite_reject tools ([11eabfa](https://github.com/hesreallyhim/proton-pass-community-mcp/commit/11eabfa9da37660bd820f5bc4ac527d687dec9cf))
+* add item attachment and member tools ([d8b92da](https://github.com/hesreallyhim/proton-pass-community-mcp/commit/d8b92dac5a533899f034aa564e2b7d6979e49d17))
+* add item_totp tool with selector and uri modes ([6bfe4a3](https://github.com/hesreallyhim/proton-pass-community-mcp/commit/6bfe4a3d90b419c835e3001c1825c1673186a6b5))
+* add item-create template resources and snapshot ([2cfe889](https://github.com/hesreallyhim/proton-pass-community-mcp/commit/2cfe889e7a9b0ef9b3208b0a1776b884a7d557f5))
+* add item-template probe runner and report ([2950f2d](https://github.com/hesreallyhim/proton-pass-community-mcp/commit/2950f2d9cd0d727b7633bbb9aac272aa5d39cb87))
+* add move, trash, and untrash item tools ([1db347b](https://github.com/hesreallyhim/proton-pass-community-mcp/commit/1db347babb2e8f71ad8c69e19567700261836390))
+* add password utility tools ([c0a51d4](https://github.com/hesreallyhim/proton-pass-community-mcp/commit/c0a51d4d5b3e70ea305c88bb42b38d1273cca27b))
+* add per-type item creation tools ([0ea7072](https://github.com/hesreallyhim/proton-pass-community-mcp/commit/0ea70723139fa8f858a0bbe1334d7889f188cd39))
+* add settings default set/unset tools ([8463dea](https://github.com/hesreallyhim/proton-pass-community-mcp/commit/8463deae4db07cbf7596c7c5f55f3a7d7e7cd8ea))
+* add support and totp generation tools ([a02b9ba](https://github.com/hesreallyhim/proton-pass-community-mcp/commit/a02b9bab102fb46d4b54e93bb4d715e64aeaf9ec))
+* add vault member update and remove tools ([9b74964](https://github.com/hesreallyhim/proton-pass-community-mcp/commit/9b749644bf6c250dd34a7bf7fd1509ddc6efc89b))
+* add vault_share and item_share tools ([3ae1a7d](https://github.com/hesreallyhim/proton-pass-community-mcp/commit/3ae1a7de4835da0cfe2919939c7d64f74eb18859))
+* add vault_transfer and create_item_alias tools ([3d1766c](https://github.com/hesreallyhim/proton-pass-community-mcp/commit/3d1766c862bb89fc5a426255675da28e7515cf4f))
+* complexity analyzer ([e56dc7c](https://github.com/hesreallyhim/proton-pass-community-mcp/commit/e56dc7c5fcd0e4c4040041eebe5e882b85aaf6b0))
+* **dev:** add anonymized docker demo shell ([c0e62e8](https://github.com/hesreallyhim/proton-pass-community-mcp/commit/c0e62e84c73eb6f92e95f906e0932bc4a5a34a82))
+* expose update_vault and create_item_from_template tools ([0a64296](https://github.com/hesreallyhim/proton-pass-community-mcp/commit/0a64296bdeda4f3e08b17732ae58b494311e9137))
+* probe template additional-properties behavior ([7becc88](https://github.com/hesreallyhim/proton-pass-community-mcp/commit/7becc88b73cbef991f143f901a08201313d5ee1d))
+* remove support tool from mcp surface ([0a065d9](https://github.com/hesreallyhim/proton-pass-community-mcp/commit/0a065d9edc58db5155c909de91baed8b9ba36472))
+
+
+### Code Refactoring
+
+* normalize MCP tool names to verb-first ordering ([fdc2165](https://github.com/hesreallyhim/proton-pass-community-mcp/commit/fdc21650d59868328bf2399a4fea0fea652eb9ac))
+* remove default-format MCP tools ([9e56e9b](https://github.com/hesreallyhim/proton-pass-community-mcp/commit/9e56e9bd25b675ba9ce97d9f33f47fb64e99ac5e))
+* rename template tool to login-only contract ([be42a9b](https://github.com/hesreallyhim/proton-pass-community-mcp/commit/be42a9b3f1ccf1ee7b3badbc3766116d24a3513e))
+
 ## [0.3.0](https://github.com/hesreallyhim/proton-pass-community-mcp/compare/v0.2.0...v0.3.0) (2026-03-07)
 
 
