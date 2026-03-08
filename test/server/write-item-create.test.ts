@@ -58,8 +58,6 @@ describe("write handlers", () => {
       "--title",
       "GitHub",
       "--generate-password",
-      "--output",
-      "json",
     ]);
 
     expect(runner).toHaveBeenNthCalledWith(2, [
@@ -79,8 +77,6 @@ describe("write handlers", () => {
       "--url",
       "https://example.com",
       "--generate-password=length=20",
-      "--output",
-      "human",
     ]);
   });
 
@@ -106,7 +102,7 @@ describe("write handlers", () => {
     });
 
     expect(runner).toHaveBeenCalledWith(
-      ["item", "create", "login", "--from-template", "-", "--share-id", "s1", "--output", "json"],
+      ["item", "create", "login", "--from-template", "-", "--share-id", "s1"],
       '{"title":"Demo","urls":["https://example.com"]}',
     );
 
@@ -118,17 +114,7 @@ describe("write handlers", () => {
     });
 
     expect(runner).toHaveBeenLastCalledWith(
-      [
-        "item",
-        "create",
-        "login",
-        "--from-template",
-        "-",
-        "--vault-name",
-        "Work",
-        "--output",
-        "human",
-      ],
+      ["item", "create", "login", "--from-template", "-", "--vault-name", "Work"],
       '{"title":"Demo","urls":["https://example.com"]}',
     );
   });
