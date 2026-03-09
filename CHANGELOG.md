@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.0.1](https://github.com/hesreallyhim/proton-pass-community-mcp/compare/v1.0.0...v1.0.1) (2026-03-09)
+
+
+### Bug Fixes
+
+* don't invoke output flag when not allowed ([a0413d9](https://github.com/hesreallyhim/proton-pass-community-mcp/commit/a0413d9f4761a9339b72bd92da3c7cd91d82a2fc))
+* **item:** remove output param from login create schemas ([6dc91d1](https://github.com/hesreallyhim/proton-pass-community-mcp/commit/6dc91d14a6eca3d2c0777c233f4bbdb4c5ee2784))
+* **pass-cli:** normalize output arg policy in runner ([7c73739](https://github.com/hesreallyhim/proton-pass-community-mcp/commit/7c73739b8c096c604e7a172859283e5b5dc4907d))
+
 ## [1.0.0](https://github.com/hesreallyhim/proton-pass-community-mcp/compare/v0.3.0...v1.0.0) (2026-03-08)
 
 
