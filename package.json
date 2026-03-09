@@ -47,6 +47,8 @@
     "pass:dev:template:snapshot:update": "node scripts/check-item-create-template-drift.mjs --write",
     "pass:dev:template:probe": "node scripts/probe-item-create-template-contract.mjs --run",
     "pass:dev:template:probe:additional-properties": "node scripts/probe-item-create-template-additional-properties.mjs --run",
+    "pass:dev:output-policy:check": "node scripts/sync-pass-cli-output-policy.mjs --check",
+    "pass:dev:output-policy:update": "node scripts/sync-pass-cli-output-policy.mjs --write",
     "docs:sync:pass-cli": "scripts/sync-pass-cli-docs.sh",
     "analyze:loc": "cloc --json --include-ext=ts,tsx,js,mjs,cjs src test",
     "analyze:complexity": "node scripts/complexity-report.mjs",
