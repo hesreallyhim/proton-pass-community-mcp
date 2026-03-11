@@ -44,7 +44,7 @@ describe("server setup", () => {
     expect(indexPayload.template_types).toEqual(
       expect.arrayContaining(["login", "note", "credit-card", "wifi", "custom", "identity"]),
     );
-    expect(indexPayload.pass_cli_version).toContain("1.5.2");
+    expect(indexPayload.pass_cli_version).toContain("1.6.1");
 
     const loginResult = await resources["pass://templates/item-create/login"].readCallback(
       new URL("pass://templates/item-create/login"),

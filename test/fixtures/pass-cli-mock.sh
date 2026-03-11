@@ -15,7 +15,7 @@ if [[ "$cmd1" == "test" ]]; then
 fi
 
 if [[ "$cmd1" == "--version" ]]; then
-  printf '1.5.2 (mock)\n'
+  printf '1.6.1 (mock)\n'
   exit 0
 fi
 

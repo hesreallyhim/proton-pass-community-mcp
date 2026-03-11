@@ -30,7 +30,7 @@ export async function createLoginItemHandler(passCli: PassCliRunner, input: Crea
     else args.push(`--generate-password=${input.generatePassword}`);
   }
 
-  // pass-cli (v1.5.2 baseline) does not support --output for login create.
+  // pass-cli does not support --output for login create.
   const { stdout, stderr } = await passCli(args);
   const out = joinStdoutStderr(stdout, stderr);
   return asTextContent(asJsonTextOrRaw(out));
@@ -44,7 +44,7 @@ export async function createLoginItemFromTemplateHandler(
 
   const args: string[] = ["item", "create", "login", "--from-template", "-"];
   appendOptionalScopeArgs(args, input.shareId, input.vaultName);
-  // pass-cli (v1.5.2 baseline) does not support --output for login create.
+  // pass-cli does not support --output for login create.
   const { stdout, stderr } = await passCli(args, JSON.stringify(input.template));
   const out = joinStdoutStderr(stdout, stderr);
   return asTextContent(asJsonTextOrRaw(out));

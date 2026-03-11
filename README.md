@@ -118,7 +118,7 @@ These template resources are example well-formed payloads from `pass-cli --get-t
 - `pass-cli` installed and authenticated
 - MCP client capable of stdio transport
 
-### 📌 Current Baseline Version of `pass-cli` used in development: v1.5.2
+### 📌 Current Baseline Version of `pass-cli` used in development: v1.6.1
 
 ## Run Locally
 
