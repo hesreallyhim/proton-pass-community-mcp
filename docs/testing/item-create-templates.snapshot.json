@@ -1,19 +1,8 @@
 {
-  "captured_at": "2026-03-06T15:24:35.287Z",
+  "captured_at": "2026-03-11T13:17:46.286Z",
   "captured_by": "scripts/pass-dev.sh item create <type> --get-template",
-  "pass_cli_version": "Proton Pass CLI 1.5.2 (41cf394)",
+  "pass_cli_version": "Proton Pass CLI 1.6.1 (0977a19)",
   "templates": {
-    "login": {
-      "title": "",
-      "username": null,
-      "email": null,
-      "password": null,
-      "urls": []
-    },
-    "note": {
-      "title": "",
-      "note": null
-    },
     "credit-card": {
       "title": "",
       "cardholder_name": null,
@@ -23,13 +12,6 @@
       "expiration_date": null,
       "pin": null,
       "note": null
-    },
-    "wifi": {
-      "title": "",
-      "ssid": "",
-      "password": "",
-      "security": "",
-      "note": ""
     },
     "custom": {
       "title": "",
@@ -97,6 +79,24 @@
       "personal_website": "",
       "work_phone_number": "",
       "work_email": ""
+    },
+    "login": {
+      "title": "",
+      "username": null,
+      "email": null,
+      "password": null,
+      "urls": []
+    },
+    "note": {
+      "title": "",
+      "note": null
+    },
+    "wifi": {
+      "title": "",
+      "ssid": "",
+      "password": "",
+      "security": "",
+      "note": ""
     }
   }
 }

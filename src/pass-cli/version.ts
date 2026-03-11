@@ -1,7 +1,7 @@
 import type { PassCliRunner } from "./runner.js";
 import { joinStdoutStderr } from "./output.js";
 
-const PROJECT_PASS_CLI_BASELINE_VERSION = "1.5.2";
+const PROJECT_PASS_CLI_BASELINE_VERSION = "1.6.1";
 
 type Semver = { major: number; minor: number; patch: number };
 type CompatibilityStatus = "equal" | "compatible" | "possibly_incompatible";
