@@ -5,18 +5,18 @@
 [![CI](https://github.com/hesreallyhim/proton-pass-community-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/hesreallyhim/proton-pass-community-mcp/actions/workflows/ci.yml)
 [![Production Hygiene](https://github.com/hesreallyhim/proton-pass-community-mcp/actions/workflows/production-hygiene.yml/badge.svg)](https://github.com/hesreallyhim/proton-pass-community-mcp/actions/workflows/production-hygiene.yml)
 
-`proton-pass-community-mcp` is an MCP server that wraps selected commands from the Proton Pass CLI (`pass-cli`).
+`proton-pass-community-mcp` is an MCP server for Proton Pass, with broad coverage of `pass-cli` operations.
 
 It is an independent community project. It is not affiliated with or endorsed by Proton AG.
 
-It is designed as a thin integration layer:
+It is designed as a production-ready integration layer:
 
 - typed tool inputs with `zod`
 - stdio transport for MCP clients
 
 ## Available Tools
 
-As this project is in its initial stages, it exposes the following tools:
+The server exposes the following MCP tool surface:
 
 | Tool                              | Purpose                                          |
 | --------------------------------- | ------------------------------------------------ |
@@ -63,6 +63,9 @@ As this project is in its initial stages, it exposes the following tools:
 | `generate_passphrase`             | Generate a passphrase                            |
 | `generate_totp`                   | Generate TOTP from secret/URI                    |
 | `score_password`                  | Score password strength                          |
+
+Coverage goal: provide comprehensive support for Proton Pass CLI workflows that fit MCP tool semantics.
+Intentionally excluded are CLI behaviors that are purely interactive or otherwise not a good fit for reliable MCP tool execution.
 
 The `search_items` operation is additional functionality that is not provided by the base CLI.
 
@@ -130,9 +133,7 @@ npm run dev
 
 ## Install and Run via npm/npx
 
-The package is prepared for npm distribution and `npx` execution.
-
-Once publishing is enabled and a release is published to npm, use one of:
+Install from npm or run directly with `npx`:
 
 ```bash
 npm install --global proton-pass-community-mcp
@@ -145,7 +146,7 @@ or:
 npx -y proton-pass-community-mcp --allow-version-drift
 ```
 
-Maintainer note: the publish workflow is intentionally gated. By default, releases validate/package and upload tarball artifacts, but skip `npm publish` until the explicit publish gate is enabled.
+Release operations for maintainers are documented in [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md).
 
 ## Anonymized Demo Shell (Docker)
 
@@ -183,7 +184,7 @@ Example MCP server config using `npx` package execution:
 }
 ```
 
-If you are developing locally (or before npm publish is enabled), use a direct local build path:
+If you are developing locally from source, use a direct local build path:
 
 Example MCP server config using command-line args:
 
@@ -255,7 +256,7 @@ npm run dev -- --allow-version-drift
 - In addition to the MCP server, there is an agent [skill file](./skills/pass-cli-mcp/SKILL.md) that is intended to be integrated with this MCP - however, it is currently only a draft.
 - Developer runtime configuration and validation workflows are documented in [CONTRIBUTING.md](./CONTRIBUTING.md).
 - Disposable account setup and contributor/CI guidance are documented in [docs/testing/TEST_ACCOUNT_WORKFLOW.md](./docs/testing/TEST_ACCOUNT_WORKFLOW.md).
-- See [CONTRIBUTING.md](./CONTRIBUTING.md) if you're interested in contributing to this project. Contributors are highly welcome at this stage.
+- See [CONTRIBUTING.md](./CONTRIBUTING.md) if you're interested in contributing to this project. Contributors are welcome.
 
 LICENSE
 
