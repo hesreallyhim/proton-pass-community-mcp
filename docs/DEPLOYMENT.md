@@ -1,6 +1,6 @@
 ---
 name: deployment-runbook
-description: Deployment and release runbook for this repository using PR-first flow, Release Please, and staged npm trusted publishing.
+description: Deployment and release runbook for this repository using PR-first flow, Release Please, and npm trusted publishing.
 ---
 
 # Deployment Runbook
@@ -12,7 +12,7 @@ This runbook covers ongoing release operations for this repository:
 1. PR-first integration to `main`
 2. Automated release PRs via Release Please
 3. GitHub Release validation/package workflow
-4. Staged npm trusted publishing enablement (approval-gated)
+4. npm publish via GitHub trusted publishing (OIDC)
 
 ## Prerequisites
 
@@ -23,7 +23,7 @@ This runbook covers ongoing release operations for this repository:
 ## Approval Gates
 
 1. Gate 1: explicit maintainer confirmation is required before any `git push` (including tags/branches/workflow changes).
-2. Gate 2: explicit maintainer confirmation is required before enabling `ENABLE_NPM_PUBLISH=true` or attempting any npm publish.
+2. Gate 2: explicit maintainer confirmation is required before changing publish automation/auth settings.
 
 ## One-Time Remote Setup
 
@@ -54,8 +54,6 @@ Configure trusted publishing on npm for this package:
    - Environment name: `npm-publish`
 4. Save settings.
 
-Do not enable publish execution in workflow until maintainer approval is explicit.
-
 ## Release Process
 
 1. Merge release-ready commits into `main` via PR (PR-first; no direct push to `main` in the default flow).
@@ -67,24 +65,15 @@ Do not enable publish execution in workflow until maintainer approval is explici
    - package metadata changes are correct
 5. Merge the Release Please PR.
 6. Wait for publish workflow (`.github/workflows/publish-npm.yml`) on `release.published`.
-7. Verify Stage A outputs (default, publish disabled):
+7. Verify outputs:
    - expected git tag for the released version
    - GitHub Release created
    - `CHANGELOG.md` and version bump committed to `main`
    - npm package tarball asset (`.tgz`) uploaded to the GitHub Release
    - checksum file (`.sha256`) uploaded to the GitHub Release
-   - workflow logs indicate `npm publish` was skipped by gate
+   - workflow logs indicate `npm publish` succeeded
 
-## Stage B: Enable Publish Gate (Requires Explicit Maintainer Approval)
-
-Enable only after explicit approval:
-
-1. Set repo or environment variable `ENABLE_NPM_PUBLISH=true` for the `npm-publish` environment.
-2. Confirm trusted publisher settings still match repository/workflow/environment.
-3. Cut a new patch release (recommended) through normal Release Please flow.
-4. Confirm publish workflow now runs `npm publish` and succeeds.
-
-## Stage C: Post-First-Publish Hardening
+## Post-First-Publish Hardening
 
 After first successful trusted publish:
 
@@ -120,8 +109,8 @@ Release-As: 0.2.0
    - fix failures on branch/PR
    - re-run checks before merging
 4. Publish workflow ran but package not on npm:
-   - confirm `ENABLE_NPM_PUBLISH=true`
    - confirm npm trusted publisher points at `publish-npm.yml`
+   - confirm trusted publisher environment claim matches workflow (`npm-publish`)
    - confirm release was not marked prerelease
 5. npm publish authentication failed:
    - verify workflow permissions include `id-token: write`
