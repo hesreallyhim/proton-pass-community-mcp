@@ -72,13 +72,22 @@ Use this checklist when you are ready to run a release candidate through a real 
   - known limitations
   - expected user setup/auth model
 
-## 9. Go/No-Go Decision
+## 9. Packaging and Distribution Readiness
+
+- [ ] `npm run check:release:package` passes locally.
+- [ ] `npm pack --dry-run` output is reviewed for expected file contents.
+- [ ] Release workflow `publish-npm` completed for latest GitHub Release.
+- [ ] Release includes package tarball (`.tgz`) and checksum (`.sha256`) assets.
+- [ ] Workflow logs explicitly show `npm publish` skipped when gate is disabled.
+- [ ] If publish gate is intentionally enabled, trusted publisher settings are verified first.
+
+## 10. Go/No-Go Decision
 
 - [ ] At least one end-to-end host session completed successfully.
 - [ ] No open P0/P1 issues for auth, data exposure, or tool correctness.
 - [ ] Maintainer sign-off recorded (release issue/PR comment).
 
-## 10. Post-Release Follow-Up
+## 11. Post-Release Follow-Up
 
 - [ ] Share in target communities and collect feedback/issues.
 - [ ] Triage first-wave feedback into:

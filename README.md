@@ -128,6 +128,25 @@ npm run build
 npm run dev
 ```
 
+## Install and Run via npm/npx
+
+The package is prepared for npm distribution and `npx` execution.
+
+Once publishing is enabled and a release is published to npm, use one of:
+
+```bash
+npm install --global proton-pass-community-mcp
+proton-pass-community-mcp --allow-version-drift
+```
+
+or:
+
+```bash
+npx -y proton-pass-community-mcp --allow-version-drift
+```
+
+Maintainer note: the publish workflow is intentionally gated. By default, releases validate/package and upload tarball artifacts, but skip `npm publish` until the explicit publish gate is enabled.
+
 ## Anonymized Demo Shell (Docker)
 
 Use this when recording demos and you want a neutral workspace path in tooling metadata:
@@ -150,6 +169,21 @@ Notes:
 - For true path anonymization in logs, run the host/tooling process from inside this containerized workspace.
 
 ## MCP Client Configuration
+
+Example MCP server config using `npx` package execution:
+
+```json
+{
+  "mcpServers": {
+    "proton-pass-community-mcp": {
+      "command": "npx",
+      "args": ["-y", "proton-pass-community-mcp", "--allow-version-drift"]
+    }
+  }
+}
+```
+
+If you are developing locally (or before npm publish is enabled), use a direct local build path:
 
 Example MCP server config using command-line args:
 
