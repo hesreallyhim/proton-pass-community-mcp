@@ -22,14 +22,13 @@ This project is intentionally small, so the roadmap focuses on high-leverage add
 - [x] Stage A npm distribution prep shipped:
   - package metadata for npm/provenance
   - release workflow that validates/packages and uploads tarball/checksum
-  - publish remains approval-gated by policy
+  - publish path is configured for direct trusted publishing on stable releases
 
 ## Top Priority Next
 
-1. Complete npm trusted publishing cutover (approval-gated).
+1. Complete npm trusted publishing cutover.
 
 - Configure npm trusted publisher for this repo/workflow/environment.
-- Enable publish gate only with explicit maintainer approval.
 - Cut next release and verify npm publish + provenance.
 
 2. Add MCP resources for read-heavy workflows.

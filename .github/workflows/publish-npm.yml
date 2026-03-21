@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   publish-npm:
-    name: Validate, Package, and Conditionally Publish
+    name: Validate, Package, and Publish
     if: ${{ github.event.release.prerelease == false }}
     runs-on: ubuntu-latest
     environment:
@@ -89,12 +89,5 @@ jobs:
           CHECKSUM_FILE: ${{ steps.package.outputs.checksum_file }}
         run: gh release upload "$TAG_NAME" "$TARBALL" "$CHECKSUM_FILE" --clobber --repo "$GITHUB_REPOSITORY"
 
-      - name: Publish to npm (approval gated)
-        if: ${{ vars.ENABLE_NPM_PUBLISH == 'true' }}
+      - name: Publish to npm
         run: npm publish
-
-      - name: Publish gate status
-        if: ${{ vars.ENABLE_NPM_PUBLISH != 'true' }}
-        run: |
-          echo "npm publish skipped by policy."
-          echo "Set repository/environment variable ENABLE_NPM_PUBLISH=true only after explicit maintainer approval."

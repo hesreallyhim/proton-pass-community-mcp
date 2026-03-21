@@ -78,8 +78,8 @@ Use this checklist when you are ready to run a release candidate through a real 
 - [ ] `npm pack --dry-run` output is reviewed for expected file contents.
 - [ ] Release workflow `publish-npm` completed for latest GitHub Release.
 - [ ] Release includes package tarball (`.tgz`) and checksum (`.sha256`) assets.
-- [ ] Workflow logs explicitly show `npm publish` skipped when gate is disabled.
-- [ ] If publish gate is intentionally enabled, trusted publisher settings are verified first.
+- [ ] Workflow logs explicitly show `npm publish` succeeded.
+- [ ] Trusted publisher settings (repo/workflow/environment) are verified.
 
 ## 10. Go/No-Go Decision
 
