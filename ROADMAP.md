@@ -2,45 +2,45 @@
 
 This project is intentionally small, so the roadmap focuses on high-leverage additions with clear utility.
 
-## Top Priority Next (Post-0.1 / Early 0.2)
+## Completed Milestones
 
-1. Ship dedicated `password` tooling as a high-value track.
+- [x] Dedicated password tooling shipped:
+  - `generate_random_password`
+  - `generate_passphrase`
+  - `score_password`
+- [x] Immediate-utility wrappers shipped:
+  - `generate_totp`
+  - `list_invites`, `accept_invite`, `reject_invite`
+  - `list_shares`
+  - `trash_item`, `untrash_item`
+- [x] Filtered listing support shipped in `list_items`:
+  - `filterType`, `filterState`, `sortBy`
+- [x] Operational tooling shipped:
+  - `download_item_attachment`
+  - `move_item`
+  - vault/item member management tools
+- [x] Stage A npm distribution prep shipped:
+  - package metadata for npm/provenance
+  - release workflow that validates/packages and uploads tarball/checksum
+  - publish remains approval-gated by policy
 
-- Commands:
-  - `pass-cli password generate random`
-  - `pass-cli password generate passphrase`
-  - `pass-cli password score`
-- Rationale:
-  - These commands are useful even without Proton authentication.
-  - They provide immediate standalone value for secure credential hygiene.
-- Product direction:
-  - Include this in `0.2` planning immediately after `0.1`.
-  - Evaluate packaging as both MCP tools and a standalone skill profile.
+## Top Priority Next
 
-## Near-Term (Practical Additions)
+1. Complete npm trusted publishing cutover (approval-gated).
 
-1. Add `pass-cli` wrappers with immediate utility.
-
-- `password generate` (`pass-cli password generate`)
-- `password score` (`pass-cli password score`)
-- `totp generate` (`pass-cli totp generate`)
-- `invite list/accept/reject`
-- `share list` [USER: INCLUDED IN V0.1]
-- `item trash/untrash`
+- Configure npm trusted publisher for this repo/workflow/environment.
+- Enable publish gate only with explicit maintainer approval.
+- Cut next release and verify npm publish + provenance.
 
 2. Add MCP resources for read-heavy workflows.
 
-- Resource ideas:
+- Candidate resources:
   - `pass://vaults`
   - `pass://vault/{vaultName}/items`
   - `pass://share/{shareId}/items`
   - `pass://item/{shareId}/{itemId}`
-
-Why: resources are better than tools for browse/read usage, caching, and context injection into LLM prompts.
-
-3. Add filtered list support to `pass_item_list`.
-
-- `filterType`, `filterState`, `sortBy` (supported by `pass-cli item list`)
+- Why:
+  - Better for browse/read usage, caching, and context injection into LLM prompts.
 
 ## Mid-Term (Workflow Features)
 
@@ -54,12 +54,6 @@ Why: resources are better than tools for browse/read usage, caching, and context
 
 - Optional dry-run planning for write tools
 - Standardized confirmation payload (operation + target summary)
-
-3. More operational tooling.
-
-- `item attachment download`
-- `item move`
-- vault/item member management wrappers
 
 ## Proton Mail Automation (Reality Check)
 
