@@ -1,0 +1,100 @@
+name: Publish npm Package
+
+on:
+  release:
+    types:
+      - published
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  publish-npm:
+    name: Validate, Package, and Conditionally Publish
+    if: ${{ github.event.release.prerelease == false }}
+    runs-on: ubuntu-latest
+    environment:
+      name: npm-publish
+    steps:
+      - name: Checkout release tag
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          registry-url: https://registry.npmjs.org/
+
+      - name: Verify trusted publishing runtime minimums
+        shell: bash
+        run: |
+          node -e '
+            const [major, minor, patch] = process.versions.node.split(".").map(Number);
+            const ok = major > 22 || (major === 22 && (minor > 14 || (minor === 14 && patch >= 0)));
+            if (!ok) {
+              console.error(`Node ${process.version} does not meet trusted publishing minimum (>=22.14.0).`);
+              process.exit(1);
+            }
+            console.log(`Node ${process.version} satisfies trusted publishing minimum.`);
+          '
+
+          npm_version="$(npm --version)"
+          node -e '
+            const [major, minor, patch = 0] = process.argv[1].split(".").map(Number);
+            const ok = major > 11 || (major === 11 && (minor > 5 || (minor === 5 && patch >= 1)));
+            if (!ok) {
+              console.error(`npm ${process.argv[1]} does not meet trusted publishing minimum (>=11.5.1).`);
+              process.exit(1);
+            }
+            console.log(`npm ${process.argv[1]} satisfies trusted publishing minimum.`);
+          ' "$npm_version"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate package release quality gate
+        run: npm run check:release:package
+
+      - name: Build publish tarball and checksum
+        id: package
+        shell: bash
+        run: |
+          pack_json="$(npm pack --json)"
+          tarball="$(printf "%s" "$pack_json" | node -e '
+            let raw = "";
+            process.stdin.setEncoding("utf8");
+            process.stdin.on("data", (chunk) => (raw += chunk));
+            process.stdin.on("end", () => {
+              const rows = JSON.parse(raw);
+              process.stdout.write(rows[0].filename);
+            });
+          ')"
+
+          checksum_file="${tarball}.sha256"
+          sha256sum "$tarball" > "$checksum_file"
+
+          echo "tarball=$tarball" >> "$GITHUB_OUTPUT"
+          echo "checksum_file=$checksum_file" >> "$GITHUB_OUTPUT"
+
+      - name: Upload tarball artifacts to GitHub release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG_NAME: ${{ github.event.release.tag_name }}
+          TARBALL: ${{ steps.package.outputs.tarball }}
+          CHECKSUM_FILE: ${{ steps.package.outputs.checksum_file }}
+        run: gh release upload "$TAG_NAME" "$TARBALL" "$CHECKSUM_FILE" --clobber --repo "$GITHUB_REPOSITORY"
+
+      - name: Publish to npm (approval gated)
+        if: ${{ vars.ENABLE_NPM_PUBLISH == 'true' }}
+        run: npm publish
+
+      - name: Publish gate status
+        if: ${{ vars.ENABLE_NPM_PUBLISH != 'true' }}
+        run: |
+          echo "npm publish skipped by policy."
+          echo "Set repository/environment variable ENABLE_NPM_PUBLISH=true only after explicit maintainer approval."

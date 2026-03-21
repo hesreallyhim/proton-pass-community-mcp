@@ -3,3 +3,5 @@ dist
 node_modules
 docs/upstream/pass-cli
 CHANGELOG.md
+.claude
+CLAUDE.md

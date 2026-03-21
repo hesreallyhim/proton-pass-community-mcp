@@ -19,6 +19,10 @@
   "bin": {
     "proton-pass-community-mcp": "dist/index.js"
   },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "provenance": true
+  },
   "files": [
     "dist"
   ],
@@ -56,6 +60,7 @@
     "check:complexity-thresholds": "node scripts/check-complexity-thresholds.mjs",
     "check:production-hygiene": "node scripts/check-production-hygiene.mjs",
     "check:upstream:pass-cli": "node scripts/check-pass-cli-upstream.mjs",
+    "check:release:package": "npm run lint && npm run typecheck && npm run test && npm run build && npm pack --dry-run",
     "check": "npm run lint && npm run format:check && npm run typecheck && npm run coverage",
     "prepare": "husky"
   },
