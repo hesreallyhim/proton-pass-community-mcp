@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.0](https://github.com/hesreallyhim/proton-pass-community-mcp/compare/v1.0.2...v1.1.0) (2026-03-21)
+
+
+### Features
+
+* add gated npm release workflow and packaging docs ([ff6f794](https://github.com/hesreallyhim/proton-pass-community-mcp/commit/ff6f7941f9e9e40150065d925d36ec81aa05b654))
+
+
+### Bug Fixes
+
+* **ci:** publish to npm on stable GitHub releases ([6f34500](https://github.com/hesreallyhim/proton-pass-community-mcp/commit/6f34500c51b6013313adcdb60c0799d880b083aa))
+
 ## [1.0.2](https://github.com/hesreallyhim/proton-pass-community-mcp/compare/v1.0.1...v1.0.2) (2026-03-21)
 
 
