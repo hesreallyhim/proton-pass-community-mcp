@@ -188,7 +188,6 @@ describe("write handlers", () => {
       itemId: "i1",
       attachmentId: "a1",
       outputPath: "./tmp.bin",
-      confirm: true,
     });
 
     const listResult = await listItemMembersHandler(runner, {
