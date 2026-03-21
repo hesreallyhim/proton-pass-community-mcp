@@ -91,10 +91,8 @@ export async function untrashItemHandler(
 
 export async function downloadItemAttachmentHandler(
   passCli: PassCliRunner,
-  { shareId, itemId, attachmentId, outputPath, confirm }: DownloadItemAttachmentInput,
+  { shareId, itemId, attachmentId, outputPath }: DownloadItemAttachmentInput,
 ) {
-  requireWriteGate(confirm);
-
   const { stdout, stderr } = await passCli([
     "item",
     "attachment",

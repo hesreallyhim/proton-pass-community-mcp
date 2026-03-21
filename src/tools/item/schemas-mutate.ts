@@ -66,7 +66,6 @@ export const downloadItemAttachmentInputSchema = z.object({
   itemId: z.string().max(100).describe("Item ID containing the attachment"),
   attachmentId: z.string().max(100).describe("Attachment ID to download"),
   outputPath: z.string().min(1).max(4096).describe("Output path for downloaded attachment"),
-  confirm: confirmInput,
 });
 
 export const deleteItemInputSchema = z.object({

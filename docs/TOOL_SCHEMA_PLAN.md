@@ -347,13 +347,13 @@ Notes:
 
 ### Item Alias, Attachment, and Members
 
-| Tool                       | Source                              | Status      | Input Summary                                                | Output Summary       |
-| -------------------------- | ----------------------------------- | ----------- | ------------------------------------------------------------ | -------------------- |
-| `create_item_alias`        | `pass-cli item alias create`        | Implemented | `shareId \| vaultName`, `prefix`, `output?`, `confirm`       | Alias item           |
-| `download_item_attachment` | `pass-cli item attachment download` | Implemented | `shareId`, `itemId`, `attachmentId`, `outputPath`, `confirm` | Download status/path |
-| `list_item_members`        | `pass-cli item member list`         | Implemented | `shareId`, `itemId`, `output?`                               | Member list          |
-| `update_item_member`       | `pass-cli item member update`       | Implemented | `shareId`, `memberShareId`, `role`, `confirm`                | Update status        |
-| `remove_item_member`       | `pass-cli item member remove`       | Implemented | `shareId`, `memberShareId`, `confirm`                        | Remove status        |
+| Tool                       | Source                              | Status      | Input Summary                                          | Output Summary       |
+| -------------------------- | ----------------------------------- | ----------- | ------------------------------------------------------ | -------------------- |
+| `create_item_alias`        | `pass-cli item alias create`        | Implemented | `shareId \| vaultName`, `prefix`, `output?`, `confirm` | Alias item           |
+| `download_item_attachment` | `pass-cli item attachment download` | Implemented | `shareId`, `itemId`, `attachmentId`, `outputPath`      | Download status/path |
+| `list_item_members`        | `pass-cli item member list`         | Implemented | `shareId`, `itemId`, `output?`                         | Member list          |
+| `update_item_member`       | `pass-cli item member update`       | Implemented | `shareId`, `memberShareId`, `role`, `confirm`          | Update status        |
+| `remove_item_member`       | `pass-cli item member remove`       | Implemented | `shareId`, `memberShareId`, `confirm`                  | Remove status        |
 
 ### Share, Invite, Password, TOTP, User, Settings, SSH Agent
 

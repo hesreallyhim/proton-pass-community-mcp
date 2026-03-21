@@ -220,7 +220,6 @@ describe("server setup", () => {
       itemId: "i1",
       attachmentId: "a1",
       outputPath: "./tmp.bin",
-      confirm: true,
     });
     await tools.share_item.handler({
       shareId: "s1",
