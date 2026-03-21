@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/hesreallyhim/proton-pass-community-mcp/compare/v1.0.1...v1.0.2) (2026-03-21)
+
+
+### Bug Fixes
+
+* **item:** remove write gate from attachment download ([8de778d](https://github.com/hesreallyhim/proton-pass-community-mcp/commit/8de778d8a5417f09fec3afdb011daaa2280ca275))
+
 ## [1.0.1](https://github.com/hesreallyhim/proton-pass-community-mcp/compare/v1.0.0...v1.0.1) (2026-03-09)
 
 
