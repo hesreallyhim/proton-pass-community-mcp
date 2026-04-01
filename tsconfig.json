@@ -4,8 +4,10 @@
     "module": "ES2022",
     "moduleResolution": "Bundler",
     "strict": true,
+    "rootDir": "src",
     "outDir": "dist",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "types": ["node"]
   },
   "include": ["src/**/*"]
 }
