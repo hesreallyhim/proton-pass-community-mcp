@@ -33,7 +33,7 @@ describe("read-only handlers", () => {
     const result = await checkPassCliVersion(runner);
 
     expect(runner).toHaveBeenCalledWith(["--version"]);
-    expect(result.baselineVersion).toBe("1.6.1");
+    expect(result.baselineVersion).toBe("1.9.0");
     expect(result.detectedVersion).toBe("1.5.9");
     expect(result.compatibilityStatus).toBe("possibly_incompatible");
   });
@@ -51,7 +51,7 @@ describe("read-only handlers", () => {
 
   it("checkStatusHandler combines version and connectivity checks", async () => {
     const runner = makeRunner(async (args) => {
-      if (args[0] === "--version") return { stdout: "1.6.1 (abc123)", stderr: "" };
+      if (args[0] === "--version") return { stdout: "1.9.0 (abc123)", stderr: "" };
       if (args[0] === "test") return { stdout: "Connection successful", stderr: "" };
       return { stdout: "", stderr: "" };
     });
@@ -78,7 +78,7 @@ describe("read-only handlers", () => {
 
   it("checkStatusHandler enriches structuredContent with auth error fields", async () => {
     const runner = makeRunner(async (args) => {
-      if (args[0] === "--version") return { stdout: "1.6.1 (abc123)", stderr: "" };
+      if (args[0] === "--version") return { stdout: "1.9.0 (abc123)", stderr: "" };
       throw new PassCliAuthError("AUTH_EXPIRED");
     });
 
