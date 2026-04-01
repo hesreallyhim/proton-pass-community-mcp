@@ -1,6 +1,6 @@
 {
   "upstream_repo": "https://github.com/protonpass/pass-cli",
-  "latest_known_version": "1.8.0",
+  "latest_known_version": "1.9.0",
   "latest_known_version_source": "https://api.github.com/repos/protonpass/pass-cli/tags?per_page=100",
   "latest_known_version_changelog_source": "https://raw.githubusercontent.com/protonpass/pass-cli/main/CHANGELOG.md",
   "latest_known_version_published_date": "2026-03-23",

@@ -4,6 +4,7 @@
 
 [![CI](https://github.com/hesreallyhim/proton-pass-community-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/hesreallyhim/proton-pass-community-mcp/actions/workflows/ci.yml)
 [![Production Hygiene](https://github.com/hesreallyhim/proton-pass-community-mcp/actions/workflows/production-hygiene.yml/badge.svg)](https://github.com/hesreallyhim/proton-pass-community-mcp/actions/workflows/production-hygiene.yml)
+![NPM Version](https://img.shields.io/npm/v/proton-pass-community-mcp?style=flat&color=forestgreen)
 
 `proton-pass-community-mcp` is an MCP server for Proton Pass, with broad coverage of `pass-cli` operations.
 
@@ -13,6 +14,8 @@ It is designed as a production-ready integration layer:
 
 - typed tool inputs with `zod`
 - stdio transport for MCP clients
+
+### 📌 Current Version of `pass-cli` used in development: v1.9.0
 
 ## Available Tools
 
@@ -28,6 +31,8 @@ The server exposes the following MCP tool surface:
 | `list_vaults`                     | List vaults                                      |
 | `list_shares`                     | List shares                                      |
 | `list_invites`                    | List pending invitations                         |
+| `accept_invite`                   | Accept an invitation token                       |
+| `reject_invite`                   | Reject an invitation token                       |
 | `view_settings`                   | View current Proton Pass CLI settings            |
 | `list_vault_members`              | List members of a specific vault                 |
 | `update_vault_member`             | Update a vault member role                       |
@@ -120,8 +125,6 @@ These template resources are example well-formed payloads from `pass-cli --get-t
 - Node.js `24` (`.nvmrc`)
 - `pass-cli` installed and authenticated
 - MCP client capable of stdio transport
-
-### 📌 Current Baseline Version of `pass-cli` used in development: v1.7.0
 
 ## Run Locally
 
