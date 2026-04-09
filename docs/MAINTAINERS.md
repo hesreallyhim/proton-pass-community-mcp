@@ -17,8 +17,9 @@ Purpose:
 
 What it checks:
 
-1. `upstream_repo_head_sha`
-2. `latest_known_version`
+1. `latest_known_version`
+2. `latest_known_version_published_date`
+3. `last_checked_utc`
 
 Source of truth for tracked values:
 
@@ -37,10 +38,9 @@ Template drift workflow policy:
 
 ## Maintainer CTA When Upstream Watch Fails
 
-1. Review workflow output and confirm the new SHA/version.
+1. Review workflow output and confirm the new version metadata.
 2. Decide whether the update implies actionable drift for this project.
 3. If accepted, update `docs/upstream/PASS_CLI_SOURCE_METADATA.json`:
-   - `upstream_repo_head_sha`
    - `latest_known_version`
    - `latest_known_version_published_date`
    - `last_checked_utc`
@@ -48,6 +48,7 @@ Template drift workflow policy:
    - `pass-cli --version`
    - relevant `pass-cli <command> --help`
    - optional local docs cache fetch (`npm run docs:sync:pass-cli -- <ref>`)
+   - note: current upstream tags use unprefixed semver values such as `1.10.0`
 5. Record resulting decisions in docs/tests and merge.
 
 ## Documentation Convention: Front Matter
@@ -75,11 +76,19 @@ Notes:
 
 ## Throwaway CLI Auth Quick Commands
 
-Use repo wrapper for all project-side CLI calls:
+Use the repo wrapper for all project-side CLI calls. Canonical npm entrypoint:
+
+```bash
+npm run pass -- <pass-cli-args...>
+```
+
+Equivalent shell wrapper:
 
 ```bash
 scripts/pass-dev.sh <pass-cli-args...>
 ```
+
+Do not use bare `pass-cli` for normal project work if you want the repo-local session/key-provider guardrails.
 
 Local throwaway login + guardrail preflight:
 
@@ -88,6 +97,8 @@ scripts/pass-dev.sh login --interactive <throwaway-account-identifier>
 export PASS_DEV_EXPECTED_ACCOUNT=<throwaway-account-identifier>
 scripts/pass-dev-preflight.sh
 ```
+
+The wrapper keeps auth in the repo-local session dir and avoids default keychain/keyring access, but the preflight is what actually verifies the active account matches the throwaway target.
 
 Quick verification:
 

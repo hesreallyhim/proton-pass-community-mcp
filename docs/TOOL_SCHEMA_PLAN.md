@@ -22,9 +22,10 @@ Primary optimization target: item discovery (`pass-cli item list`) should return
 4. When `structuredContent` is returned, also return a `TextContent` serialization of that same JSON object for backwards compatibility/interoperability. This is not a separate human-output mode from the CLI.
 5. Listing/search tools return references, then callers use `view_item` for full content.
 6. Release branches may retain non-release code paths, but only release-scoped tools are registered/exposed by default.
-7. Authentication lifecycle (`pass-cli login`, `pass-cli logout`) remains out-of-band and is not exposed as MCP tools.
-8. CLI binary lifecycle commands (for example `pass-cli update` / track switching) remain out-of-band and are not exposed as MCP tools.
-9. Host SSH agent integration/lifecycle commands (`pass-cli ssh-agent *`) remain out-of-band and are not exposed as MCP tools.
+7. Authentication session lifecycle (`pass-cli login`, `pass-cli logout`) remains out-of-band and is not exposed as MCP tools, even when login is PAT-backed.
+8. PAT administration is evaluated separately from login/logout because it manages scoped credentials after bootstrap auth; see `docs/ADR/ADR-005-pat-auth-boundary-and-tooling.md`.
+9. CLI binary lifecycle commands (for example `pass-cli update` / track switching) remain out-of-band and are not exposed as MCP tools.
+10. Host SSH agent integration/lifecycle commands (`pass-cli ssh-agent *`) remain out-of-band and are not exposed as MCP tools.
 
 ## Write Authorization and Confirmation Policy (Proposal)
 
@@ -264,7 +265,8 @@ Status key:
 1. `Implemented`: currently in server.
 2. `Planned`: targeted for schema/tool implementation.
 3. `Planned (MCP-native)`: added for MCP ergonomics, not direct CLI command.
-4. `Out of Scope (Out-of-Band)`: intentionally not exposed as MCP tools.
+4. `Deferred (Secret-emitting)`: intentionally postponed because safe MCP handling of the returned secret material is unresolved.
+5. `Out of Scope (Out-of-Band)`: intentionally not exposed as MCP tools.
 
 Input summary convention:
 
@@ -286,6 +288,24 @@ Input summary convention:
 | `support`           | `pass-cli support`                     | Out of Scope (Out-of-Band) | n/a                                                    | n/a                                                     |
 | `inject`            | `pass-cli inject`                      | Implemented                | `inFile`, `outFile?`, `fileMode?`, `force?`, `confirm` | Output path/status                                      |
 | `run`               | `pass-cli run`                         | Implemented                | `command[]`, `envFile[]?`, `noMasking?`, `confirm`     | Exit code/stdout/stderr summary                         |
+
+### Personal Access Tokens
+
+| Tool                                  | Source                            | Status                     | Input Summary                                                                                                                                                          | Output Summary                        |
+| ------------------------------------- | --------------------------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------- |
+| `create_personal_access_token`        | `pass-cli pat create`             | Deferred (Secret-emitting) | `name`, `expiration`, `confirm`                                                                                                                                        | One-time bearer credential + metadata |
+| `list_personal_access_tokens`         | `pass-cli pat list`               | Planned                    | `output?`                                                                                                                                                              | Token refs / expiration metadata      |
+| `delete_personal_access_token`        | `pass-cli pat delete`             | Planned                    | `personalAccessTokenId`, `confirm`                                                                                                                                     | Delete status                         |
+| `renew_personal_access_token`         | `pass-cli pat renew`              | Deferred (Secret-emitting) | xor: `personalAccessTokenId \| personalAccessTokenName`; required: `expiration`, `confirm`                                                                             | New bearer credential + metadata      |
+| `grant_personal_access_token_access`  | `pass-cli pat access grant`       | Planned                    | token selector: `personalAccessTokenId \| personalAccessTokenName`; scope selector: `shareId \| vaultName`; item selector: `itemId? \| itemTitle?`; `role?`, `confirm` | Grant status                          |
+| `revoke_personal_access_token_access` | `pass-cli pat access revoke`      | Planned                    | token selector: `personalAccessTokenId \| personalAccessTokenName`; required: `shareId`, `confirm`                                                                     | Revoke status                         |
+| `list_personal_access_token_access`   | `pass-cli pat access list-access` | Planned                    | token selector: `personalAccessTokenId \| personalAccessTokenName`; `output?`                                                                                          | Current grant list                    |
+
+Notes:
+
+1. PAT-backed `pass-cli login` remains out of scope because it is still login lifecycle, not steady-state vault operation.
+2. `pat create` and `pat renew` are deferred because upstream docs say the full token value is shown only once; exposing that through normal MCP tool output would leak a fresh bearer credential into tool transcripts/model context.
+3. Dynamic PAT state is not planned as an MCP resource surface because it is security-sensitive and mutable.
 
 ### Vault Tools
 
