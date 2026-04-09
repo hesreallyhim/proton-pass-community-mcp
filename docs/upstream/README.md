@@ -34,6 +34,8 @@ Fetch docs to local ignored cache only when needed:
 npm run docs:sync:pass-cli -- <ref>
 ```
 
+Use the literal upstream tag/ref string. Current releases use unprefixed semver tags such as `1.10.0`, not `v1.10.0`.
+
 Equivalent command:
 
 ```bash
