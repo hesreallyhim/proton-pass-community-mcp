@@ -125,6 +125,7 @@ These template resources are example well-formed payloads from `pass-cli --get-t
 - Node.js `24` (`.nvmrc`)
 - `pass-cli` installed and authenticated
 - MCP client capable of stdio transport
+- For project development and testing, use the repo wrapper (`npm run pass -- <args>` or `scripts/pass-dev.sh <args>`) instead of bare `pass-cli` so auth stays in the repo-local session scope.
 
 ## Run Locally
 
@@ -132,6 +133,19 @@ These template resources are example well-formed payloads from `pass-cli --get-t
 npm ci
 npm run build
 npm run dev
+```
+
+For project-side `pass-cli` work, prefer:
+
+```bash
+npm run pass -- info
+```
+
+This routes through the repo wrapper, which uses a project-local session dir and avoids OS keychain/keyring by default. To assert that the active repo-local session is the intended throwaway account before mutative work:
+
+```bash
+export PASS_DEV_EXPECTED_ACCOUNT=<throwaway-account-identifier>
+npm run pass:dev:preflight
 ```
 
 ## Install and Run via npm/npx
@@ -222,15 +236,19 @@ Example MCP server config using environment overrides:
 ## Authentication Model
 
 1. Authentication is user-managed outside MCP with `pass-cli login`.
-2. On auth failure, tools return standardized `AUTH_*` errors and a retry instruction.
-3. The MCP server does not collect credentials, OTP codes, or private keys.
-4. Use `check_status` once as a session preflight (not per tool call); rely on `AUTH_*` fallback errors if the session later expires.
-5. `check_status` compares your local CLI version against the development baseline and reports a version assessment for LLMs:
+2. The `pass-cli` session may be established with normal account credentials or with a pre-provisioned personal access token (PAT).
+3. On auth failure, tools return standardized `AUTH_*` errors and a retry instruction.
+4. The MCP server does not collect credentials, OTP codes, private keys, or PAT values.
+5. PAT-backed login does not change the boundary: login/logout remain outside MCP, and PAT provisioning is not currently exposed as an MCP tool surface.
+6. For project development, the canonical `pass-cli` entrypoint is the repo wrapper (`npm run pass -- <args>` / `scripts/pass-dev.sh <args>`), not bare `pass-cli`.
+7. The repo wrapper isolates project auth into `.tmp/proton-pass-dev-session` and avoids default keychain/keyring access, but it does not by itself prove the correct account is active; use `scripts/pass-dev-preflight.sh` or `npm run pass:dev:preflight` to assert the expected throwaway account.
+8. Use `check_status` once as a session preflight (not per tool call); rely on `AUTH_*` fallback errors if the session later expires.
+9. `check_status` compares your local CLI version against the development baseline and reports a version assessment for LLMs:
    - `equal`: exact semver match
    - `compatible`: semver differs but appears compatible by policy
    - `possibly_incompatible`: semver indicates potential drift, or version parsing/execution prevented a strict comparison
-6. Version assessments are advisory. `check_status` is marked as an MCP error only when connectivity/authentication fails.
-7. There is no MCP-specific API token auth layer in this server. Authentication methods are those supported by `pass-cli` in the server process environment.
+10. Version assessments are advisory. `check_status` is marked as an MCP error only when connectivity/authentication fails.
+11. There is no MCP-specific API token auth layer in this server. Authentication methods are those supported by `pass-cli` in the server process environment.
 
 ### Test Account Workflow
 

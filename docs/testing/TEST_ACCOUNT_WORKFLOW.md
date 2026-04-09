@@ -21,6 +21,7 @@ Based on Proton Pass CLI docs:
 
 1. Web login: `pass-cli login`
 2. Interactive login: `pass-cli login --interactive [USERNAME]`
+3. PAT login: `PROTON_PASS_PERSONAL_ACCESS_TOKEN=... pass-cli login` or `pass-cli login --personal-access-token ...`
 
 Interactive login can be automated with:
 
@@ -30,6 +31,8 @@ Interactive login can be automated with:
 
 SSO and U2F/FIDO hardware-key login are web-login-only.
 
+PAT login requires a token that has already been provisioned. Upstream docs imply that PATs are created/managed from an already-authenticated account session and then reused for later scoped logins.
+
 ## MCP Integration Authentication Model
 
 This MCP server does not implement a separate token-based authentication layer. It invokes `pass-cli` as a subprocess and inherits the server process environment.
@@ -38,7 +41,9 @@ Implications:
 
 1. If `pass-cli` can authenticate in that environment, MCP tools can run.
 2. If `pass-cli` cannot authenticate, MCP tools return auth errors and require login out-of-band.
-3. Current Proton Pass CLI docs do not describe a static API token/PAT login mode for `pass-cli login`.
+3. PAT-backed login is now a documented `pass-cli` session source, but it remains out-of-band from the MCP server.
+4. PAT administration is a separate design question from login itself; see `docs/ADR/ADR-005-pat-auth-boundary-and-tooling.md`.
+5. For project development, the canonical CLI entrypoints are `npm run pass -- ...`, `scripts/pass ...`, or `scripts/pass-dev.sh ...`; bare `pass-cli` is outside the normal repo safety convention.
 
 ### Pattern A: Local persistent dev session (recommended)
 
@@ -57,7 +62,14 @@ Use ephemeral session + env key provider:
 - `PROTON_PASS_KEY_PROVIDER=env`
 - `PROTON_PASS_ENCRYPTION_KEY=<ci-secret>`
 
-Then authenticate with `pass-cli login --interactive` using environment/file inputs for password, TOTP, and extra password as required by the account.
+Preferred when available: authenticate with a pre-provisioned PAT:
+
+```bash
+export PROTON_PASS_PERSONAL_ACCESS_TOKEN=<scoped-pat>
+pass-cli login
+```
+
+Fallback/bootstrap path: authenticate with `pass-cli login --interactive` using environment/file inputs for password, TOTP, and extra password as required by the account.
 
 ### MCP client configuration example (local throwaway account)
 
@@ -82,9 +94,16 @@ Then authenticate with `pass-cli login --interactive` using environment/file inp
 
 ### 1. Use the repo wrapper for all project CLI calls
 
-Use:
+Preferred npm entrypoint:
 
 ```bash
+npm run pass -- <pass-cli-args...>
+```
+
+Equivalent shell wrappers:
+
+```bash
+scripts/pass <pass-cli-args...>
 scripts/pass-dev.sh <pass-cli-args...>
 ```
 
@@ -97,6 +116,8 @@ The wrapper intentionally avoids the keyring backend in normal project usage.
 
 - Allowed defaults: `fs` or `env`
 - Escape hatch: `PASS_DEV_ALLOW_KEYRING=1 PASS_DEV_KEY_PROVIDER=keyring ...`
+
+Do not use bare `pass-cli` for normal project work if you want the repo-local session and key-provider guardrails.
 
 ### 2. Authenticate once with the throwaway account
 
@@ -128,6 +149,8 @@ scripts/pass-dev-preflight.sh
 ```
 
 This fails fast if the currently authenticated CLI account does not match the expected throwaway account.
+
+That distinction matters: the wrapper isolates project auth from your default desktop/browser session, but the preflight is what actually enforces "secondary account only".
 
 ## Desktop App and SSH Key Workflow
 

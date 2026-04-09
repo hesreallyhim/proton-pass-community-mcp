@@ -37,7 +37,9 @@ Out of scope:
 3. Proton Pass CLI docs currently describe:
    - web login: `pass-cli login`
    - interactive login: `pass-cli login --interactive [USERNAME]`
-4. Proton docs do not currently describe static PAT/API-token login for `pass-cli`.
+   - PAT login: `PROTON_PASS_PERSONAL_ACCESS_TOKEN=... pass-cli login` or `pass-cli login --personal-access-token ...`
+4. PAT creation and access management are documented under `pass-cli pat ...`.
+5. The upstream docs imply PATs are created first from an already-authenticated account context and then used for later scoped logins.
 
 ## Architecture and Boundaries
 
@@ -45,6 +47,10 @@ Out of scope:
 2. MCP tools never receive/store account password, TOTP, or extra password as tool inputs.
 3. Session storage and key provider are environment-controlled (`PROTON_PASS_SESSION_DIR`, `PROTON_PASS_KEY_PROVIDER`).
 4. Desktop app/browser extension auth state is treated as independent from this CLI-scoped workflow.
+5. PAT-backed login does not change the boundary: `pass-cli login` and `pass-cli logout` remain out-of-band operations for this MCP server.
+6. PAT administration is a separate tool-surface question from login itself; see `docs/ADR/ADR-005-pat-auth-boundary-and-tooling.md`.
+7. For project development, the canonical CLI entrypoints are `npm run pass -- ...`, `scripts/pass ...`, or `scripts/pass-dev.sh ...`; bare `pass-cli` is outside the normal repo safety convention.
+8. Repo-local session isolation reduces cross-account mixups, but the expected-account preflight is the actual guardrail that rejects a non-throwaway account.
 
 ## Standard Modes
 
@@ -52,28 +58,32 @@ Out of scope:
 
 1. Provider: `PROTON_PASS_KEY_PROVIDER=fs`
 2. Session dir: repo-local `PROTON_PASS_SESSION_DIR=<repo>/.tmp/proton-pass-dev-session`
-3. Login: `scripts/pass-dev.sh login` or `scripts/pass-dev.sh login --interactive <user>`
-4. Guardrail: `scripts/pass-dev-preflight.sh` before mutative integration checks
+3. Canonical CLI entrypoint: `npm run pass -- ...` (or the equivalent shell wrappers `scripts/pass ...` / `scripts/pass-dev.sh ...`)
+4. Login: `scripts/pass-dev.sh login` or `scripts/pass-dev.sh login --interactive <user>`
+5. Guardrail: `scripts/pass-dev-preflight.sh` before mutative integration checks
 
 Rationale:
 
 1. Isolation from other repos/tools
 2. No default keychain/keyring dependence
 3. Repeatable behavior across shells and MCP clients
+4. Preflight enforces the throwaway-account convention rather than relying on session-path isolation alone
 
 ### Mode B: CI Integration
 
 1. Provider: `PROTON_PASS_KEY_PROVIDER=env`
 2. Encryption key: `PROTON_PASS_ENCRYPTION_KEY` from CI secret storage
 3. Session dir: ephemeral runner path (`$RUNNER_TEMP/...`)
-4. Login: `pass-cli login --interactive <user>` with env/file-fed credentials
-5. Cleanup: logout best-effort
+4. Preferred login when available: pre-provisioned PAT via `PROTON_PASS_PERSONAL_ACCESS_TOKEN=... pass-cli login`
+5. Fallback/bootstrap login: `pass-cli login --interactive <user>` with env/file-fed credentials
+6. Cleanup: logout best-effort
 
 Rationale:
 
 1. No machine keychain dependency
 2. Compatible with ephemeral runners
-3. Controlled secret handling in CI platform
+3. PAT-backed sessions are more scopeable for automation than full-account credentials
+4. Controlled secret handling in CI platform
 
 ### Mode C: Keyring Compatibility (optional verification lane)
 
@@ -141,7 +151,7 @@ Detailed planning for this is tracked in `docs/testing/THROWAWAY_DATA_PLAN.md`.
 
 ## Open Questions
 
-1. Whether future Proton CLI releases add token-like login methods.
+1. Whether this repo should expose PAT metadata/admin tools (`list`, `delete`, `grant`, `revoke`, `list-access`) in a future release.
 2. Whether Codex runtime should include per-project MCP config in this repo or remain documented-only.
 3. Whether keyring compatibility should become required versus optional.
 
@@ -149,4 +159,4 @@ Detailed planning for this is tracked in `docs/testing/THROWAWAY_DATA_PLAN.md`.
 
 1. `docs/testing/TEST_ACCOUNT_WORKFLOW.md`
 2. `.github/workflows/pass-cli-integration-manual.yml`
-3. Proton Pass CLI login/configuration docs (upstream)
+3. Proton Pass CLI login/configuration/PAT docs (upstream)
