@@ -15,7 +15,7 @@ It is designed as a production-ready integration layer:
 - typed tool inputs with `zod`
 - stdio transport for MCP clients
 
-### 📌 Current Version of `pass-cli` used in development: v1.9.0
+### 📌 Current Version of `pass-cli` used in development: v1.10.0
 
 ## Available Tools
 
