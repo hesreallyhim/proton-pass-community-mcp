@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/hesreallyhim/proton-pass-community-mcp/compare/v1.1.0...v1.1.1) (2026-04-10)
+
+
+### Bug Fixes
+
+* prettier ([078941a](https://github.com/hesreallyhim/proton-pass-community-mcp/commit/078941aecb4f27c6a654aa7a49eb18172d5fcd25))
+
 ## [1.1.0](https://github.com/hesreallyhim/proton-pass-community-mcp/compare/v1.0.2...v1.1.0) (2026-03-21)
 
 
