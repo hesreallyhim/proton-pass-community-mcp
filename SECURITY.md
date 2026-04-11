@@ -6,7 +6,8 @@ Please do not open public issues for suspected security vulnerabilities.
 
 Instead:
 
-- Open a private GitHub security advisory for this repository.
+- [Open a private GitHub security advisory for this repository](https://github.com/hesreallyhim/proton-pass-community-mcp/security/advisories/new).
+- See GitHub's [private vulnerability reporting guide](https://docs.github.com/en/code-security/security-advisories/guidance-on-reporting-and-writing-information-about-vulnerabilities/privately-reporting-a-security-vulnerability) if you are unfamiliar with the flow.
 
 Security concerns will be treated with urgency due to the sensitive nature of the library.
 
