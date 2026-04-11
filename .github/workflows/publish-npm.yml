@@ -32,7 +32,7 @@ jobs:
         with:
           node-version: 24
           cache: npm
-          registry-url: https://registry.npmjs.org/
+          registry-url: https://registry.npmjs.org
 
       - name: Verify trusted publishing runtime minimums
         shell: bash
