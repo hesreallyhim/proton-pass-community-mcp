@@ -7,13 +7,18 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 jobs:
   release-please:
     name: Release Please
     runs-on: ubuntu-latest
+    # Job-level write grants only where actually needed:
+    #   contents: write       -> release-please creates release commits and tags
+    #   pull-requests: write  -> release-please opens and updates the release PR
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Run Release Please
         uses: googleapis/release-please-action@v4

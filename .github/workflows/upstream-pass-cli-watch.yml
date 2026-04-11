@@ -6,13 +6,18 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 jobs:
   watch-upstream:
     name: Watch upstream latest version tag
     runs-on: ubuntu-latest
+    # Job-level write grants only where actually needed:
+    #   contents: write       -> peter-evans/create-pull-request pushes a chore branch
+    #   pull-requests: write  -> peter-evans/create-pull-request opens the PR
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@v5
