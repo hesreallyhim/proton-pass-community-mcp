@@ -85,6 +85,19 @@ jobs:
           echo "tarball=$tarball" >> "$GITHUB_OUTPUT"
           echo "checksum_file=$checksum_file" >> "$GITHUB_OUTPUT"
 
+      - name: Install cosign
+        uses: sigstore/cosign-installer@7e8b541eb2e61bf99390e1afd4be13a184e9ebc5 # v3.10.1
+
+      - name: Sign tarball with cosign keyless
+        shell: bash
+        env:
+          TARBALL: ${{ steps.package.outputs.tarball }}
+        run: |
+          cosign sign-blob --yes \
+            --bundle "${TARBALL}.sigstore" \
+            "$TARBALL"
+          echo "sigstore_bundle=${TARBALL}.sigstore" >> "$GITHUB_OUTPUT"
+
       - name: Upload tarball artifacts to GitHub release
         shell: bash
         env:
@@ -92,7 +105,12 @@ jobs:
           TAG_NAME: ${{ github.event.release.tag_name }}
           TARBALL: ${{ steps.package.outputs.tarball }}
           CHECKSUM_FILE: ${{ steps.package.outputs.checksum_file }}
-        run: gh release upload "$TAG_NAME" "$TARBALL" "$CHECKSUM_FILE" --clobber --repo "$GITHUB_REPOSITORY"
+        run: |
+          gh release upload "$TAG_NAME" \
+            "$TARBALL" \
+            "$CHECKSUM_FILE" \
+            "${TARBALL}.sigstore" \
+            --clobber --repo "$GITHUB_REPOSITORY"
 
       - name: Publish to npm
         run: npm publish
