@@ -11,7 +11,7 @@ Instead:
 
 Security concerns will be treated with urgency due to the sensitive nature of the library.
 
-An initial response may be expected within 7 days. 
+An initial response may be expected within 7 days.
 
 ## Report Expectations
 
