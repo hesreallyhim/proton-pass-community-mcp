@@ -70,21 +70,21 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",
-    "zod": "^4.3.6"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@modelcontextprotocol/inspector": "^0.21.2",
     "@vitest/coverage-v8": "^4.1.5",
     "cloc": "^2.6.0-cloc",
-    "eslint": "^10.2.1",
+    "eslint": "^10.3.0",
     "fast-check": "^4.7.0",
-    "globals": "^17.5.0",
+    "globals": "^17.6.0",
     "husky": "^9.1.7",
     "prettier": "^3.8.3",
     "tsx": "^4.21.0",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.59.0",
+    "typescript-eslint": "^8.59.2",
     "vitest": "^4.1.5"
   }
 }
