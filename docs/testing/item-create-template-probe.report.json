@@ -1,15 +1,15 @@
 {
-  "generated_at": "2026-03-06T16:03:31.856Z",
-  "pass_cli_version": "Proton Pass CLI 1.5.2 (41cf394)",
+  "generated_at": "2026-05-06T15:45:52.340Z",
+  "pass_cli_version": "Proton Pass CLI 2.0.2 (4c8adbc)",
   "share_id": "09pmGPeO8fJwRea9hLkYlpQlCWZ-X1t51Kcfm28LnKsC16qWifIiOD04FEd3kTs2PFN-ILO52JPo_4a1S1F_oA==",
   "source_snapshot": "docs/testing/item-create-templates.snapshot.json",
-  "delay_ms": 250,
+  "delay_ms": 0,
   "results": {
     "credit-card": [
       {
         "variant": "baseline",
         "exit_code": 0,
-        "stdout": "Y5wqoEDAaB8Y05nqQQSLCWMOxEQHIwBw3GDuq9WMBso42KssGYqKfQkSF5wI3BApvDFNR3WoJALnUx4y_XfSog==",
+        "stdout": "1sYM_p4_QVXsexwhTnUBu6iL_QwEaLo3eyljgLHETa_s13MrBsEl6zfyByck40ydS79S6vYyHpAoimYfvaaCCg==",
         "stderr": "",
         "cleanup_enabled": false,
         "cleanup": {
@@ -42,7 +42,7 @@
       {
         "variant": "title_empty",
         "exit_code": 0,
-        "stdout": "7GFvFI-ahPL6xCANNC26SqjzV0lWajoKiHlXjMOQxaJh0Btx9ST45oaG9dc83nUDsHa6WjRKb_Soytogc1ebzg==",
+        "stdout": "ziAr4IjkYkWMs8bQRpdUGOeiqKrc3AIyfv37XdOxtkQhJSTj5x4ntXOpSfJaYGiMwLKnTJ8Z-rOoUTOid89Maw==",
         "stderr": "",
         "cleanup_enabled": false,
         "cleanup": {
@@ -53,7 +53,7 @@
       {
         "variant": "omit_all_null_fields",
         "exit_code": 0,
-        "stdout": "ia76TxfNhaKRqbURow0SinogLB8HQBEiSZp2h_BvK3fvCa3h5k1MAD5rpihBCRbsR_d4tuK1opl02aXtdqmMjQ==",
+        "stdout": "wBzRfmCo8wUcobhca86biIEIdCrH6IqIv5HIvtzSikA6ekgAlM5W2u5YeEIW9SopElA7lPasK_JkO0Y9c0jX9Q==",
         "stderr": "",
         "cleanup_enabled": false,
         "cleanup": {
@@ -64,7 +64,7 @@
       {
         "variant": "nullify_string_fields",
         "exit_code": 0,
-        "stdout": "6UzOBaSW_XB-s3nLV92rmOmxhHW0ArLexpx3C81dX6ofYrCb7fWrLs17sL7py9HdTy1WOf0kotlsaJ8l0owqeA==",
+        "stdout": "SjdV4XY5pArZSEIMTs5jRI6XZvnoqv282hKhqKAN1ZRQDpj3ApIVuXiDmGYP8fET42JwNsIMYl0HKyC7CTlBdA==",
         "stderr": "",
         "cleanup_enabled": false,
         "cleanup": {
@@ -77,7 +77,7 @@
       {
         "variant": "baseline",
         "exit_code": 0,
-        "stdout": "pA90E2cfcn4hbNh_QKOgPSIHvMo49lWwRT10H1v4sRNFG10TiP0Kgtm2GjZaX_JSmD3VS6i112WpARV7EQlXtg==",
+        "stdout": "B7sbDvKJRuiYdGhbh4Diy5LSosutXoBkFDBWlhb01zXgCDwdFje491KmglCekbviftdt6z5W6R-oZ390QtG_pA==",
         "stderr": "",
         "cleanup_enabled": false,
         "cleanup": {
@@ -110,7 +110,7 @@
       {
         "variant": "title_empty",
         "exit_code": 0,
-        "stdout": "RTDGDP7IyRSLtW7tBhPZTEuy2fgcL9WuAfC3ld5JXM6MG1sb4MZCm_xAmjWkU0UBoAKBFbl7qetJSULmCSg_EA==",
+        "stdout": "VzAelKXjksgV10M91mUzXmjbPV3NJiDTTF8y8Wp5TyNgQBDYCCb4W29zayCMJtWeXkEk7G9Jxc1FRfw3VDMx7w==",
         "stderr": "",
         "cleanup_enabled": false,
         "cleanup": {
@@ -121,7 +121,7 @@
       {
         "variant": "omit_all_null_fields",
         "exit_code": 0,
-        "stdout": "gdm7xiM9_4xHs-dqZz3DTcDWMU-w6lyILAq6tMbWSF5dVkA5p_DNurAP1CVc6qGenYUiGoBYNWOG9aGn05RAeA==",
+        "stdout": "sifMKOv8wSyYv4_NigN698uJNetvDUI2BxwX7_RjueLFoOtgCrVyf2Jqaor-o0VWGseIXEyVx-1Aju468QpPMQ==",
         "stderr": "",
         "cleanup_enabled": false,
         "cleanup": {
@@ -132,7 +132,7 @@
       {
         "variant": "nullify_string_fields",
         "exit_code": 0,
-        "stdout": "iVekoKb_6wKTl3X3y6dtIsv24uf89IsZLn1S2b0-vPqXLnmJd3x0KlC3e8A8kjHOQrbWbBI6Qy2-MFWlv0Aj3w==",
+        "stdout": "rr-rvItd2DJd6hLd0UDlUwU9J9Z2g_yFIZtCFizrUkpQliXAWDDoQ3C3hSWzLWd3IzMhoZHSAO6hxJkQZrkBcw==",
         "stderr": "",
         "cleanup_enabled": false,
         "cleanup": {
@@ -145,7 +145,7 @@
       {
         "variant": "baseline",
         "exit_code": 0,
-        "stdout": "X4mOsXcGCDz9f0I7bHT4z4WmSqqgtia-KSKQFC6A6EN1FMbamBjsu6If035UR_ISaIG34Uu7cw9urmRJMYEYjQ==",
+        "stdout": "E2Ap_7lq3tkMfEza2vOdVFPKRUyx92zRZtxJQauK71uPFYi98kolG2bhr3C0xg1WcLZL0fvHiSiMJS3YA_qmWw==",
         "stderr": "",
         "cleanup_enabled": false,
         "cleanup": {
@@ -178,7 +178,7 @@
       {
         "variant": "title_empty",
         "exit_code": 0,
-        "stdout": "QMZwoJe8jS9ZvpmYCh9doDwt1zKzw-fouTUIShcOyEaOOP18GHrzm0jylRcb1RBBmM3TzFmlTwYeGswCornN1w==",
+        "stdout": "9dKjPLiCpgs3_Xm6UcnaP-bDIpqSe7PeRomPH2Hi4oxHBx4oZ0jyBoA91sFQA7yoZfQPOSh7-xMQ2fsqHzqHuA==",
         "stderr": "",
         "cleanup_enabled": false,
         "cleanup": {
@@ -189,7 +189,7 @@
       {
         "variant": "omit_all_null_fields",
         "exit_code": 0,
-        "stdout": "x1i5SmYt1kd5rTuf9t0WSwnq50BaIPIT0SSwc3fX2v5zWuyQY_0Z9xmZID83QZAaV1Q7j_zHkvm6Ult9DVkP4Q==",
+        "stdout": "NtcnqjqsIn2bA0sfOkq6rEjodBikKHfFp--mXI6HJ-8PwCEKowGoBGwbZ-mmMeSvYSGLg8I-vozT5u-zedYShg==",
         "stderr": "",
         "cleanup_enabled": false,
         "cleanup": {
@@ -200,7 +200,7 @@
       {
         "variant": "nullify_string_fields",
         "exit_code": 0,
-        "stdout": "7CMB6q-CSdudklDAO9ySYadf3uXZwgafX2R6SABgkIgZOPF6RZYgXO0WDiWmakIInd03IUOtQJUNFsbQjkC4dQ==",
+        "stdout": "L4m5djom-BY_tvE-ewDvBypEebobm136P-ZdCaE61rcZwCP0Fm113ky1rBElzhzNX-iHXVVifFSnIo_wqUQxvg==",
         "stderr": "",
         "cleanup_enabled": false,
         "cleanup": {
@@ -213,7 +213,7 @@
       {
         "variant": "baseline",
         "exit_code": 0,
-        "stdout": "wIRFIbOZz0HTJQEeExo92hw1LaFy06bmLc5ykqjtjipS1_Y9BU9QRIKwWN1SV-k4Z3HBKlk2J2lA_2P1QrKAnA==",
+        "stdout": "qgkMcGMA3C1nBzMX0DrCNKkbQoT7H1NLvdZP6dthSsh_rDinPlonA8le8Z5l7kvvo-V5rC5OAhskpMiDHsPw3g==",
         "stderr": "",
         "cleanup_enabled": false,
         "cleanup": {
@@ -246,7 +246,7 @@
       {
         "variant": "title_empty",
         "exit_code": 0,
-        "stdout": "0QMKLPZa02WQlh8j0pHOTsr7H1JAbtNIuLvDuBhOF9UlgZdL-lHT0WKOAIZJPRKdq08AI3DusVTA4EYwxCX1JA==",
+        "stdout": "c_bWWO_s2WrvE5JNstCxUCag7UrTd1Qbv4y9T9DDyebOBX46ot9Ei4CmPNkSY5WNYMqrZKQ_K5Z9FQgAF0Jpug==",
         "stderr": "",
         "cleanup_enabled": false,
         "cleanup": {
@@ -257,7 +257,7 @@
       {
         "variant": "omit_all_null_fields",
         "exit_code": 0,
-        "stdout": "dLxPgqcBdSKkl0uGIC3LE1rgc3HhuaYwP_v81yTOsuIwaoZ38G51EO6TPd9JsW5UsLAsdsWQp2lPhO-iCrk3yw==",
+        "stdout": "ya0XkuOF3O9j0itWMOuAsJI7QtQmGd91qpTf8hBI536CUNJfC3t_b-1rRCmTf-nWzYAf8wpEDVCJrbImHKZxjQ==",
         "stderr": "",
         "cleanup_enabled": false,
         "cleanup": {
@@ -268,7 +268,7 @@
       {
         "variant": "nullify_string_fields",
         "exit_code": 0,
-        "stdout": "P-5c_Ye0yAhsc4Kvn7gNF9qZhsX9QutY2nqVRX2gM2gI6UmTtWkkFW8nYY2vcEzDAZBO5lEOvOLYDJd8KxwrhA==",
+        "stdout": "1UzBs5tDgawd79Y30xiSdH-MMxXTNTtUb-me_otIC9hUMa5Zu6Rq-081oYnme3so0_UIzSsnLj-Ll7C1PSQVHQ==",
         "stderr": "",
         "cleanup_enabled": false,
         "cleanup": {
@@ -281,7 +281,7 @@
       {
         "variant": "baseline",
         "exit_code": 0,
-        "stdout": "lJe_Yr86eNLjMSBRnzVKanaKmwyv4hO_FPg6lJL3_ZpLIewsI241jL2aMEHElrCg2qZ-dPg8qVm8XM3-DNZTwg==",
+        "stdout": "FowcDk6p_rNyePVu9pSmzasY9QZsd4w9od9gXsIZHz0hx51hMO9gQbvW8RDW2zVCxSI3h6ZkFXksAPl9YIf1SA==",
         "stderr": "",
         "cleanup_enabled": false,
         "cleanup": {
@@ -314,7 +314,7 @@
       {
         "variant": "title_empty",
         "exit_code": 0,
-        "stdout": "7uxfvoUaZYgbn2UyLY9iCgcLndowk8Nc6cjVqhtWji92gX9XOFvVVfBmofKzLLyv7qcrnbiph2nVBSkFXhHB4w==",
+        "stdout": "xQQjJcmEk7JObFCCBpOQf6u343p8qOqFSvLYKBt4ktfKsVN-jtu7bu3Gr4mZUoE18SqYGcH1miE905naSuH8tQ==",
         "stderr": "",
         "cleanup_enabled": false,
         "cleanup": {
@@ -325,7 +325,7 @@
       {
         "variant": "omit_all_null_fields",
         "exit_code": 0,
-        "stdout": "urDbwdHZpFOizY8Om9-Hwwj-X8giyYVOPvQ-QfxCE202WT53Zb-haDGKYmOuBbxk2SKDnKrtRBGyBXYI5qWutw==",
+        "stdout": "_ttelgnSYPw4eWLo5Oi1xfWqSzVL49x1tTFAkMPgSqPMI-JZjrfUwCU1ZAadtnrtB0CnVt9Nqb8TbOgBsFx3NQ==",
         "stderr": "",
         "cleanup_enabled": false,
         "cleanup": {
@@ -336,7 +336,7 @@
       {
         "variant": "nullify_string_fields",
         "exit_code": 0,
-        "stdout": "Q6Ln6LmtuD92mkZJOfCNV7dm5pQLHIF8VwBVTBH8RGa2CI-HzAEP-MDX-3cdnDh5Jrv1um1w28Vd4JEE8uzh0A==",
+        "stdout": "2R5SYiwgpqik2Oo3bT_uRo4BewaduAe3Od9wDwTEBXqVmpPQL_IjzBTcIMUUbP6GXZaBhCfSrihYL72TYVs3wg==",
         "stderr": "",
         "cleanup_enabled": false,
         "cleanup": {
