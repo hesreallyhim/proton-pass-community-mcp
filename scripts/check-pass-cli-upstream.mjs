@@ -189,7 +189,7 @@ async function main() {
   }
 
   const checkedAtUtc = new Date().toISOString();
-  let metadataSynced = false;
+  let metadataWritten = false;
   if (syncMetadata && changedFields.length > 0) {
     metadata.latest_known_version = latestVersion;
     if (latestVersionPublishedDate) {
@@ -200,8 +200,9 @@ async function main() {
     metadata.last_checked_utc = checkedAtUtc;
     delete metadata.upstream_repo_head_sha;
     await writeFile(METADATA_PATH, `${JSON.stringify(metadata, null, 2)}\n`, "utf8");
-    metadataSynced = true;
+    metadataWritten = true;
   }
+  const metadataSynced = changedFields.length === 0 || metadataWritten;
 
   const report = {
     status: changedFields.length > 0 ? "UPSTREAM_RELEASE_CHANGED" : "UNCHANGED",
