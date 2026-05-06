@@ -22,14 +22,21 @@ export const moveItemInputSchema = z
     message: "Provide exactly one of itemId or itemTitle.",
   });
 
-export const updateItemInputSchema = z.object({
-  shareId: z.string().max(100).optional().describe("Share ID containing the item"),
-  vaultName: z.string().max(255).optional().describe("Vault name containing the item"),
-  itemId: z.string().max(100).optional().describe("Item ID to update"),
-  itemTitle: z.string().max(255).optional().describe("Item title to update"),
-  fields: z.array(z.string().max(1024)).min(1).describe("Fields to update (key=value pairs)"),
-  confirm: confirmInput,
-});
+export const updateItemInputSchema = z
+  .object({
+    shareId: z.string().max(100).optional().describe("Share ID containing the item"),
+    vaultName: z.string().max(255).optional().describe("Vault name containing the item"),
+    itemId: z.string().max(100).optional().describe("Item ID to update"),
+    itemTitle: z.string().max(255).optional().describe("Item title to update"),
+    fields: z.array(z.string().max(1024)).min(1).describe("Fields to update (key=value pairs)"),
+    confirm: confirmInput,
+  })
+  .refine((input) => !(input.shareId && input.vaultName), {
+    message: "Provide only one of shareId or vaultName.",
+  })
+  .refine((input) => Boolean(input.itemId) !== Boolean(input.itemTitle), {
+    message: "Provide exactly one of itemId or itemTitle.",
+  });
 
 export const trashItemInputSchema = z
   .object({

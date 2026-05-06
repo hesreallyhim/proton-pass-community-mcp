@@ -180,8 +180,9 @@ describe("moveItemInputSchema", () => {
 });
 
 describe("updateItemInputSchema", () => {
-  it("accepts a minimal valid input (only required fields)", () => {
+  it("accepts a minimal valid input (item selector + fields)", () => {
     const result = updateItemInputSchema.safeParse({
+      itemId: "i",
       fields: ["username=alice"],
     });
     expect(result.success).toBe(true);
@@ -197,25 +198,49 @@ describe("updateItemInputSchema", () => {
     expect(result.success).toBe(true);
   });
 
-  // NOTE: divergence with handler-helpers.ts:
-  // updateItemInputSchema has NO XOR refinement on shareId/vaultName or
-  // itemId/itemTitle, and does not require any item selector. The handler
-  // throws on these conditions. The schema is intentionally laxer; the
-  // tests below assert the schema as written.
-  it("accepts both shareId AND vaultName (schema does not refine)", () => {
+  it("accepts vaultName + itemTitle", () => {
     const result = updateItemInputSchema.safeParse({
-      shareId: "s",
-      vaultName: "v",
+      vaultName: "Work",
+      itemTitle: "GitHub",
       fields: ["x=1"],
     });
     expect(result.success).toBe(true);
   });
 
-  it("accepts no item selector (schema does not refine)", () => {
+  it("accepts neither shareId nor vaultName (scope is optional)", () => {
     const result = updateItemInputSchema.safeParse({
+      itemId: "i",
       fields: ["x=1"],
     });
     expect(result.success).toBe(true);
+  });
+
+  it("rejects when shareId AND vaultName are both set", () => {
+    const result = updateItemInputSchema.safeParse({
+      shareId: "s",
+      vaultName: "v",
+      itemId: "i",
+      fields: ["x=1"],
+    });
+    expectIssueWithMessage(result, "Provide only one of shareId or vaultName.");
+  });
+
+  it("rejects when itemId AND itemTitle are both set", () => {
+    const result = updateItemInputSchema.safeParse({
+      shareId: "s",
+      itemId: "i",
+      itemTitle: "T",
+      fields: ["x=1"],
+    });
+    expectIssueWithMessage(result, "Provide exactly one of itemId or itemTitle.");
+  });
+
+  it("rejects when neither itemId nor itemTitle are set", () => {
+    const result = updateItemInputSchema.safeParse({
+      shareId: "s",
+      fields: ["x=1"],
+    });
+    expectIssueWithMessage(result, "Provide exactly one of itemId or itemTitle.");
   });
 
   it("rejects missing fields (required)", () => {
@@ -279,8 +304,12 @@ describe("updateItemInputSchema", () => {
   });
 
   it("accepts confirm: false and omitted", () => {
-    const a = updateItemInputSchema.safeParse({ fields: ["x=1"], confirm: false });
-    const b = updateItemInputSchema.safeParse({ fields: ["x=1"] });
+    const a = updateItemInputSchema.safeParse({
+      itemId: "i",
+      fields: ["x=1"],
+      confirm: false,
+    });
+    const b = updateItemInputSchema.safeParse({ itemId: "i", fields: ["x=1"] });
     expect(a.success).toBe(true);
     expect(b.success).toBe(true);
   });
