@@ -5,6 +5,10 @@
 [![CI](https://github.com/hesreallyhim/proton-pass-community-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/hesreallyhim/proton-pass-community-mcp/actions/workflows/ci.yml)
 [![Production Hygiene](https://github.com/hesreallyhim/proton-pass-community-mcp/actions/workflows/production-hygiene.yml/badge.svg)](https://github.com/hesreallyhim/proton-pass-community-mcp/actions/workflows/production-hygiene.yml)
 ![NPM Version](https://img.shields.io/npm/v/proton-pass-community-mcp?style=flat&color=forestgreen)
+[![Codacy Badge](https://app.codacy.com/project/badge/Coverage/5e174e31330149d68d4bba97373ce576)](https://app.codacy.com/gh/hesreallyhim/proton-pass-community-mcp/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_coverage)
+[![Dependabot Updates](https://github.com/hesreallyhim/proton-pass-community-mcp/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/hesreallyhim/proton-pass-community-mcp/actions/workflows/dependabot/dependabot-updates)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/hesreallyhim/proton-pass-community-mcp/badge?style=flat)](https://api.securityscorecards.dev/projects/github.com/hesreallyhim/proton-pass-community-mcp)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/12721/badge)](https://www.bestpractices.dev/projects/12721)
 
 `proton-pass-community-mcp` is an MCP server for Proton Pass, with broad coverage of `pass-cli` operations.
 
