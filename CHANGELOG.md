@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.2](https://github.com/hesreallyhim/proton-pass-community-mcp/compare/v1.1.1...v1.1.2) (2026-05-07)
+
+
+### Bug Fixes
+
+* **schemas:** tighten updateItemInputSchema to match handler contract ([fbf3de0](https://github.com/hesreallyhim/proton-pass-community-mcp/commit/fbf3de0c3e7fcc61cf62274e74085ce59bbaaab1))
+
 ## [1.1.1](https://github.com/hesreallyhim/proton-pass-community-mcp/compare/v1.1.0...v1.1.1) (2026-04-10)
 
 
