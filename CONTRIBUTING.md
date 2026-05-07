@@ -78,6 +78,8 @@ Administrative maintainer workflows (release operations, upstream watch triage, 
 3. Include tests for behavior changes.
 4. Keep changes focused and small where practical.
 
+Changes that add or materially alter runtime behavior, schemas, tool contracts, CLI argument construction, or user-visible output should include automated tests. If automated tests are not practical for a change, the PR should explain why and describe the manual validation performed.
+
 ## Working Areas
 
 - Tool registration: `src/server/register-tools.ts`
