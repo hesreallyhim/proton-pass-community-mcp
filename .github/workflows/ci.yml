@@ -51,17 +51,8 @@ jobs:
       - name: Verify coverage report
         run: test -s coverage/lcov.info
 
-      - name: Upload coverage to Codacy with project token
-        id: codacy-project-token
+      - name: Upload coverage to Codacy
         if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
-        continue-on-error: true
-        uses: codacy/codacy-coverage-reporter-action@89d6c85cfafaec52c72b6c5e8b2878d33104c699 # v1.3.0
-        with:
-          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-          coverage-reports: coverage/lcov.info
-
-      - name: Upload coverage to Codacy with account token
-        if: steps.codacy-project-token.outcome == 'failure'
         uses: codacy/codacy-coverage-reporter-action@89d6c85cfafaec52c72b6c5e8b2878d33104c699 # v1.3.0
         with:
           api-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
