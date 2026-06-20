@@ -24,7 +24,8 @@
     "provenance": true
   },
   "files": [
-    "dist"
+    "dist",
+    "docs/testing/item-create-templates.snapshot.json"
   ],
   "scripts": {
     "dev": "tsx src/index.ts",
