@@ -17,8 +17,7 @@ export function restoreProcessEnvAndMocks() {
 
 export function makeRunner(
   output:
-    | PassCliResult
-    | ((args: string[], stdin?: string) => PassCliResult | Promise<PassCliResult>) = {
+    PassCliResult | ((args: string[], stdin?: string) => PassCliResult | Promise<PassCliResult>) = {
     stdout: "",
     stderr: "",
   },

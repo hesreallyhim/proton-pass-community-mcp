@@ -69,22 +69,26 @@
     "node": ">=24"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@modelcontextprotocol/sdk": "^1.30.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@modelcontextprotocol/inspector": "^0.22.0",
-    "@vitest/coverage-v8": "^4.1.9",
+    "@vitest/coverage-v8": "^4.1.10",
     "cloc": "^2.11.0",
-    "eslint": "^10.5.0",
-    "fast-check": "^4.8.0",
-    "globals": "^17.7.0",
+    "eslint": "^10.8.1",
+    "fast-check": "^4.9.0",
+    "globals": "^17.9.0",
     "husky": "^9.1.7",
-    "prettier": "^3.8.4",
-    "tsx": "^4.22.4",
+    "prettier": "^3.9.6",
+    "tsx": "^4.23.11",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.62.0",
-    "vitest": "^4.1.9"
+    "typescript-eslint": "^8.66.0",
+    "vitest": "^4.1.10"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true,
+    "fsevents@2.3.3": true
   }
 }
