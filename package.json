@@ -74,7 +74,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@modelcontextprotocol/inspector": "^0.22.0",
+    "@modelcontextprotocol/inspector": "^2.2.0",
     "@vitest/coverage-v8": "^4.1.10",
     "cloc": "^2.11.0",
     "eslint": "^10.8.1",
