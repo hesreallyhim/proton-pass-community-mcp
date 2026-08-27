@@ -1,642 +1,860 @@
 {
-  "generated_at": "2026-08-09T09:59:26Z",
+  "generated_at": "2026-08-27T15:23:13.672Z",
   "repo": "hesreallyhim/proton-pass-community-mcp",
   "ecosystems": ["npm", "github-actions"],
   "tooling": {
     "npm_check_updates": {
-      "command": "npx --yes npm-check-updates --jsonUpgraded",
-      "policy": "latest stable, with incompatible majors deferred"
+      "command": "npm exec --yes --package=npm-check-updates -- ncu --jsonUpgraded",
+      "note": "Registry metadata and semver supplied initial intake because ncu was not initially installed; ncu used as a final candidate cross-check."
+    },
+    "node": "v24.18.0",
+    "npm": "11.16.0",
+    "github": {
+      "open_dependabot_pr_count": 10,
+      "open_dependabot_pr_endpoint": "https://api.github.com/repos/hesreallyhim/proton-pass-community-mcp/pulls?state=open&per_page=100",
+      "pagination": "Complete response; no next-page Link header",
+      "remote_changes": false
     },
     "osv": {
-      "provider": "npm audit and GitHub Dependabot alerts",
-      "baseline": {
-        "npm_audit_vulnerabilities": 10,
-        "github_dependabot_alerts": 14,
-        "severity": {
-          "moderate": 3,
-          "high": 7
-        }
-      }
-    },
-    "github": {
-      "open_dependabot_pr_query": "repo:hesreallyhim/proton-pass-community-mcp is:pr is:open author:app/dependabot",
-      "open_dependabot_pr_count": 11,
-      "incomplete_results": false
+      "provider": "npm audit",
+      "baseline_vulnerabilities": 0,
+      "final_vulnerabilities": 0
     }
   },
   "upgrades": [
     {
       "ecosystem": "npm",
-      "name": "@modelcontextprotocol/sdk",
-      "current": "1.29.0",
-      "target": "1.30.0",
-      "specifier": "^1.30.0",
-      "versions_in_range": ["1.30.0"],
-      "sources": {
-        "registry": "https://www.npmjs.com/package/@modelcontextprotocol/sdk/v/1.30.0",
-        "repo": "https://github.com/modelcontextprotocol/typescript-sdk",
-        "release_notes": [],
-        "changelog_files": [],
-        "compare_urls": [
-          "https://github.com/modelcontextprotocol/typescript-sdk/compare/1.29.0...1.30.0"
-        ]
-      },
-      "risk_flags": ["runtime_dependency", "security_fix"],
-      "vulnerabilities": [
-        {
-          "package": "@hono/node-server",
-          "advisory": "GHSA-frvp-7c67-39w9",
-          "note": "The SDK upgrade permits the patched transitive server adapter."
-        }
-      ],
-      "notes": [
-        "Compatible direct update discovered by npm-check-updates.",
-        "Contract tests are required because the SDK and Zod form a runtime schema boundary."
-      ],
-      "selected": true,
-      "pr_numbers": []
-    },
-    {
-      "ecosystem": "npm",
       "name": "@modelcontextprotocol/inspector",
       "current": "0.22.0",
-      "target": "2.1.0",
-      "specifier": "^2.1.0",
-      "versions_in_range": ["2.1.0"],
+      "target": "1.0.2",
+      "specifier": "^0.22.0",
+      "selected": true,
+      "latest": "2.4.0",
+      "versions_in_range": ["1.0.0", "1.0.1", "1.0.2"],
       "sources": {
-        "registry": "https://www.npmjs.com/package/@modelcontextprotocol/inspector/v/2.1.0",
+        "registry": "https://registry.npmjs.org/@modelcontextprotocol/inspector",
         "repo": "https://github.com/modelcontextprotocol/inspector",
-        "release_notes": [],
-        "changelog_files": [],
-        "compare_urls": ["https://github.com/modelcontextprotocol/inspector/compare/0.22.0...2.1.0"]
+        "release_notes": [
+          {
+            "url": "https://github.com/modelcontextprotocol/inspector/releases/tag/1.0.0"
+          },
+          {
+            "url": "https://github.com/modelcontextprotocol/inspector/releases/tag/1.0.2"
+          }
+        ]
       },
-      "risk_flags": ["major_version_bump", "many_transitive_changes", "no_open_dependabot_pr"],
+      "risk_flags": ["major_version_bump", "maintenance_line_deprecated"],
       "notes": [
-        "Deferred: outside the open-PR scope and requires a separate Inspector migration/smoke-test review."
+        "Accept 1.0.2 security maintenance; defer 2.4.0 because current CLI separator ordering and PASS_CLI_BIN inheritance must migrate."
       ],
-      "selected": false,
-      "pr_numbers": []
+      "selected_version": "1.0.2",
+      "pr_numbers": [155],
+      "resulting_specifier": "^1.0.2"
     },
     {
       "ecosystem": "npm",
       "name": "@vitest/coverage-v8",
-      "current": "4.1.9",
-      "target": "4.1.10",
+      "current": "4.1.10",
+      "target": "4.1.11",
       "specifier": "^4.1.10",
-      "versions_in_range": ["4.1.10"],
+      "selected": true,
+      "latest": "4.1.11",
+      "versions_in_range": ["4.1.11"],
       "sources": {
-        "registry": "https://www.npmjs.com/package/@vitest/coverage-v8/v/4.1.10",
+        "registry": "https://registry.npmjs.org/@vitest/coverage-v8",
         "repo": "https://github.com/vitest-dev/vitest",
         "release_notes": [
           {
-            "url": "https://github.com/vitest-dev/vitest/releases/tag/v4.1.10"
+            "url": "https://github.com/vitest-dev/vitest/releases/tag/v4.1.11",
+            "tag": "v4.1.11"
           }
-        ],
-        "changelog_files": [],
-        "compare_urls": ["https://github.com/vitest-dev/vitest/compare/v4.1.9...v4.1.10"]
+        ]
       },
       "risk_flags": ["paired_upgrade_required"],
-      "notes": ["Must remain exactly aligned with vitest because of its peer dependency."],
-      "selected": true,
-      "pr_numbers": []
+      "notes": [
+        "Accepted compatible stable release after upstream notes, engine/peer review, and local validation."
+      ],
+      "selected_version": "4.1.11",
+      "pr_numbers": [],
+      "resulting_specifier": "^4.1.11"
+    },
+    {
+      "ecosystem": "npm",
+      "name": "cloc",
+      "current": "2.11.0",
+      "target": "2.6.0-cloc",
+      "specifier": "^2.11.0",
+      "selected": false,
+      "latest": "2.6.0-cloc",
+      "versions_in_range": [],
+      "sources": {
+        "registry": "https://registry.npmjs.org/cloc",
+        "repo": "https://github.com/kentcdodds/cloc",
+        "release_notes": []
+      },
+      "risk_flags": ["dist_tag_would_downgrade"],
+      "notes": ["Keep 2.11.0; latest tag 2.6.0-cloc is older and outside current range."],
+      "selected_version": "2.11.0",
+      "pr_numbers": [],
+      "resulting_specifier": "^2.11.0"
     },
     {
       "ecosystem": "npm",
       "name": "eslint",
-      "current": "10.5.0",
-      "target": "10.8.1",
+      "current": "10.8.1",
+      "target": "10.9.1",
       "specifier": "^10.8.1",
-      "versions_in_range": ["10.6.0", "10.7.0", "10.8.0", "10.8.1"],
+      "selected": true,
+      "latest": "10.9.1",
+      "versions_in_range": ["10.9.0", "10.9.1"],
       "sources": {
-        "registry": "https://www.npmjs.com/package/eslint/v/10.8.1",
+        "registry": "https://registry.npmjs.org/eslint",
         "repo": "https://github.com/eslint/eslint",
         "release_notes": [
           {
-            "url": "https://github.com/eslint/eslint/releases/tag/v10.8.1"
-          }
-        ],
-        "changelog_files": [],
-        "compare_urls": ["https://github.com/eslint/eslint/compare/v10.5.0...v10.8.1"]
-      },
-      "risk_flags": ["lint_behavior_change"],
-      "notes": [
-        "Rolls PR #146 forward from 10.7.0 to the latest compatible 10.x release.",
-        "The PR's full check suite passed at 10.7.0."
-      ],
-      "selected": true,
-      "pr_numbers": [146]
-    },
-    {
-      "ecosystem": "npm",
-      "name": "fast-check",
-      "current": "4.8.0",
-      "target": "4.9.0",
-      "specifier": "^4.9.0",
-      "versions_in_range": ["4.9.0"],
-      "sources": {
-        "registry": "https://www.npmjs.com/package/fast-check/v/4.9.0",
-        "repo": "https://github.com/dubzzz/fast-check",
-        "release_notes": [
+            "url": "https://github.com/eslint/eslint/releases/tag/v10.9.0",
+            "tag": "v10.9.0"
+          },
           {
-            "url": "https://github.com/dubzzz/fast-check/releases/tag/v4.9.0"
+            "url": "https://github.com/eslint/eslint/releases/tag/v10.9.1",
+            "tag": "v10.9.1"
           }
-        ],
-        "changelog_files": [],
-        "compare_urls": ["https://github.com/dubzzz/fast-check/compare/v4.8.0...v4.9.0"]
+        ]
       },
-      "risk_flags": ["fuzz_test_behavior_change"],
+      "risk_flags": [],
       "notes": [
-        "Compatible update discovered by npm-check-updates; validate the dedicated fuzz suite."
+        "Accepted compatible stable release after upstream notes, engine/peer review, and local validation."
       ],
-      "selected": true,
-      "pr_numbers": []
+      "selected_version": "10.9.1",
+      "pr_numbers": [],
+      "resulting_specifier": "^10.9.1"
     },
     {
       "ecosystem": "npm",
       "name": "globals",
-      "current": "17.7.0",
-      "target": "17.9.0",
+      "current": "17.9.0",
+      "target": "17.11.0",
       "specifier": "^17.9.0",
-      "versions_in_range": ["17.8.0", "17.9.0"],
-      "sources": {
-        "registry": "https://www.npmjs.com/package/globals/v/17.9.0",
-        "repo": "https://github.com/sindresorhus/globals",
-        "release_notes": [],
-        "changelog_files": [],
-        "compare_urls": ["https://github.com/sindresorhus/globals/compare/v17.7.0...v17.9.0"]
-      },
-      "risk_flags": ["lint_environment_change"],
-      "notes": ["Compatible update discovered by npm-check-updates."],
       "selected": true,
-      "pr_numbers": []
-    },
-    {
-      "ecosystem": "npm",
-      "name": "prettier",
-      "current": "3.8.4",
-      "target": "3.9.6",
-      "specifier": "^3.9.6",
-      "versions_in_range": ["3.9.0", "3.9.1", "3.9.2", "3.9.3", "3.9.4", "3.9.5", "3.9.6"],
+      "latest": "17.11.0",
+      "versions_in_range": ["17.10.0", "17.11.0"],
       "sources": {
-        "registry": "https://www.npmjs.com/package/prettier/v/3.9.6",
-        "repo": "https://github.com/prettier/prettier",
+        "registry": "https://registry.npmjs.org/globals",
+        "repo": "https://github.com/sindresorhus/globals",
         "release_notes": [
           {
-            "url": "https://github.com/prettier/prettier/releases/tag/3.9.6"
+            "url": "https://github.com/sindresorhus/globals/releases/tag/v17.10.0",
+            "tag": "v17.10.0"
+          },
+          {
+            "url": "https://github.com/sindresorhus/globals/releases/tag/v17.11.0",
+            "tag": "v17.11.0"
           }
-        ],
-        "changelog_files": [],
-        "compare_urls": ["https://github.com/prettier/prettier/compare/3.8.4...3.9.6"]
+        ]
       },
-      "risk_flags": ["formatting_change_required", "dependabot_pr_ci_failure"],
+      "risk_flags": [],
       "notes": [
-        "Rolls PR #147 forward from 3.9.5 to 3.9.6.",
-        "PR #147 failed format:check because test/server/test-support.ts requires reformatting under 3.9.x."
+        "Accepted compatible stable release after upstream notes, engine/peer review, and local validation."
       ],
-      "selected": true,
-      "pr_numbers": [147]
+      "selected_version": "17.11.0",
+      "pr_numbers": [154],
+      "resulting_specifier": "^17.11.0"
     },
     {
       "ecosystem": "npm",
       "name": "tsx",
-      "current": "4.22.4",
-      "target": "4.23.11",
+      "current": "4.23.11",
+      "target": "4.23.12",
       "specifier": "^4.23.11",
-      "versions_in_range": ["4.23.0", "4.23.11"],
+      "selected": true,
+      "latest": "4.23.12",
+      "versions_in_range": ["4.23.12"],
       "sources": {
-        "registry": "https://www.npmjs.com/package/tsx/v/4.23.11",
+        "registry": "https://registry.npmjs.org/tsx",
         "repo": "https://github.com/privatenumber/tsx",
         "release_notes": [
           {
-            "url": "https://github.com/privatenumber/tsx/releases/tag/v4.23.11"
+            "url": "https://github.com/privatenumber/tsx/releases/tag/v4.23.12",
+            "tag": "v4.23.12"
           }
-        ],
-        "changelog_files": [],
-        "compare_urls": ["https://github.com/privatenumber/tsx/compare/v4.22.4...v4.23.11"]
+        ]
       },
-      "risk_flags": ["runtime_loader_change"],
+      "risk_flags": [],
       "notes": [
-        "Rolls PR #144 forward from 4.23.0 to the latest compatible release.",
-        "PR #144 passed all checks."
+        "Accepted compatible stable release after upstream notes, engine/peer review, and local validation."
       ],
-      "selected": true,
-      "pr_numbers": [144]
+      "selected_version": "4.23.12",
+      "pr_numbers": [156],
+      "resulting_specifier": "^4.23.12"
     },
     {
       "ecosystem": "npm",
       "name": "typescript",
       "current": "6.0.3",
       "target": "7.0.2",
-      "specifier": "^7.0.2",
+      "specifier": "^6.0.3",
+      "selected": false,
+      "latest": "7.0.2",
       "versions_in_range": ["7.0.2"],
       "sources": {
-        "registry": "https://www.npmjs.com/package/typescript/v/7.0.2",
-        "repo": "https://github.com/microsoft/typescript-go",
-        "release_notes": [
-          {
-            "url": "https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/"
-          },
-          {
-            "url": "https://github.com/microsoft/typescript-go/releases/tag/typescript%2Fv7.0.2"
-          }
-        ],
-        "changelog_files": [],
-        "compare_urls": []
+        "registry": "https://registry.npmjs.org/typescript",
+        "repo": "https://github.com/microsoft/TypeScript",
+        "release_notes": []
       },
-      "risk_flags": [
-        "major_version_bump",
-        "unsupported_peer_dependency",
-        "dependabot_pr_ci_failure",
-        "many_transitive_changes"
-      ],
+      "risk_flags": ["major_version_bump", "peer_dependency_incompatible"],
       "notes": [
-        "Deferred: PR #148 fails npm installation because typescript-eslint requires TypeScript >=4.8.4 <6.1.0.",
-        "Do not use --force or --legacy-peer-deps to conceal the incompatibility.",
-        "Requires a future typescript-eslint release that explicitly supports TypeScript 7 and a separate migration."
+        "Deferred; typescript-eslint 8.68.0 requires TypeScript >=4.8.4 <6.1.0. Retain 6.0.3."
       ],
-      "selected": false,
-      "pr_numbers": [148]
+      "selected_version": "6.0.3",
+      "pr_numbers": [148],
+      "resulting_specifier": "^6.0.3"
     },
     {
       "ecosystem": "npm",
       "name": "typescript-eslint",
-      "current": "8.62.0",
-      "target": "8.66.0",
+      "current": "8.66.0",
+      "target": "8.68.0",
       "specifier": "^8.66.0",
-      "versions_in_range": ["8.63.0", "8.64.0", "8.65.0", "8.66.0"],
+      "selected": true,
+      "latest": "8.68.0",
+      "versions_in_range": ["8.67.0", "8.68.0"],
       "sources": {
-        "registry": "https://www.npmjs.com/package/typescript-eslint/v/8.66.0",
+        "registry": "https://registry.npmjs.org/typescript-eslint",
         "repo": "https://github.com/typescript-eslint/typescript-eslint",
         "release_notes": [
           {
-            "url": "https://github.com/typescript-eslint/typescript-eslint/releases/tag/v8.66.0"
+            "url": "https://github.com/typescript-eslint/typescript-eslint/releases/tag/v8.67.0",
+            "tag": "v8.67.0"
+          },
+          {
+            "url": "https://github.com/typescript-eslint/typescript-eslint/releases/tag/v8.68.0",
+            "tag": "v8.68.0"
           }
-        ],
-        "changelog_files": [],
-        "compare_urls": [
-          "https://github.com/typescript-eslint/typescript-eslint/compare/v8.62.0...v8.66.0"
         ]
       },
-      "risk_flags": ["lint_behavior_change", "typescript_peer_upper_bound"],
+      "risk_flags": [],
       "notes": [
-        "Rolls PR #149 forward from 8.63.0 to the latest compatible 8.x release.",
-        "Retains TypeScript support below 6.1, so TypeScript remains at 6.0.3."
+        "Accepted compatible stable release after upstream notes, engine/peer review, and local validation."
       ],
-      "selected": true,
-      "pr_numbers": [149]
+      "selected_version": "8.68.0",
+      "pr_numbers": [153],
+      "resulting_specifier": "^8.68.0"
     },
     {
       "ecosystem": "npm",
       "name": "vitest",
-      "current": "4.1.9",
-      "target": "4.1.10",
+      "current": "4.1.10",
+      "target": "4.1.11",
       "specifier": "^4.1.10",
-      "versions_in_range": ["4.1.10"],
+      "selected": true,
+      "latest": "4.1.11",
+      "versions_in_range": ["4.1.11"],
       "sources": {
-        "registry": "https://www.npmjs.com/package/vitest/v/4.1.10",
+        "registry": "https://registry.npmjs.org/vitest",
         "repo": "https://github.com/vitest-dev/vitest",
         "release_notes": [
           {
-            "url": "https://github.com/vitest-dev/vitest/releases/tag/v4.1.10"
+            "url": "https://github.com/vitest-dev/vitest/releases/tag/v4.1.11",
+            "tag": "v4.1.11"
           }
-        ],
-        "changelog_files": [],
-        "compare_urls": ["https://github.com/vitest-dev/vitest/compare/v4.1.9...v4.1.10"]
+        ]
       },
-      "risk_flags": ["paired_upgrade_required", "coverage_mapping_change"],
-      "notes": ["Updated atomically with @vitest/coverage-v8."],
-      "selected": true,
-      "pr_numbers": []
+      "risk_flags": ["paired_upgrade_required"],
+      "notes": [
+        "Accepted compatible stable release after upstream notes, engine/peer review, and local validation."
+      ],
+      "selected_version": "4.1.11",
+      "pr_numbers": [],
+      "resulting_specifier": "^4.1.11"
     },
     {
       "ecosystem": "npm",
-      "name": "fast-uri",
-      "current": "3.1.2",
-      "target": "3.1.5",
-      "specifier": "transitive ^3.0.1",
-      "versions_in_range": ["3.1.3", "3.1.4", "3.1.5"],
+      "name": "@types/node",
+      "current": "undeclared (transitive 26.2.0)",
+      "target": "24.13.3",
+      "selected": true,
+      "specifier": "^24.13.3",
+      "versions_in_range": [],
       "sources": {
-        "registry": "https://www.npmjs.com/package/fast-uri/v/3.1.5",
-        "repo": "https://github.com/fastify/fast-uri",
+        "registry": "https://registry.npmjs.org/@types/node",
+        "repo": "https://github.com/DefinitelyTyped/DefinitelyTyped"
+      },
+      "risk_flags": ["runtime_type_alignment"],
+      "notes": [
+        "Declare direct dependency aligned with supported Node 24 instead of relying on Inspector transitive types. Do not adopt Node 26 types."
+      ],
+      "selected_version": "24.13.3",
+      "pr_numbers": [],
+      "resulting_specifier": "^24.13.3"
+    },
+    {
+      "ecosystem": "github-actions",
+      "name": "actions/checkout",
+      "current": "v7.0.0",
+      "target": "v7.0.1",
+      "versions_in_range": ["v7.0.1"],
+      "sources": {
+        "registry": "https://github.com/actions/checkout/releases/tag/v7.0.1",
+        "repo": "https://github.com/actions/checkout",
         "release_notes": [
           {
-            "url": "https://github.com/fastify/fast-uri/releases/tag/v3.1.5"
+            "url": "https://github.com/actions/checkout/releases/tag/v7.0.1",
+            "tag": "v7.0.1"
           }
         ],
-        "changelog_files": [],
-        "compare_urls": ["https://github.com/fastify/fast-uri/compare/v3.1.2...v3.1.5"]
+        "compare_urls": ["https://github.com/actions/checkout/compare/v7.0.0...v7.0.1"]
       },
-      "risk_flags": ["security_fix", "dependabot_target_superseded"],
-      "vulnerabilities": [
-        {
-          "advisory": "GHSA-4c8g-83qw-93j6",
-          "fixed": "3.1.3"
-        },
-        {
-          "advisory": "GHSA-v2hh-gcrm-f6hx",
-          "fixed": "3.1.4"
-        },
-        {
-          "advisory": "GHSA-7p8r-x3mc-p8w7",
-          "fixed": "3.1.5"
-        }
-      ],
+      "risk_flags": [],
       "notes": [
-        "PR #150 targets 3.1.4, which remains vulnerable to GHSA-7p8r-x3mc-p8w7.",
-        "Use 3.1.5, the newest release compatible with ajv's ^3.0.1 range."
+        "Verified release tag resolves to 3d3c42e5aac5ba805825da76410c181273ba90b1; existing action inputs and workflow permissions preserved."
       ],
+      "selected_version": "v7.0.1",
       "selected": true,
-      "pr_numbers": [150]
+      "pr_numbers": [],
+      "specifier": "3d3c42e5aac5ba805825da76410c181273ba90b1"
     },
     {
-      "ecosystem": "npm",
-      "name": "@hono/node-server",
-      "current": "1.19.14",
-      "target": "2.1.0",
-      "specifier": "transitive",
-      "versions_in_range": ["2.1.0"],
+      "ecosystem": "github-actions",
+      "name": "actions/setup-node",
+      "current": "v6.4.0",
+      "target": "v7.0.0",
+      "versions_in_range": ["v7.0.0"],
       "sources": {
-        "registry": "https://www.npmjs.com/package/@hono/node-server/v/2.1.0",
-        "repo": "https://github.com/honojs/node-server",
-        "release_notes": [],
-        "changelog_files": [],
-        "compare_urls": []
-      },
-      "risk_flags": ["major_version_bump", "security_fix", "transitive_runtime_dependency"],
-      "vulnerabilities": [
-        {
-          "advisory": "GHSA-frvp-7c67-39w9",
-          "fixed": "2.0.5"
-        }
-      ],
-      "notes": ["Selected by npm audit fix through @modelcontextprotocol/sdk 1.30.0."],
-      "selected": true,
-      "pr_numbers": []
-    },
-    {
-      "ecosystem": "npm",
-      "name": "shell-quote",
-      "current": "1.8.4",
-      "target": "1.9.0",
-      "specifier": "transitive",
-      "versions_in_range": ["1.9.0"],
-      "sources": {
-        "registry": "https://www.npmjs.com/package/shell-quote/v/1.9.0",
-        "release_notes": [],
-        "changelog_files": [],
-        "compare_urls": []
-      },
-      "risk_flags": ["security_fix", "transitive_dev_dependency", "no_release_notes_found"],
-      "vulnerabilities": [
-        {
-          "advisory": "GHSA-395f-4hp3-45gv",
-          "fixed": "1.9.0"
-        }
-      ],
-      "notes": ["Lockfile-only remediation selected by npm audit fix."],
-      "selected": true,
-      "pr_numbers": []
-    },
-    {
-      "ecosystem": "npm",
-      "name": "brace-expansion",
-      "current": "1.1.15 and 5.0.6",
-      "target": "1.1.18 and 5.0.9",
-      "specifier": "transitive",
-      "versions_in_range": ["1.1.18", "5.0.9"],
-      "sources": {
-        "registry": "https://www.npmjs.com/package/brace-expansion",
-        "release_notes": [],
-        "changelog_files": [],
-        "compare_urls": []
-      },
-      "risk_flags": ["security_fix", "transitive_dev_dependency", "no_release_notes_found"],
-      "vulnerabilities": [
-        {
-          "advisory": "GHSA-3jxr-9vmj-r5cp"
-        },
-        {
-          "advisory": "GHSA-mh99-v99m-4gvg"
-        },
-        {
-          "advisory": "GHSA-rgw5-rvv9-x895"
-        }
-      ],
-      "notes": [
-        "Lockfile-only remediation selected by npm audit fix for every installed major line."
-      ],
-      "selected": true,
-      "pr_numbers": []
-    },
-    {
-      "ecosystem": "npm",
-      "name": "postcss",
-      "current": "8.5.15",
-      "target": "8.5.26",
-      "specifier": "transitive",
-      "versions_in_range": ["8.5.26"],
-      "sources": {
-        "registry": "https://www.npmjs.com/package/postcss/v/8.5.26",
-        "repo": "https://github.com/postcss/postcss",
-        "release_notes": [],
-        "changelog_files": [],
-        "compare_urls": ["https://github.com/postcss/postcss/compare/8.5.15...8.5.26"]
-      },
-      "risk_flags": ["security_fix", "transitive_dev_dependency"],
-      "vulnerabilities": [
-        {
-          "advisory": "GHSA-r28c-9q8g-f849"
-        },
-        {
-          "advisory": "GHSA-fxqj-rqcc-2cmp"
-        }
-      ],
-      "notes": ["Lockfile-only remediation selected by npm audit fix."],
-      "selected": true,
-      "pr_numbers": []
-    },
-    {
-      "ecosystem": "npm",
-      "name": "nanoid",
-      "current": "3.3.15",
-      "target": "3.3.18",
-      "specifier": "transitive",
-      "versions_in_range": ["3.3.18"],
-      "sources": {
-        "registry": "https://www.npmjs.com/package/nanoid/v/3.3.18",
-        "repo": "https://github.com/ai/nanoid",
-        "release_notes": [],
-        "changelog_files": [],
-        "compare_urls": ["https://github.com/ai/nanoid/compare/3.3.15...3.3.18"]
-      },
-      "risk_flags": ["security_fix", "transitive_dev_dependency"],
-      "vulnerabilities": [
-        {
-          "advisory": "GHSA-28wg-ghj8-5hjv"
-        },
-        {
-          "advisory": "GHSA-2v37-7h3g-55p8"
-        }
-      ],
-      "notes": ["Lockfile-only remediation selected by npm audit fix."],
-      "selected": true,
-      "pr_numbers": []
-    },
-    {
-      "ecosystem": "npm",
-      "name": "ip-address",
-      "current": "10.2.0",
-      "target": "10.4.0",
-      "specifier": "transitive",
-      "versions_in_range": ["10.4.0"],
-      "sources": {
-        "registry": "https://www.npmjs.com/package/ip-address/v/10.4.0",
-        "repo": "https://github.com/beaugunderson/ip-address",
-        "release_notes": [],
-        "changelog_files": [],
-        "compare_urls": []
-      },
-      "risk_flags": ["security_fix", "transitive_runtime_dependency"],
-      "vulnerabilities": [
-        {
-          "advisory": "GHSA-mwp4-54f8-5fhr"
-        },
-        {
-          "advisory": "GHSA-4xrf-jv44-h6hh"
-        },
-        {
-          "advisory": "GHSA-22jq-vg5j-6vgg"
-        }
-      ],
-      "notes": ["Lockfile-only remediation selected by npm audit fix."],
-      "selected": true,
-      "pr_numbers": []
-    },
-    {
-      "ecosystem": "npm",
-      "name": "hono",
-      "current": "4.12.27",
-      "target": "4.13.1",
-      "specifier": "transitive",
-      "versions_in_range": ["4.13.1"],
-      "sources": {
-        "registry": "https://www.npmjs.com/package/hono/v/4.13.1",
-        "repo": "https://github.com/honojs/hono",
+        "registry": "https://github.com/actions/setup-node/releases/tag/v7.0.0",
+        "repo": "https://github.com/actions/setup-node",
         "release_notes": [
           {
-            "url": "https://github.com/honojs/hono/releases/tag/v4.13.1"
+            "url": "https://github.com/actions/setup-node/releases/tag/v7.0.0",
+            "tag": "v7.0.0"
           }
         ],
-        "changelog_files": [],
-        "compare_urls": ["https://github.com/honojs/hono/compare/v4.12.27...v4.13.1"]
+        "compare_urls": ["https://github.com/actions/setup-node/compare/v6.4.0...v7.0.0"]
       },
-      "risk_flags": ["security_fix", "transitive_runtime_dependency"],
-      "vulnerabilities": [
-        {
-          "advisory": "GHSA-8j4g-w8fx-2239"
-        },
-        {
-          "advisory": "GHSA-f23p-vx2j-j53r"
-        },
-        {
-          "advisory": "GHSA-79qm-7rj5-m7r9"
-        },
-        {
-          "advisory": "GHSA-54fx-42gc-7vw4"
-        }
+      "risk_flags": ["major_version_bump"],
+      "notes": [
+        "Verified release tag resolves to 820762786026740c76f36085b0efc47a31fe5020; existing action inputs and workflow permissions preserved."
       ],
-      "notes": ["Lockfile-only remediation selected by npm audit fix."],
+      "selected_version": "v7.0.0",
       "selected": true,
-      "pr_numbers": []
-    },
-    {
-      "ecosystem": "npm",
-      "name": "concurrently",
-      "current": "9.2.3",
-      "target": "9.2.4",
-      "specifier": "transitive",
-      "versions_in_range": ["9.2.4"],
-      "sources": {
-        "registry": "https://www.npmjs.com/package/concurrently/v/9.2.4",
-        "repo": "https://github.com/open-cli-tools/concurrently",
-        "release_notes": [],
-        "changelog_files": [],
-        "compare_urls": []
-      },
-      "risk_flags": ["security_fix", "transitive_dev_dependency"],
-      "vulnerabilities": [
-        {
-          "advisory": "GHSA-395f-4hp3-45gv",
-          "via": "shell-quote"
-        }
-      ],
-      "notes": ["Lockfile-only remediation selected by npm audit fix."],
-      "selected": true,
-      "pr_numbers": []
+      "pr_numbers": [],
+      "specifier": "820762786026740c76f36085b0efc47a31fe5020"
     },
     {
       "ecosystem": "github-actions",
       "name": "step-security/harden-runner",
-      "current": "2.19.4",
-      "target": "2.20.0",
-      "specifier": "bf7454d06d71f1098171f2acdf0cd4708d7b5920",
-      "versions_in_range": ["2.20.0"],
+      "current": "v2.20.0",
+      "target": "v2.21.0",
+      "versions_in_range": ["v2.20.1", "v2.21.0"],
       "sources": {
-        "registry": "https://github.com/step-security/harden-runner",
+        "registry": "https://github.com/step-security/harden-runner/releases/tag/v2.21.0",
         "repo": "https://github.com/step-security/harden-runner",
         "release_notes": [
           {
-            "url": "https://github.com/step-security/harden-runner/releases/tag/v2.20.0"
+            "url": "https://github.com/step-security/harden-runner/releases/tag/v2.21.0",
+            "tag": "v2.21.0"
           }
         ],
-        "changelog_files": [],
-        "compare_urls": ["https://github.com/step-security/harden-runner/compare/v2.19.4...v2.20.0"]
+        "compare_urls": ["https://github.com/step-security/harden-runner/compare/v2.20.0...v2.21.0"]
       },
-      "risk_flags": ["broad_workflow_surface"],
+      "risk_flags": [],
       "notes": [
-        "PR #145 passes all checks and preserves egress-policy: audit.",
-        "Update all nine active workflow usages to the same full SHA pin."
+        "Verified release tag resolves to 05e31511f85b41b11d1cf0ef85d0992719546e2c; existing action inputs and workflow permissions preserved."
       ],
+      "selected_version": "v2.21.0",
       "selected": true,
-      "pr_numbers": [145]
+      "pr_numbers": [145],
+      "specifier": "05e31511f85b41b11d1cf0ef85d0992719546e2c"
     },
     {
       "ecosystem": "github-actions",
       "name": "github/codeql-action",
-      "current": "4.35.5",
-      "target": "4.36.3",
-      "specifier": "54f647b7e1bb85c95cddabcd46b0c578ec92bc1a",
-      "versions_in_range": ["4.36.2", "4.36.3"],
+      "current": "v4.36.3",
+      "target": "v4.37.9",
+      "versions_in_range": [
+        "v4.37.0",
+        "v4.37.1",
+        "v4.37.2",
+        "v4.37.3",
+        "v4.37.4",
+        "v4.37.5",
+        "v4.37.6",
+        "v4.37.7",
+        "v4.37.8",
+        "v4.37.9"
+      ],
       "sources": {
-        "registry": "https://github.com/github/codeql-action",
+        "registry": "https://github.com/github/codeql-action/releases/tag/v4.37.9",
         "repo": "https://github.com/github/codeql-action",
         "release_notes": [
           {
-            "url": "https://github.com/github/codeql-action/releases/tag/v4.36.3"
+            "url": "https://github.com/github/codeql-action/releases/tag/v4.37.9",
+            "tag": "v4.37.9"
           }
         ],
-        "changelog_files": [],
-        "compare_urls": ["https://github.com/github/codeql-action/compare/v4.35.5...v4.36.3"]
+        "compare_urls": ["https://github.com/github/codeql-action/compare/v4.36.3...v4.37.9"]
       },
-      "risk_flags": ["coordinated_multi_file_upgrade", "dependabot_pr_ci_failure_when_split"],
+      "risk_flags": ["coordinated_multi_file_upgrade"],
       "notes": [
-        "PRs #139 and #141 fail because init and analyze are on mixed releases.",
-        "PR #140 passes alone; PR #123 proves the atomic pattern but is stale at 4.36.2.",
-        "Update init, analyze, and upload-sarif atomically to the 4.36.3 SHA."
+        "Verified release tag resolves to cdf488f595d80d6e07e03d4674febd5ab45fa938; existing action inputs and workflow permissions preserved."
       ],
+      "selected_version": "v4.37.9",
       "selected": true,
-      "pr_numbers": [123, 139, 140, 141]
+      "pr_numbers": [123, 139, 140, 141],
+      "specifier": "cdf488f595d80d6e07e03d4674febd5ab45fa938"
+    },
+    {
+      "ecosystem": "github-actions",
+      "name": "ossf/scorecard-action",
+      "current": "v2.4.3",
+      "target": "v2.4.4",
+      "versions_in_range": ["v2.4.4"],
+      "sources": {
+        "registry": "https://github.com/ossf/scorecard-action/releases/tag/v2.4.4",
+        "repo": "https://github.com/ossf/scorecard-action",
+        "release_notes": [
+          {
+            "url": "https://github.com/ossf/scorecard-action/releases/tag/v2.4.4",
+            "tag": "v2.4.4"
+          }
+        ],
+        "compare_urls": ["https://github.com/ossf/scorecard-action/compare/v2.4.3...v2.4.4"]
+      },
+      "risk_flags": [],
+      "notes": [
+        "Verified release tag resolves to 2d1146689b8cda280b9bc96326124645441f03bc; existing action inputs and workflow permissions preserved."
+      ],
+      "selected_version": "v2.4.4",
+      "selected": true,
+      "pr_numbers": [],
+      "specifier": "2d1146689b8cda280b9bc96326124645441f03bc"
+    },
+    {
+      "ecosystem": "npm",
+      "name": "@modelcontextprotocol/inspector",
+      "current": "0.22.0",
+      "target": "2.4.0",
+      "specifier": "^0.22.0",
+      "selected": false,
+      "latest": "2.4.0",
+      "versions_in_range": ["2.0.0", "2.1.0", "2.2.0", "2.3.0", "2.4.0"],
+      "sources": {
+        "registry": "https://registry.npmjs.org/@modelcontextprotocol/inspector/2.4.0",
+        "repo": "https://github.com/modelcontextprotocol/inspector",
+        "release_notes": [
+          {
+            "url": "https://github.com/modelcontextprotocol/inspector/releases/tag/2.4.0"
+          }
+        ],
+        "changelog_files": [
+          "https://github.com/modelcontextprotocol/inspector/blob/2.4.0/docs/v1-to-v2-migration.md"
+        ]
+      },
+      "risk_flags": [
+        "major_version_bump",
+        "cli_separator_order_change",
+        "child_environment_forwarding_change",
+        "error_exit_semantics_change"
+      ],
+      "notes": [
+        "Deferred: existing options-before-separator CLI invocation is incompatible.",
+        "PASS_CLI_BIN must be passed explicitly via -e or config for v2 fixture safety.",
+        "Current PR also loses undeclared Node types; direct @types/node is now declared independently."
+      ],
+      "selected_version": "1.0.2",
+      "pr_numbers": [155],
+      "resulting_specifier": "^1.0.2"
     }
   ],
   "summary": {
-    "total_upgrades": 22,
-    "major_bumps": 3,
+    "total_upgrades": 16,
+    "major_bumps": 4,
     "needs_attention": [
-      "Defer TypeScript 7.0.2 until typescript-eslint explicitly supports it.",
-      "Defer @modelcontextprotocol/inspector 2.1.0 to a separate migration.",
-      "Apply the Prettier 3.9.x formatting delta.",
-      "Replace fast-uri PR #150's vulnerable 3.1.4 target with 3.1.5.",
-      "Apply every github/codeql-action usage atomically at 4.36.3."
-    ]
+      "Defer TypeScript 7 and Inspector 2.",
+      "Retain cloc 2.11.0; registry latest tag is older.",
+      "Keep Node 24 type definitions.",
+      "Codacy upload failures are an existing external CI issue.",
+      "The existing Inspector smoke script asserts an obsolete eight-tool surface; a 47-tool fixture comparison was used for this review."
+    ],
+    "selected_upgrades": 13
+  },
+  "baseline_commit": "5fc186b9d7292ccd346efe95fcc1dc1a31281b30",
+  "open_dependabot_prs": [
+    {
+      "number": 156,
+      "title": "chore(deps-dev): bump tsx from 4.23.11 to 4.23.12",
+      "url": "https://github.com/hesreallyhim/proton-pass-community-mcp/pull/156",
+      "head_sha": "7d0aea9a8d07b5215bf572e67de9adedabe726cb",
+      "disposition": "Included at 4.23.12; CI tests pass, Codacy upload fails."
+    },
+    {
+      "number": 155,
+      "title": "chore(deps-dev): bump @modelcontextprotocol/inspector from 0.22.0 to 2.2.0",
+      "url": "https://github.com/hesreallyhim/proton-pass-community-mcp/pull/155",
+      "head_sha": "ccc9adf751e7ea5107753f543ae593a3d36e5d7a",
+      "disposition": "Defer v2; apply compatible maintenance 1.0.2 and direct Node types."
+    },
+    {
+      "number": 154,
+      "title": "chore(deps-dev): bump globals from 17.9.0 to 17.11.0",
+      "url": "https://github.com/hesreallyhim/proton-pass-community-mcp/pull/154",
+      "head_sha": "c90572792d03fd270b2044c288a76e6de22299af",
+      "disposition": "Included at 17.11.0; CI tests pass, Codacy upload fails."
+    },
+    {
+      "number": 153,
+      "title": "chore(deps-dev): bump typescript-eslint from 8.66.0 to 8.67.0",
+      "url": "https://github.com/hesreallyhim/proton-pass-community-mcp/pull/153",
+      "head_sha": "c88d98f4b19f51ca44bf461608a938c1f74e150a",
+      "disposition": "Superseded by 8.68.0; CI tests pass, Codacy upload fails."
+    },
+    {
+      "number": 148,
+      "title": "chore(deps-dev): bump typescript from 6.0.3 to 7.0.2",
+      "url": "https://github.com/hesreallyhim/proton-pass-community-mcp/pull/148",
+      "head_sha": "a3218ef191345ec0e42144d287b5b7322ba81d31",
+      "disposition": "Defer 7.0.2; current latest lint toolchain requires TypeScript <6.1."
+    },
+    {
+      "number": 145,
+      "title": "chore(deps): bump step-security/harden-runner from 2.19.4 to 2.20.0",
+      "url": "https://github.com/hesreallyhim/proton-pass-community-mcp/pull/145",
+      "head_sha": "ea35cdca854409a864d98bd17307419a1c0e13df",
+      "disposition": "Already present at baseline; superseded by 2.21.0."
+    },
+    {
+      "number": 141,
+      "title": "chore(deps): bump github/codeql-action/init from 4.35.5 to 4.36.3",
+      "url": "https://github.com/hesreallyhim/proton-pass-community-mcp/pull/141",
+      "head_sha": "21b5d05d4ec85bc0d5258c66b497f3538934de8c",
+      "disposition": "Already present at baseline; superseded by synchronized 4.37.9."
+    },
+    {
+      "number": 140,
+      "title": "chore(deps): bump github/codeql-action/upload-sarif from 4.35.5 to 4.36.3",
+      "url": "https://github.com/hesreallyhim/proton-pass-community-mcp/pull/140",
+      "head_sha": "7954d408f87079fefc82a0e8e9cb6f01da0396e6",
+      "disposition": "Already present at baseline; superseded by synchronized 4.37.9."
+    },
+    {
+      "number": 139,
+      "title": "chore(deps): bump github/codeql-action/analyze from 4.35.5 to 4.36.3",
+      "url": "https://github.com/hesreallyhim/proton-pass-community-mcp/pull/139",
+      "head_sha": "8efb00a5ae7f1097f84cd16fe3394f69acb00374",
+      "disposition": "Already present at baseline; superseded by synchronized 4.37.9."
+    },
+    {
+      "number": 123,
+      "title": "chore(deps): bump github/codeql-action from 4.35.5 to 4.36.2",
+      "url": "https://github.com/hesreallyhim/proton-pass-community-mcp/pull/123",
+      "head_sha": "91cfd48509bd53188fa2661bae767111179a9a3a",
+      "disposition": "Unnecessary downgrade from baseline 4.36.3; selected 4.37.9."
+    }
+  ],
+  "transitive_changes": [
+    {
+      "path": "node_modules/@hono/node-server",
+      "current": "2.1.0",
+      "target": "2.1.1"
+    },
+    {
+      "path": "node_modules/@modelcontextprotocol/inspector-cli",
+      "current": "0.22.0",
+      "target": "1.0.2"
+    },
+    {
+      "path": "node_modules/@modelcontextprotocol/inspector-client",
+      "current": "0.22.0",
+      "target": "1.0.2"
+    },
+    {
+      "path": "node_modules/@modelcontextprotocol/inspector-server",
+      "current": "0.22.0",
+      "target": "1.0.2"
+    },
+    {
+      "path": "node_modules/@oxc-project/types",
+      "current": "0.143.0",
+      "target": "0.147.0"
+    },
+    {
+      "path": "node_modules/@rolldown/binding-android-arm64",
+      "current": "1.2.3",
+      "target": "1.2.6"
+    },
+    {
+      "path": "node_modules/@rolldown/binding-darwin-arm64",
+      "current": "1.2.3",
+      "target": "1.2.6"
+    },
+    {
+      "path": "node_modules/@rolldown/binding-darwin-x64",
+      "current": "1.2.3",
+      "target": "1.2.6"
+    },
+    {
+      "path": "node_modules/@rolldown/binding-freebsd-x64",
+      "current": "1.2.3",
+      "target": "1.2.6"
+    },
+    {
+      "path": "node_modules/@rolldown/binding-linux-arm-gnueabihf",
+      "current": "1.2.3",
+      "target": "1.2.6"
+    },
+    {
+      "path": "node_modules/@rolldown/binding-linux-arm64-gnu",
+      "current": "1.2.3",
+      "target": "1.2.6"
+    },
+    {
+      "path": "node_modules/@rolldown/binding-linux-arm64-musl",
+      "current": "1.2.3",
+      "target": "1.2.6"
+    },
+    {
+      "path": "node_modules/@rolldown/binding-linux-ppc64-gnu",
+      "current": "1.2.3",
+      "target": "1.2.6"
+    },
+    {
+      "path": "node_modules/@rolldown/binding-linux-s390x-gnu",
+      "current": "1.2.3",
+      "target": "1.2.6"
+    },
+    {
+      "path": "node_modules/@rolldown/binding-linux-x64-gnu",
+      "current": "1.2.3",
+      "target": "1.2.6"
+    },
+    {
+      "path": "node_modules/@rolldown/binding-linux-x64-musl",
+      "current": "1.2.3",
+      "target": "1.2.6"
+    },
+    {
+      "path": "node_modules/@rolldown/binding-openharmony-arm64",
+      "current": "1.2.3",
+      "target": "1.2.6"
+    },
+    {
+      "path": "node_modules/@rolldown/binding-win32-arm64-msvc",
+      "current": "1.2.3",
+      "target": "1.2.6"
+    },
+    {
+      "path": "node_modules/@rolldown/binding-win32-x64-msvc",
+      "current": "1.2.3",
+      "target": "1.2.6"
+    },
+    {
+      "path": "node_modules/@tsconfig/node10",
+      "current": "1.0.12",
+      "target": "1.0.13"
+    },
+    {
+      "path": "node_modules/@typescript-eslint/eslint-plugin",
+      "current": "8.66.0",
+      "target": "8.68.0"
+    },
+    {
+      "path": "node_modules/@typescript-eslint/parser",
+      "current": "8.66.0",
+      "target": "8.68.0"
+    },
+    {
+      "path": "node_modules/@typescript-eslint/project-service",
+      "current": "8.66.0",
+      "target": "8.68.0"
+    },
+    {
+      "path": "node_modules/@typescript-eslint/scope-manager",
+      "current": "8.66.0",
+      "target": "8.68.0"
+    },
+    {
+      "path": "node_modules/@typescript-eslint/tsconfig-utils",
+      "current": "8.66.0",
+      "target": "8.68.0"
+    },
+    {
+      "path": "node_modules/@typescript-eslint/type-utils",
+      "current": "8.66.0",
+      "target": "8.68.0"
+    },
+    {
+      "path": "node_modules/@typescript-eslint/types",
+      "current": "8.66.0",
+      "target": "8.68.0"
+    },
+    {
+      "path": "node_modules/@typescript-eslint/typescript-estree",
+      "current": "8.66.0",
+      "target": "8.68.0"
+    },
+    {
+      "path": "node_modules/@typescript-eslint/utils",
+      "current": "8.66.0",
+      "target": "8.68.0"
+    },
+    {
+      "path": "node_modules/@typescript-eslint/visitor-keys",
+      "current": "8.66.0",
+      "target": "8.68.0"
+    },
+    {
+      "path": "node_modules/@vitest/expect",
+      "current": "4.1.10",
+      "target": "4.1.11"
+    },
+    {
+      "path": "node_modules/@vitest/mocker",
+      "current": "4.1.10",
+      "target": "4.1.11"
+    },
+    {
+      "path": "node_modules/@vitest/pretty-format",
+      "current": "4.1.10",
+      "target": "4.1.11"
+    },
+    {
+      "path": "node_modules/@vitest/runner",
+      "current": "4.1.10",
+      "target": "4.1.11"
+    },
+    {
+      "path": "node_modules/@vitest/snapshot",
+      "current": "4.1.10",
+      "target": "4.1.11"
+    },
+    {
+      "path": "node_modules/@vitest/spy",
+      "current": "4.1.10",
+      "target": "4.1.11"
+    },
+    {
+      "path": "node_modules/@vitest/utils",
+      "current": "4.1.10",
+      "target": "4.1.11"
+    },
+    {
+      "path": "node_modules/body-parser/node_modules/content-type",
+      "current": "2.0.0",
+      "target": "2.1.0"
+    },
+    {
+      "path": "node_modules/default-browser",
+      "current": "5.5.0",
+      "target": "5.5.1"
+    },
+    {
+      "path": "node_modules/es-module-lexer",
+      "current": "2.3.1",
+      "target": "2.3.2"
+    },
+    {
+      "path": "node_modules/eventsource-parser",
+      "current": "3.1.0",
+      "target": "3.1.1"
+    },
+    {
+      "path": "node_modules/fast-uri",
+      "current": "3.1.5",
+      "target": "3.1.6"
+    },
+    {
+      "path": "node_modules/hono",
+      "current": "4.13.1",
+      "target": "4.13.5"
+    },
+    {
+      "path": "node_modules/ip-address",
+      "current": "10.4.0",
+      "target": "10.5.0"
+    },
+    {
+      "path": "node_modules/jose",
+      "current": "6.2.8",
+      "target": "6.2.10"
+    },
+    {
+      "path": "node_modules/negotiator",
+      "current": "1.0.0",
+      "target": "1.1.0"
+    },
+    {
+      "path": "node_modules/picomatch",
+      "current": "4.0.5",
+      "target": "4.0.7"
+    },
+    {
+      "path": "node_modules/rolldown",
+      "current": "1.2.3",
+      "target": "1.2.6"
+    },
+    {
+      "path": "node_modules/type-is/node_modules/content-type",
+      "current": "2.0.0",
+      "target": "2.1.0"
+    },
+    {
+      "path": "node_modules/undici-types",
+      "current": "8.3.0",
+      "target": "7.18.2"
+    },
+    {
+      "path": "node_modules/vite",
+      "current": "8.2.1",
+      "target": "8.2.2"
+    }
+  ],
+  "retained_direct_dependencies": [
+    {
+      "name": "@modelcontextprotocol/sdk",
+      "specifier": "^1.30.0",
+      "version": "1.30.0",
+      "note": "Already latest stable."
+    },
+    {
+      "name": "zod",
+      "specifier": "^4.4.3",
+      "version": "4.4.3",
+      "note": "Already latest stable."
+    },
+    {
+      "name": "@eslint/js",
+      "specifier": "^10.0.1",
+      "version": "10.0.1",
+      "note": "Already latest stable."
+    },
+    {
+      "name": "fast-check",
+      "specifier": "^4.9.0",
+      "version": "4.9.0",
+      "note": "Already latest stable."
+    },
+    {
+      "name": "husky",
+      "specifier": "^9.1.7",
+      "version": "9.1.7",
+      "note": "Already latest stable."
+    },
+    {
+      "name": "prettier",
+      "specifier": "^3.9.6",
+      "version": "3.9.6",
+      "note": "Already latest stable."
+    }
+  ],
+  "validation": {
+    "node": "v24.18.0",
+    "npm": "11.16.0",
+    "tests": 158,
+    "test_files": 10,
+    "fuzz_tests": 2,
+    "known_npm_audit_vulnerabilities": 0,
+    "installed_packages_below_wanted": 0,
+    "mock_inspector_tools": 47,
+    "action_references_verified": 38,
+    "live_proton_cli_executed": false
   }
 }

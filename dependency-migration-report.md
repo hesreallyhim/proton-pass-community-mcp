@@ -1,104 +1,107 @@
-# Dependency Migration Report
+# Dependency review — 2026-08-27
 
-Generated: 2026-08-09
+Reviewed all 10 open Dependabot PRs against baseline commit `5fc186b9d7292ccd346efe95fcc1dc1a31281b30`. Changes are consolidated on `codex/deps-2026-08-27`; no PR was merged, closed, or otherwise modified on GitHub. Registry metadata, upstream releases, PR diffs, and failing CI job logs were checked on this date. The runtime remains Node 24, and validation uses fixtures rather than a live Proton Pass vault.
 
-Repository: `hesreallyhim/proton-pass-community-mcp`
+## npm decisions
 
-Branch: `chore/deps`
+| Dependency                         | Previous                        | Selected                     | Reason                                                                                                                          |
+| ---------------------------------- | ------------------------------- | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `@modelcontextprotocol/inspector`  | 0.22.0                          | 1.0.2                        | Compatible classic Inspector maintenance release with a DNS rebinding protection fix; defer v2 migration below.                 |
+| `@types/node`                      | Undeclared; transitively 26.2.0 | 24.13.3, explicitly declared | Match the supported Node 24 runtime and stop relying on Inspector to supply the project's Node type definitions.                |
+| `@vitest/coverage-v8` and `vitest` | 4.1.10                          | 4.1.11                       | Update together to satisfy their exact peer requirements; includes lifecycle concurrency and mock filesystem restriction fixes. |
+| `eslint`                           | 10.8.1                          | 10.9.1                       | Includes safer autofixes and the follow-up fix for a numeric-precision false positive.                                          |
+| `globals`                          | 17.9.0                          | 17.11.0                      | Compatible additions to global identifier tables; the existing Node globals configuration is preserved.                         |
+| `tsx`                              | 4.23.11                         | 4.23.12                      | Fixes `import.meta` handling when tokens are separated by comments or newlines.                                                 |
+| `typescript-eslint`                | 8.66.0                          | 8.68.0                       | Includes rule fixes and ESLint metadata support; retains support for TypeScript 6.0.3 and ESLint 10.                            |
 
-Baseline commit: `82e046b6247fa7b02a56878bc0088e5066edc15c`
+Sources: [Inspector 1.0.0](https://github.com/modelcontextprotocol/inspector/releases/tag/1.0.0), [Inspector 1.0.2](https://github.com/modelcontextprotocol/inspector/releases/tag/1.0.2), [Node 24 types](https://www.npmjs.com/package/@types/node/v/24.13.3), [Vitest 4.1.11](https://github.com/vitest-dev/vitest/releases/tag/v4.1.11), [ESLint 10.9.0](https://github.com/eslint/eslint/releases/tag/v10.9.0), [ESLint 10.9.1](https://github.com/eslint/eslint/releases/tag/v10.9.1), [globals 17.10.0](https://github.com/sindresorhus/globals/releases/tag/v17.10.0), [globals 17.11.0](https://github.com/sindresorhus/globals/releases/tag/v17.11.0), [tsx 4.23.12](https://github.com/privatenumber/tsx/releases/tag/v4.23.12), [typescript-eslint 8.67.0](https://github.com/typescript-eslint/typescript-eslint/releases/tag/v8.67.0), and [typescript-eslint 8.68.0](https://github.com/typescript-eslint/typescript-eslint/releases/tag/v8.68.0).
 
-Migration commits: `e08f114` (npm dependencies and formatter delta), `0dba095` (pinned GitHub Actions)
+`npm update --ignore-scripts --package-lock-only` also refreshed transitive dependencies within their parents' declared constraints. No forced resolution or peer-dependency bypass was used. Runtime transitives include `@hono/node-server` 2.1.1, Hono 4.13.5, JOSE 6.2.10, and `eventsource-parser` 3.1.1. Existing native platform entries are retained; the Rolldown update adds an Android ARM entry. The only dependency installation scripts remain the previously allowed `esbuild@0.28.2` and `fsevents@2.3.3` scripts.
 
-## Outcome
+Hono 4.13.5 includes query-parsing, static-generation path-containment, and body-parsing security fixes; JOSE 6.2.10 tightens token/key validation. These are worthwhile transitive updates even though the baseline npm audit reported no advisories. [Hono release](https://github.com/honojs/hono/releases/tag/v4.13.5), [JOSE release](https://github.com/panva/jose/releases/tag/v6.2.10)
 
-All 11 open Dependabot PRs were inventoried and classified. This branch consolidates the compatible npm and GitHub Actions updates, rolls stale PR targets forward to current compatible releases, remediates every advisory reported by the baseline `npm audit`, applies the Prettier 3.9 formatting delta, and deliberately defers TypeScript 7 because the current lint toolchain does not support it.
+The runtime dependencies `@modelcontextprotocol/sdk` 1.30.0 and Zod 4.4.3 were already the latest stable versions. `@eslint/js` 10.0.1, `fast-check` 4.9.0, Husky 9.1.7, and Prettier 3.9.6 also remain current. Prerelease tags were excluded.
 
-The baseline dependency graph reported 10 npm vulnerabilities: 3 moderate and 7 high. The migrated graph reports 0 vulnerabilities.
+## Deferred or unnecessary npm changes
 
-No GitHub PR was merged, closed, commented on, relabeled, or otherwise mutated during this migration.
+### TypeScript 7.0.2
 
-## Direct npm dependency changes
+Retain TypeScript 6.0.3. The latest `typescript-eslint` 8.68.0 declares a TypeScript peer range of `>=4.8.4 <6.1.0`; TypeScript 7 is outside it. PR #148 already fails `npm ci` with `ERESOLVE` for this reason. The complexity report also imports the TypeScript compiler API, so a later migration must validate that integration as well as compilation. Do not use `--force` or `--legacy-peer-deps` to suppress the conflict. Revisit when the lint toolchain supports TypeScript 7. [Published peer requirements](https://registry.npmjs.org/typescript-eslint/8.68.0)
 
-| Package                     | Baseline | Migrated | Reason                                                                                                      |
-| --------------------------- | -------: | -------: | ----------------------------------------------------------------------------------------------------------- |
-| `@modelcontextprotocol/sdk` |   1.29.0 |   1.30.0 | Current compatible runtime release; unlocks patched Hono transitive dependencies.                           |
-| `@vitest/coverage-v8`       |    4.1.9 |   4.1.10 | Updated atomically with Vitest because the provider has an exact peer on the test runner.                   |
-| `eslint`                    |   10.5.0 |   10.8.1 | Rolls Dependabot PR #146 forward from 10.7.0 to the current 10.x release.                                   |
-| `fast-check`                |    4.8.0 |    4.9.0 | Current compatible fuzz-testing release.                                                                    |
-| `globals`                   |   17.7.0 |   17.9.0 | Current compatible lint-environment definitions.                                                            |
-| `prettier`                  |    3.8.4 |    3.9.6 | Rolls PR #147 forward from 3.9.5; includes the required formatting update to `test/server/test-support.ts`. |
-| `tsx`                       |   4.22.4 |  4.23.11 | Rolls PR #144 forward from 4.23.0 to the latest compatible patch with follow-up loader/runtime fixes.       |
-| `typescript-eslint`         |   8.62.0 |   8.66.0 | Rolls PR #149 forward from 8.63.0; retains the supported TypeScript `<6.1.0` range.                         |
-| `vitest`                    |    4.1.9 |   4.1.10 | Updated atomically with `@vitest/coverage-v8`.                                                              |
+### Inspector 2.4.0 (PR #155 targets 2.2.0)
 
-TypeScript remains at 6.0.3. `@modelcontextprotocol/inspector` remains at 0.22.0 because its 2.1.0 major migration was discovered by the intake but is not represented by an open Dependabot PR and has a large independent transitive/smoke-test surface.
+Keep the classic implementation on its latest security-maintenance release, 1.0.2. This line is deprecated and receives security fixes only; the selection is an intermediate step, not a claim that v2 is unnecessary.
 
-## Security-relevant transitive changes
+Static comparison of the published 0.22.0 and 1.0.2 packages found the existing CLI implementation unchanged except for a deprecation notice written to stderr. Inspector 2 changes the CLI separator ordering used by `scripts/inspector-smoke.mjs`, child-process environment propagation, and error exit semantics. In particular, setting `PASS_CLI_BIN` only on the Inspector process no longer guarantees that the child MCP server uses the fixture: v2 needs an explicit `-e PASS_CLI_BIN=...` argument or equivalent configuration. A future migration must update and test both the interactive launch and CLI smoke paths before any invocation against a real vault. [Migration guide](https://github.com/modelcontextprotocol/inspector/blob/2.4.0/docs/v1-to-v2-migration.md), [CLI parsing](https://github.com/modelcontextprotocol/inspector/blob/2.4.0/clients/cli/src/cli.ts#L595), [v1 environment handling](https://github.com/modelcontextprotocol/inspector/blob/1.0.2/cli/src/transport.ts#L25), [v2 transport](https://github.com/modelcontextprotocol/inspector/blob/2.4.0/core/mcp/node/transport.ts#L77)
 
-| Package             |       Baseline |       Migrated | Relevant advisory or path                                                                                                          |
-| ------------------- | -------------: | -------------: | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `fast-uri`          |          3.1.2 |          3.1.5 | Supersedes PR #150's still-vulnerable 3.1.4 target; fixes `GHSA-4c8g-83qw-93j6`, `GHSA-v2hh-gcrm-f6hx`, and `GHSA-7p8r-x3mc-p8w7`. |
-| `@hono/node-server` |        1.19.14 |          2.1.0 | Fixes `GHSA-frvp-7c67-39w9` through SDK 1.30.0.                                                                                    |
-| `hono`              |        4.12.27 |         4.13.1 | Clears current Hono advisories, including `GHSA-8j4g-w8fx-2239` and later 4.12.x fixes.                                            |
-| `ip-address`        |         10.2.0 |         10.4.0 | Clears current SSRF/trust-boundary classification advisories.                                                                      |
-| `shell-quote`       |          1.8.4 |          1.9.0 | Fixes `GHSA-395f-4hp3-45gv`.                                                                                                       |
-| `concurrently`      |          9.2.3 |          9.2.4 | Removes the vulnerable `shell-quote` path.                                                                                         |
-| `brace-expansion`   | 1.1.15 / 5.0.6 | 1.1.18 / 5.0.9 | Clears the installed major lines affected by the current denial-of-service advisories.                                             |
-| `postcss`           |         8.5.15 |         8.5.26 | Clears current source-map path traversal/disclosure advisories.                                                                    |
-| `nanoid`            |         3.3.15 |         3.3.18 | Clears current infinite-loop denial-of-service advisories.                                                                         |
+PR #155 also fails typechecking because Node type definitions disappear from its dependency tree. Declaring `@types/node` directly fixes that dependency omission here, but does not resolve the v2 invocation and environment changes.
 
-## GitHub Actions changes
+### cloc and Node type major versions
 
-- `step-security/harden-runner` is updated in all nine active workflow files from 2.19.4 (`9af89fc71515a100421586dfdb3dc9c984fbf411`) to 2.20.0 (`bf7454d06d71f1098171f2acdf0cd4708d7b5920`). Existing `egress-policy: audit` inputs and job permissions are unchanged.
-- `github/codeql-action/init`, `github/codeql-action/analyze`, and `github/codeql-action/upload-sarif` are updated atomically from 4.35.5 (`9e0d7b8d25671d64c341c19c0152d693099fb5ba`) to 4.36.3 (`54f647b7e1bb85c95cddabcd46b0c578ec92bc1a`). The atomic update avoids the configuration-version mismatch that makes PRs #139 and #141 fail independently.
+Retain `cloc` 2.11.0. Its npm `latest` tag points to `2.6.0-cloc`, which is older and outside the existing `^2.11.0` range. Following that tag would be an unjustified downgrade. Node types are intentionally constrained to major 24 instead of the registry's newer major 26, to reflect the supported runtime. [cloc registry metadata](https://registry.npmjs.org/cloc)
 
-All Actions remain pinned to full 40-character commit SHAs. Top-level workflow permissions remain unchanged and read-only/minimal.
+## GitHub Actions
 
-## Open Dependabot PR dispositions
+Every selected release tag was resolved to its full commit SHA with `git ls-remote`, including annotated-tag dereferencing. Updates preserve workflow inputs, triggers, and permissions. The three private workflow templates remain inactive under `.github/private-repo-workflows/`; their floating checkout/setup-node references are now pinned as well.
 
-|                                                                         PR | Dependency                            | Observed state                                                                                                                              | Disposition on this branch                                              |
-| -------------------------------------------------------------------------: | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
-| [#150](https://github.com/hesreallyhim/proton-pass-community-mcp/pull/150) | `fast-uri` 3.1.2 → 3.1.4              | All checks pass, but 3.1.4 is vulnerable to a newer high-severity advisory.                                                                 | Superseded with secure compatible 3.1.5. Do not merge the PR as-is.     |
-| [#149](https://github.com/hesreallyhim/proton-pass-community-mcp/pull/149) | `typescript-eslint` 8.62.0 → 8.63.0   | All checks pass.                                                                                                                            | Incorporated and rolled forward to 8.66.0.                              |
-| [#148](https://github.com/hesreallyhim/proton-pass-community-mcp/pull/148) | TypeScript 6.0.3 → 7.0.2              | CI and Production Hygiene fail during `npm install` with `ERESOLVE`; current/latest `typescript-eslint` supports TypeScript only below 6.1. | Deferred. Keep TypeScript 6.0.3; do not merge or force-install this PR. |
-| [#147](https://github.com/hesreallyhim/proton-pass-community-mcp/pull/147) | Prettier 3.8.4 → 3.9.5                | CI fails because `test/server/test-support.ts` needs the new formatter output.                                                              | Incorporated at 3.9.6 with the formatting delta applied.                |
-| [#146](https://github.com/hesreallyhim/proton-pass-community-mcp/pull/146) | ESLint 10.5.0 → 10.7.0                | All checks pass.                                                                                                                            | Incorporated and rolled forward to 10.8.1.                              |
-| [#145](https://github.com/hesreallyhim/proton-pass-community-mcp/pull/145) | Harden Runner 2.19.4 → 2.20.0         | All checks pass.                                                                                                                            | Incorporated across all nine active workflows at the PR's full SHA.     |
-| [#144](https://github.com/hesreallyhim/proton-pass-community-mcp/pull/144) | `tsx` 4.22.4 → 4.23.0                 | All checks pass.                                                                                                                            | Incorporated and rolled forward to 4.23.11.                             |
-| [#141](https://github.com/hesreallyhim/proton-pass-community-mcp/pull/141) | CodeQL `init` 4.35.5 → 4.36.3         | Both CodeQL analysis jobs fail because `analyze` remains on 4.35.5.                                                                         | Incorporated only as part of the atomic 4.36.3 CodeQL family update.    |
-| [#140](https://github.com/hesreallyhim/proton-pass-community-mcp/pull/140) | CodeQL `upload-sarif` 4.35.5 → 4.36.3 | All checks pass.                                                                                                                            | Incorporated as part of the atomic 4.36.3 CodeQL family update.         |
-| [#139](https://github.com/hesreallyhim/proton-pass-community-mcp/pull/139) | CodeQL `analyze` 4.35.5 → 4.36.3      | Both CodeQL analysis jobs fail because `init` remains on 4.35.5.                                                                            | Incorporated only as part of the atomic 4.36.3 CodeQL family update.    |
-| [#123](https://github.com/hesreallyhim/proton-pass-community-mcp/pull/123) | CodeQL family 4.35.5 → 4.36.2         | Checks pass, but the PR is behind and its target is stale.                                                                                  | Superseded by the atomic 4.36.3 update.                                 |
+| Action                                                     | Previous active version | Selected version                                                              | Verified commit                            |
+| ---------------------------------------------------------- | ----------------------- | ----------------------------------------------------------------------------- | ------------------------------------------ |
+| `actions/checkout`                                         | 7.0.0                   | [7.0.1](https://github.com/actions/checkout/releases/tag/v7.0.1)              | `3d3c42e5aac5ba805825da76410c181273ba90b1` |
+| `actions/setup-node`                                       | 6.4.0                   | [7.0.0](https://github.com/actions/setup-node/releases/tag/v7.0.0)            | `820762786026740c76f36085b0efc47a31fe5020` |
+| `step-security/harden-runner`                              | 2.20.0                  | [2.21.0](https://github.com/step-security/harden-runner/releases/tag/v2.21.0) | `05e31511f85b41b11d1cf0ef85d0992719546e2c` |
+| `github/codeql-action` (`init`, `analyze`, `upload-sarif`) | 4.36.3                  | [4.37.9](https://github.com/github/codeql-action/releases/tag/v4.37.9)        | `cdf488f595d80d6e07e03d4674febd5ab45fa938` |
+| `ossf/scorecard-action`                                    | 2.4.3                   | [2.4.4](https://github.com/ossf/scorecard-action/releases/tag/v2.4.4)         | `2d1146689b8cda280b9bc96326124645441f03bc` |
 
-## Validation evidence
+`setup-node` 7 keeps the Node 24 action runtime and the inputs used here. Its removal of the dummy `NODE_AUTH_TOKEN` export is compatible with this repository's OIDC npm publishing configuration. Harden Runner remains in audit mode. Scorecard now bundles analyzer 5.5.0, which can change reported scores and logs publication failures instead of failing the entire action.
 
-The pre-migration baseline passed `npm ci`, `npm run check`, and `npm run build` at commit `82e046b`.
+All CodeQL steps move together: PRs #139 and #141 show actual failures when `init` and `analyze` versions differ. CodeQL's generic latest-release endpoint can return a `codeql-bundle-*` tag; the selected SHA is verified against the action's `v4.37.9` tag, not a bundle tag.
 
-The migrated branch passed:
+The other eight action repositories were checked and remain at their latest releases: semantic-pull-request 6.1.1, dependency-review-action 5.0.0, create-github-app-token 3.2.0, release-please-action 5.0.0, cosign-installer 4.1.2, Codacy coverage reporter 1.3.0, upload-artifact 7.0.1, and `peter-evans/create-pull-request` 8.1.1. The app-token comment now records the exact 3.2.0 version; its SHA is unchanged.
 
-- `npm ci`: clean lockfile reproduction; 401 packages installed; 0 vulnerabilities.
-- `npm audit --json`: 0 total vulnerabilities.
-- `npm run check`: lint, Prettier check, typecheck, dedicated fuzz test, and full V8 coverage all passed.
-- `npm run test:fuzz`: 2 tests passed.
-- `npm run coverage`: 10 test files and 158 tests passed; statements 95.25%, branches 83.43%, functions 97.90%, lines 96.24%.
-- `npm run analyze:complexity -- src --json-out .tmp/complexity-report.json`: 51 files and 191 functions analyzed, with 0 parser diagnostics.
-- `npm run check:complexity-thresholds -- --report .tmp/complexity-report.json`: 0 LOC warnings, 0 LOC violations, average cyclomatic complexity 2.48 per function.
-- `npm run check:production-hygiene`: 51 files scanned, 0 findings.
-- `npm run check:release:package`: lint, typecheck, all 158 tests, TypeScript build, and `npm pack --dry-run` passed; the dry-run tarball contained 54 files.
-- `git diff --check`: passed.
+## Every open Dependabot PR
 
-No live `pass-cli` or `pass` command was invoked. Validation remained within mocks, fixtures, static analysis, build, package, and unit/contract test surfaces as required by the release-preparation safety constraint.
+| PR                                                                         | Proposal                     | Disposition                                                                                          |
+| -------------------------------------------------------------------------- | ---------------------------- | ---------------------------------------------------------------------------------------------------- |
+| [#156](https://github.com/hesreallyhim/proton-pass-community-mcp/pull/156) | tsx 4.23.12                  | Included. Its checks and tests pass; its CI failure is the Codacy upload, not a tsx regression.      |
+| [#155](https://github.com/hesreallyhim/proton-pass-community-mcp/pull/155) | Inspector 2.2.0              | Defer the v2 migration. Apply compatible security-maintenance 1.0.2 and declare Node types directly. |
+| [#154](https://github.com/hesreallyhim/proton-pass-community-mcp/pull/154) | globals 17.11.0              | Included. Its checks and tests pass before the same Codacy upload failure.                           |
+| [#153](https://github.com/hesreallyhim/proton-pass-community-mcp/pull/153) | typescript-eslint 8.67.0     | Superseded by compatible 8.68.0. Its checks and tests pass before the same Codacy upload failure.    |
+| [#148](https://github.com/hesreallyhim/proton-pass-community-mcp/pull/148) | TypeScript 7.0.2             | Defer: incompatible lint peer range; CI installation fails with `ERESOLVE`.                          |
+| [#145](https://github.com/hesreallyhim/proton-pass-community-mcp/pull/145) | Harden Runner 2.20.0         | Already present at the baseline; superseded here by 2.21.0.                                          |
+| [#141](https://github.com/hesreallyhim/proton-pass-community-mcp/pull/141) | CodeQL `init` 4.36.3         | Already present; superseded by synchronized 4.37.9. Do not merge the isolated step bump.             |
+| [#140](https://github.com/hesreallyhim/proton-pass-community-mcp/pull/140) | CodeQL `upload-sarif` 4.36.3 | Already present; superseded by synchronized 4.37.9.                                                  |
+| [#139](https://github.com/hesreallyhim/proton-pass-community-mcp/pull/139) | CodeQL `analyze` 4.36.3      | Already present; superseded by synchronized 4.37.9. Do not merge the isolated step bump.             |
+| [#123](https://github.com/hesreallyhim/proton-pass-community-mcp/pull/123) | CodeQL 4.36.2                | Unnecessary: older than the baseline 4.36.3 and selected 4.37.9.                                     |
+
+The five stale action PRs can be closed as superseded once the consolidated updates are accepted. PRs #153, #154, and #156 can likewise be closed after these changes land. No remote cleanup was performed as part of this local update.
+
+## Validation and remaining operational notes
+
+- Baseline and updated `npm run check` pass: lint, formatting, typecheck, two fuzz tests, and all 158 tests across 10 test files. Coverage is unchanged: 95.14% statements, 83.43% branches, 97.9% functions, and 96.24% lines.
+- Manifest/lockfile consistency, installed Node 24 engine compatibility, TypeScript peer compatibility, and Vitest/coverage version alignment were checked.
+- Active workflows pass `actionlint`; workflow pin and permission invariants were checked separately, including the dormant templates.
+- A final `npm ci` succeeds on Node 24.18.0 and npm 11.16.0, followed by a passing `npm run check:release:package` (lint, typecheck, 158 tests, build, and package dry run).
+- `npm audit --json` reports zero known vulnerabilities. `npm ls --depth=0` reports a valid dependency tree; `npm outdated --all --json` has no installed packages below their wanted versions. The remaining `npm-check-updates` proposals are only the deliberately excluded Inspector 2, Node 26 types, and TypeScript 7.
+- The Inspector fixture smoke passes: all 47 tool definitions, including schemas, exactly match the baseline response, and `view_session_info` returns `mock-pass-info` before and after the update.
+- Complexity thresholds and production hygiene both pass in enforcement mode. `git diff --check` passes, and all 38 active/template action references match their verified release SHAs.
+
+The clean install still emits deprecation notices for Inspector's security-maintenance line and existing transitive packages such as `glob` 7, `inflight`, and `node-domexception`. No incompatible transitive-major overrides were introduced to suppress these notices; the audit result is not a guarantee of absence of vulnerabilities.
+
+The existing `mcp:inspect:smoke` script still asserts an obsolete eight-tool v0.1 surface and excludes mutations. It is not an acceptance gate for the current 47-tool server. The dependency validation instead compares the complete Inspector `tools/list` response before and after the update and calls `view_session_info` through the shell fixture. Updating the old smoke assertions is separate maintenance work.
+
+The two fixture-only Inspector calls can be repeated from the repository root after `npm run build`:
+
+```sh
+PASS_CLI_BIN="$PWD/test/fixtures/pass-cli-mock.sh" node_modules/.bin/mcp-inspector --cli --transport stdio --method tools/list -- node dist/index.js
+PASS_CLI_BIN="$PWD/test/fixtures/pass-cli-mock.sh" node_modules/.bin/mcp-inspector --cli --transport stdio --method tools/call --tool-name view_session_info -- node dist/index.js
+```
+
+The Codacy failures in PRs #153, #154, and #156 report an invalid upload URL/token combination after tests complete. Repository owners should check the Codacy endpoint/token and whether the secret is available to Dependabot runs; no credentials, permissions, or upload-failure behavior were changed here. [Example failed job](https://github.com/hesreallyhim/proton-pass-community-mcp/actions/runs/31981177888/job/95248106287)
+
+The upstream setup-node documentation recommends disabling dependency caches in privileged publishing jobs. This repository's publish job already uses `cache: npm`; that pre-existing hardening concern is noted rather than silently changing the publishing policy. [Upstream publishing guidance](https://github.com/actions/setup-node/blob/v7.0.0/docs/advanced-usage.md)
+
+Proton Pass CLI metadata and behavioral snapshots were not upgraded. The separate non-Dependabot PR #138 proposes CLI 2.3.3; evaluating that behavioral drift is outside this npm/Actions update and requires the repository's approved CLI validation process. No live CLI command, authenticated workflow, package publication, or remote CI run was triggered.
 
 ## Rollback
 
-The migration is isolated on `chore/deps`. Revert the dependency commits on this branch to restore the baseline manifests, lockfile, formatter output, and workflow SHAs. If only one surface needs rollback, the npm manifest/lockfile commit and the GitHub Actions commit are intentionally separable.
-
-Do not restore `fast-uri` 3.1.4 as a partial rollback; it remains vulnerable. If the SDK update must be reverted, preserve or re-establish secure transitive resolutions and confirm `npm audit` remains at zero.
-
-## Follow-up
-
-- Close or supersede the incorporated/stale Dependabot PRs after this branch is merged, and explicitly close or defer TypeScript PR #148 with the peer-incompatibility rationale.
-- Treat TypeScript 7 as a separate migration. Its native compiler does not expose the TypeScript programmatic API used by `typescript-eslint`; a deliberate side-by-side alias design is required until the lint toolchain supports it directly.
-- Treat `@modelcontextprotocol/inspector` 2.1.0 as a separate major upgrade with Inspector-specific smoke validation.
-- Consider declaring `@types/node` directly in a later maintenance change because `tsconfig.json` requests Node types while the package currently arrives transitively.
+Revert the dependency-update commit to restore `package.json` and `package-lock.json`, then run `npm ci` on Node 24. Revert the separate Actions commit to restore the prior workflow pins. No application behavior, data schema, credentials, or vault data was migrated.
