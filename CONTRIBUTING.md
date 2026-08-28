@@ -15,6 +15,8 @@ npm ci
 
 ```bash
 npm run check
+npm run check:package:smoke
+npm run mcp:inspect:smoke
 ```
 
 ## Runtime Configuration (Developer)
@@ -27,6 +29,8 @@ Environment variables:
 
 - `PASS_CLI_BIN`: override CLI binary path/name (default `pass-cli`) - useful for testing when you want to use a mock.
 - `PASS_CLI_ALLOW_VERSION_DRIFT`: equivalent env control for `--allow-version-drift` (`true|false`, `1|0`, `yes|no`, `on|off`)
+- `ALLOW_WRITE=1`: allow mutating tools, still requiring `confirm: true` per call. Attachment downloads are included because they write local files.
+- `PROTON_PASS_AGENT_REASON`: optional inherited CLI reason. Prefer each tool's `agentReason` for request-specific explanations. The four tools with a required `agentReason` input do not accept this environment variable as a substitute.
 
 Disposable test account workflow:
 
@@ -50,6 +54,8 @@ Precedence:
 
 ## Validation / QA
 
+During rehabilitation, use static source inspection and fixtures only. Do not run the template drift/probe scripts or authenticated wrappers until a maintainer explicitly approves a live smoke check.
+
 Required full check:
 
 ```bash
@@ -63,11 +69,25 @@ npm run test
 npm run typecheck
 npm run lint
 npm run format:check
+npm run check:release:package
+npm run mcp:inspect:smoke
 ```
+
+`check:package:smoke` packs the build, installs it with production dependencies into a temporary consumer, and exercises MCP initialization, all 47 tool registrations, the seven template resources, read output, per-call audit reasons, and write rejection. Both smoke scripts use an isolated Node fixture and cannot select the real CLI from ambient `PASS_CLI_BIN`.
+
+### Inspector 2
+
+`npm run mcp:inspect` starts the Inspector web UI for the local build. Inspector 2 does not forward arbitrary shell environment variables to the server automatically. Pass each server variable explicitly, for example:
+
+```bash
+npm run mcp:inspect -- -e PASS_CLI_BIN=/absolute/path/to/approved-fixture
+```
+
+Use `npm run mcp:inspect:smoke` for the fully isolated, noninteractive fixture check. If a live session is explicitly approved, forward its CLI binary/session configuration deliberately; never rely on a shell-only fixture override. The v2 CLI uses `mcp-inspector <server command> -- <Inspector options>`; the web mode uses `--web`.
 
 ## Scope of Contributions
 
-It is recommended to open an issue regarding any substantial change before beginning to work on a contribution. This is in early phases of development, and the ROADMAP has not yet stabilized. Some general strategic decisions remain unresolved. In the initial release, we have confined the scope to read-only operations. Additional infrastructure is needed before any destructive operations can be introduced.
+It is recommended to open an issue regarding any substantial change before beginning to work on a contribution. The current rehabilitation preserves the existing 47-tool surface, including gated writes. The elicitation-based authorization design in the tool schema plan remains a proposal; do not infer that it is implemented from the roadmap.
 
 Administrative maintainer workflows (release operations, upstream watch triage, metadata upkeep) are documented in `MAINTAINERS.md`.
 

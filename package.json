@@ -24,7 +24,8 @@
     "provenance": true
   },
   "files": [
-    "dist"
+    "dist",
+    "docs/testing/item-create-templates.snapshot.json"
   ],
   "scripts": {
     "dev": "tsx src/index.ts",
@@ -38,7 +39,7 @@
     "test:fuzz": "vitest run test/server/fuzz-item-handlers.test.ts",
     "test:watch": "vitest",
     "coverage": "vitest run --coverage",
-    "mcp:inspect": "npm run build && mcp-inspector --transport stdio -- node dist/index.js",
+    "mcp:inspect": "npm run build && mcp-inspector --web node dist/index.js",
     "mcp:inspect:smoke": "npm run build && node scripts/inspector-smoke.mjs",
     "demo:shell": "scripts/demo-shell.sh",
     "pass": "scripts/pass",
@@ -61,7 +62,8 @@
     "check:complexity-thresholds": "node scripts/check-complexity-thresholds.mjs",
     "check:production-hygiene": "node scripts/check-production-hygiene.mjs",
     "check:upstream:pass-cli": "node scripts/check-pass-cli-upstream.mjs",
-    "check:release:package": "npm run lint && npm run typecheck && npm run test && npm run build && npm pack --dry-run",
+    "check:package:smoke": "npm run build && node scripts/check-package-smoke.mjs",
+    "check:release:package": "npm run lint && npm run typecheck && npm run test && npm run check:package:smoke",
     "check": "npm run lint && npm run format:check && npm run typecheck && npm run test:fuzz && npm run coverage",
     "prepare": "husky"
   },
@@ -74,7 +76,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@modelcontextprotocol/inspector": "^1.0.2",
+    "@modelcontextprotocol/inspector": "^2.4.0",
     "@types/node": "^24.13.3",
     "@vitest/coverage-v8": "^4.1.11",
     "cloc": "^2.11.0",

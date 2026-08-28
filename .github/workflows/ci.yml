@@ -48,6 +48,12 @@ jobs:
       - name: Run checks
         run: npm run check
 
+      - name: Verify installed npm package with fixtures
+        run: npm run check:package:smoke
+
+      - name: Verify Inspector with fixtures
+        run: npm run mcp:inspect:smoke
+
       - name: Verify coverage report
         run: test -s coverage/lcov.info
 
