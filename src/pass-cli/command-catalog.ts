@@ -1,7 +1,6 @@
 export const WRAPPED_COMMAND_PREFIXES = [
   ["info"],
   ["user", "info"],
-  ["test"],
   ["settings", "view"],
   ["settings", "set", "default-vault"],
   ["settings", "unset", "default-vault"],

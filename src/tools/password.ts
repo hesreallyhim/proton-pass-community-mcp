@@ -12,7 +12,18 @@ export const generateRandomPasswordInputSchema = z.object({
 
 export const generatePassphraseInputSchema = z.object({
   count: z.number().int().min(1).max(1024).optional().describe("Number of words"),
-  separator: z.string().max(64).optional().describe("Word separator"),
+  separator: z
+    .enum([
+      "hyphens",
+      "spaces",
+      "periods",
+      "commas",
+      "underscores",
+      "numbers",
+      "numbers-and-symbols",
+    ])
+    .optional()
+    .describe("Word separator style supported by the CLI"),
   capitalize: z.boolean().optional().describe("Capitalize each word"),
   numbers: z.boolean().optional().describe("Include numbers"),
 });
@@ -58,6 +69,6 @@ export async function scorePasswordHandler(
   passCli: PassCliRunner,
   { password, output }: ScorePasswordInput,
 ) {
-  const { stdout } = await passCli(["password", "score", password, "--output", output]);
+  const { stdout } = await passCli(["password", "score", "--output", output, "--", password]);
   return asTextContent(asJsonTextOrRaw(stdout));
 }

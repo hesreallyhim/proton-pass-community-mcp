@@ -35,7 +35,10 @@ export const listItemsInputSchema = z
       .optional()
       .describe(PAGE_SIZE_DESCRIPTION),
     cursor: z.string().max(20).optional().describe(CURSOR_DESCRIPTION),
-    output: z.enum(["json", "human"]).default("json").describe("Output format"),
+    output: z
+      .enum(["json", "human"])
+      .default("json")
+      .describe("Legacy format hint; output always contains JSON item references without secrets"),
   })
   .refine(
     (input) => {

@@ -18,7 +18,7 @@ function normalizeSettingKey(raw: string): string {
 }
 
 function normalizeSettingValue(raw: string): string | null {
-  const trimmed = raw.trim();
+  const trimmed = raw.trim().replace(/\s+\(default\)$/i, "");
   if (!trimmed) return null;
   const lower = trimmed.toLowerCase();
   if (lower === "none" || lower === "(none)" || lower === "null" || lower === "unset") {

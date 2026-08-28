@@ -1,10 +1,46 @@
-import { asJsonTextOrRaw, asTextContent } from "../../pass-cli/output.js";
 import type { PassCliRunner } from "../../pass-cli/runner.js";
-import { extractArrayFromParsed, paginateRefs } from "../shared/pagination.js";
+import { asRecord } from "../shared/item-utils.js";
+import { paginateRefs } from "../shared/pagination.js";
 import { DEFAULT_ITEM_LIST_PAGE_SIZE } from "./constants.js";
 import { matchesQuery } from "./query.js";
 import { toItemRef } from "./refs.js";
 import type { ListItemsInput, SearchItemsInput } from "./schemas-list.js";
+
+function parseItemList(stdout: string): unknown[] {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(stdout);
+  } catch {
+    throw new Error("Invalid JSON from pass-cli item list; refusing to return unfiltered output.");
+  }
+  const items = Array.isArray(parsed) ? parsed : asRecord(parsed)?.items;
+  if (!Array.isArray(items)) {
+    throw new Error("Unexpected pass-cli item list shape; expected an items array.");
+  }
+  return items;
+}
+
+type ItemListOptions = Pick<
+  ListItemsInput,
+  "vaultName" | "shareId" | "filterType" | "filterState" | "sortBy"
+>;
+
+function buildItemListArgs({
+  vaultName,
+  shareId,
+  filterType,
+  filterState,
+  sortBy,
+}: ItemListOptions): string[] {
+  const args = ["item", "list"];
+  if (shareId) args.push("--share-id", shareId);
+  if (filterType) args.push("--filter-type", filterType);
+  if (filterState) args.push("--filter-state", filterState);
+  if (sortBy) args.push("--sort-by", sortBy);
+  args.push("--output", "json");
+  if (vaultName) args.push("--", vaultName);
+  return args;
+}
 
 export async function listItemsHandler(
   passCli: PassCliRunner,
@@ -18,30 +54,9 @@ export async function listItemsHandler(
     throw new Error('Pagination is supported only with {"output":"json"}.');
   }
 
-  const args = ["item", "list"];
-  if (shareId) args.push("--share-id", shareId);
-  if (filterType) args.push("--filter-type", filterType);
-  if (filterState) args.push("--filter-state", filterState);
-  if (sortBy) args.push("--sort-by", sortBy);
-  args.push("--output", output);
-  if (vaultName) args.push("--", vaultName);
-
+  const args = buildItemListArgs({ vaultName, shareId, filterType, filterState, sortBy });
   const { stdout } = await passCli(args);
-  if (output !== "json") {
-    return asTextContent(asJsonTextOrRaw(stdout));
-  }
-
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(stdout);
-  } catch {
-    return asTextContent(asJsonTextOrRaw(stdout));
-  }
-
-  const rawItems = extractArrayFromParsed(parsed, ["items"]);
-  if (!rawItems) {
-    return asTextContent(asJsonTextOrRaw(stdout));
-  }
+  const rawItems = parseItemList(stdout);
   const refs = rawItems.map((item, index) => toItemRef(item, index));
   const page = paginateRefs(refs, cursor, pageSize, DEFAULT_ITEM_LIST_PAGE_SIZE);
 
@@ -75,27 +90,10 @@ export async function searchItemsHandler(
     throw new Error("Provide only one of vaultName or shareId.");
   }
 
-  const args = ["item", "list"];
-  if (shareId) args.push("--share-id", shareId);
-  if (filterType) args.push("--filter-type", filterType);
-  if (filterState) args.push("--filter-state", filterState);
-  if (sortBy) args.push("--sort-by", sortBy);
-  args.push("--output", "json");
-  if (vaultName) args.push("--", vaultName);
-
+  const args = buildItemListArgs({ vaultName, shareId, filterType, filterState, sortBy });
   const { stdout } = await passCli(args);
 
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(stdout);
-  } catch {
-    return asTextContent(asJsonTextOrRaw(stdout));
-  }
-
-  const rawItems = extractArrayFromParsed(parsed, ["items"]);
-  if (!rawItems) {
-    return asTextContent(asJsonTextOrRaw(stdout));
-  }
+  const rawItems = parseItemList(stdout);
   const refs = rawItems.map((item, index) => toItemRef(item, index));
   const filtered = refs.filter((item) =>
     item.title

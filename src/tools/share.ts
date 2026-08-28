@@ -18,8 +18,8 @@ export async function listSharesHandler(passCli: PassCliRunner, input: ListShare
   }
 
   const args = ["share", "list", "--output", output];
-  if (onlyItems) args.push("--items");
-  if (onlyVaults) args.push("--vaults");
+  if (onlyItems) args.push("--only-items", "true");
+  if (onlyVaults) args.push("--only-vaults", "true");
 
   const { stdout } = await passCli(args);
   return asTextContent(asJsonTextOrRaw(stdout));

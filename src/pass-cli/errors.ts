@@ -1,5 +1,16 @@
 export type PassCliAuthErrorCode = "AUTH_REQUIRED" | "AUTH_EXPIRED";
 
+const AUTH_REQUIRED_PHRASES = [
+  "not logged in",
+  "please login",
+  "please log in",
+  "requires an authenticated client",
+  "authentication required",
+  "unauthorized",
+];
+
+const AUTH_EXPIRED_PHRASES = ["session expired", "expired session"];
+
 export class PassCliAuthError extends Error {
   readonly name = "PassCliAuthError";
   readonly retryable = true;
@@ -25,22 +36,13 @@ export function classifyPassCliAuthErrorText(text: string): PassCliAuthErrorCode
   const normalized = (text ?? "").toLowerCase();
 
   if (
-    normalized.includes("session expired") ||
-    normalized.includes("expired session") ||
+    AUTH_EXPIRED_PHRASES.some((phrase) => normalized.includes(phrase)) ||
     (normalized.includes("token") && normalized.includes("expired"))
   ) {
     return "AUTH_EXPIRED";
   }
 
-  if (
-    normalized.includes("not logged in") ||
-    normalized.includes("please login") ||
-    normalized.includes("please log in") ||
-    normalized.includes("requires an authenticated client") ||
-    normalized.includes("authentication required") ||
-    normalized.includes("unauthorized") ||
-    normalized.includes("forbidden")
-  ) {
+  if (AUTH_REQUIRED_PHRASES.some((phrase) => normalized.includes(phrase))) {
     return "AUTH_REQUIRED";
   }
 

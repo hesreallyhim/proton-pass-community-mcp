@@ -21,7 +21,15 @@ export const ITEM_SORT_OPTIONS = [
   "created-desc",
 ] as const;
 
-export const WIFI_SECURITY_OPTIONS = ["wpa", "wpa2", "wpa3", "wep", "open", "none"] as const;
+export const WIFI_SECURITY_OPTIONS = [
+  "wpa",
+  "wpa2",
+  "wpa3",
+  "wep",
+  "open",
+  "none",
+  "unspecified",
+] as const;
 export const SHARE_ROLE_OPTIONS = ["viewer", "editor", "manager"] as const;
 
 export const VAULT_NAME_SCOPE_DESCRIPTION =
@@ -42,5 +50,7 @@ export const SEARCH_QUERY_DESCRIPTION = "Search query string";
 export const SEARCH_FIELD_DESCRIPTION = "Field to search (currently title only)";
 export const SEARCH_MATCH_DESCRIPTION = "Match strategy for the query";
 export const SEARCH_CASE_SENSITIVE_DESCRIPTION = "Whether the search is case-sensitive";
-export const SEARCH_VAULT_SCOPE_DESCRIPTION = "Limit search to a specific vault by name";
-export const SEARCH_SHARE_SCOPE_DESCRIPTION = "Limit search to a specific share by ID";
+export const SEARCH_VAULT_SCOPE_DESCRIPTION =
+  "Search this vault by name; omitting both selectors uses the CLI default vault";
+export const SEARCH_SHARE_SCOPE_DESCRIPTION =
+  "Search this share by ID; omitting both selectors uses the CLI default vault";

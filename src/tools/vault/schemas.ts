@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { agentReasonInput } from "../shared/agent-reason.js";
 import { confirmInput } from "../shared/schema-fragments.js";
 import { scopeRefinement } from "../shared/scope.js";
 import { MAX_VAULT_MEMBER_PAGE_SIZE, VAULT_MEMBER_ROLE_OPTIONS } from "./constants.js";
@@ -33,6 +34,9 @@ export const createVaultInputSchema = z.object({
 });
 
 export const updateVaultInputSchema = z.object({
+  agentReason: agentReasonInput.describe(
+    "Required before update: upstream validates agent reasons after mutation",
+  ),
   shareId: z.string().max(100).optional().describe("Share ID of the vault to update"),
   vaultName: z.string().max(255).optional().describe("Name of the vault to update"),
   newName: z.string().max(255).describe("New name for the vault"),

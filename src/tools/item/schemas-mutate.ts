@@ -1,9 +1,11 @@
 import { z } from "zod";
 
+import { agentReasonInput } from "../shared/agent-reason.js";
 import { confirmInput } from "../shared/schema-fragments.js";
 
 export const moveItemInputSchema = z
   .object({
+    agentReason: agentReasonInput.optional(),
     fromShareId: z.string().max(100).optional().describe("Source share ID"),
     fromVaultName: z.string().max(255).optional().describe("Source vault name"),
     toShareId: z.string().max(100).optional().describe("Destination share ID"),
@@ -24,6 +26,9 @@ export const moveItemInputSchema = z
 
 export const updateItemInputSchema = z
   .object({
+    agentReason: agentReasonInput.describe(
+      "Required before update: upstream validates agent reasons after mutation",
+    ),
     shareId: z.string().max(100).optional().describe("Share ID containing the item"),
     vaultName: z.string().max(255).optional().describe("Vault name containing the item"),
     itemId: z.string().max(100).optional().describe("Item ID to update"),
@@ -40,6 +45,9 @@ export const updateItemInputSchema = z
 
 export const trashItemInputSchema = z
   .object({
+    agentReason: agentReasonInput.describe(
+      "Required before trashing: upstream validates agent reasons after mutation",
+    ),
     shareId: z.string().max(100).optional().describe("Share ID containing the item"),
     vaultName: z.string().max(255).optional().describe("Vault name containing the item"),
     itemId: z.string().max(100).optional().describe("Item ID to trash"),
@@ -55,6 +63,9 @@ export const trashItemInputSchema = z
 
 export const untrashItemInputSchema = z
   .object({
+    agentReason: agentReasonInput.describe(
+      "Required before restoring: upstream validates agent reasons after mutation",
+    ),
     shareId: z.string().max(100).optional().describe("Share ID containing the item"),
     vaultName: z.string().max(255).optional().describe("Vault name containing the item"),
     itemId: z.string().max(100).optional().describe("Item ID to restore"),
@@ -69,6 +80,7 @@ export const untrashItemInputSchema = z
   });
 
 export const downloadItemAttachmentInputSchema = z.object({
+  confirm: confirmInput,
   shareId: z.string().max(100).describe("Share ID containing the item"),
   itemId: z.string().max(100).describe("Item ID containing the attachment"),
   attachmentId: z.string().max(100).describe("Attachment ID to download"),
@@ -76,6 +88,7 @@ export const downloadItemAttachmentInputSchema = z.object({
 });
 
 export const deleteItemInputSchema = z.object({
+  agentReason: agentReasonInput.optional(),
   shareId: z.string().max(100).describe("Share ID containing the item to delete"),
   itemId: z.string().max(100).describe("Item ID to delete"),
   confirm: confirmInput,

@@ -182,6 +182,7 @@ describe("moveItemInputSchema", () => {
 describe("updateItemInputSchema", () => {
   it("accepts a minimal valid input (item selector + fields)", () => {
     const result = updateItemInputSchema.safeParse({
+      agentReason: "Testing current CLI write contract",
       itemId: "i",
       fields: ["username=alice"],
     });
@@ -190,6 +191,7 @@ describe("updateItemInputSchema", () => {
 
   it("accepts a full valid input", () => {
     const result = updateItemInputSchema.safeParse({
+      agentReason: "Testing current CLI write contract",
       shareId: "share-1",
       itemId: "item-1",
       fields: ["a=1", "b=2"],
@@ -200,6 +202,7 @@ describe("updateItemInputSchema", () => {
 
   it("accepts vaultName + itemTitle", () => {
     const result = updateItemInputSchema.safeParse({
+      agentReason: "Testing current CLI write contract",
       vaultName: "Work",
       itemTitle: "GitHub",
       fields: ["x=1"],
@@ -209,6 +212,7 @@ describe("updateItemInputSchema", () => {
 
   it("accepts neither shareId nor vaultName (scope is optional)", () => {
     const result = updateItemInputSchema.safeParse({
+      agentReason: "Testing current CLI write contract",
       itemId: "i",
       fields: ["x=1"],
     });
@@ -217,6 +221,7 @@ describe("updateItemInputSchema", () => {
 
   it("rejects when shareId AND vaultName are both set", () => {
     const result = updateItemInputSchema.safeParse({
+      agentReason: "Testing current CLI write contract",
       shareId: "s",
       vaultName: "v",
       itemId: "i",
@@ -227,6 +232,7 @@ describe("updateItemInputSchema", () => {
 
   it("rejects when itemId AND itemTitle are both set", () => {
     const result = updateItemInputSchema.safeParse({
+      agentReason: "Testing current CLI write contract",
       shareId: "s",
       itemId: "i",
       itemTitle: "T",
@@ -237,6 +243,7 @@ describe("updateItemInputSchema", () => {
 
   it("rejects when neither itemId nor itemTitle are set", () => {
     const result = updateItemInputSchema.safeParse({
+      agentReason: "Testing current CLI write contract",
       shareId: "s",
       fields: ["x=1"],
     });
@@ -245,6 +252,7 @@ describe("updateItemInputSchema", () => {
 
   it("rejects missing fields (required)", () => {
     const result = updateItemInputSchema.safeParse({
+      agentReason: "Testing current CLI write contract",
       shareId: "s",
       itemId: "i",
     });
@@ -253,6 +261,7 @@ describe("updateItemInputSchema", () => {
 
   it("rejects an empty fields array (min 1)", () => {
     const result = updateItemInputSchema.safeParse({
+      agentReason: "Testing current CLI write contract",
       shareId: "s",
       itemId: "i",
       fields: [],
@@ -262,6 +271,7 @@ describe("updateItemInputSchema", () => {
 
   it("rejects a non-array fields value", () => {
     const result = updateItemInputSchema.safeParse({
+      agentReason: "Testing current CLI write contract",
       shareId: "s",
       itemId: "i",
       fields: "username=alice",
@@ -271,6 +281,7 @@ describe("updateItemInputSchema", () => {
 
   it("accepts a fields entry at exactly 1024 chars", () => {
     const result = updateItemInputSchema.safeParse({
+      agentReason: "Testing current CLI write contract",
       itemId: "i",
       fields: [STR_1024],
     });
@@ -279,6 +290,7 @@ describe("updateItemInputSchema", () => {
 
   it("rejects a fields entry over 1024 chars", () => {
     const result = updateItemInputSchema.safeParse({
+      agentReason: "Testing current CLI write contract",
       itemId: "i",
       fields: [STR_1025],
     });
@@ -287,6 +299,7 @@ describe("updateItemInputSchema", () => {
 
   it("rejects shareId over 100 chars", () => {
     const result = updateItemInputSchema.safeParse({
+      agentReason: "Testing current CLI write contract",
       shareId: STR_101,
       itemId: "i",
       fields: ["x=1"],
@@ -296,6 +309,7 @@ describe("updateItemInputSchema", () => {
 
   it("rejects vaultName over 255 chars", () => {
     const result = updateItemInputSchema.safeParse({
+      agentReason: "Testing current CLI write contract",
       vaultName: STR_256,
       itemId: "i",
       fields: ["x=1"],
@@ -305,11 +319,16 @@ describe("updateItemInputSchema", () => {
 
   it("accepts confirm: false and omitted", () => {
     const a = updateItemInputSchema.safeParse({
+      agentReason: "Testing current CLI write contract",
       itemId: "i",
       fields: ["x=1"],
       confirm: false,
     });
-    const b = updateItemInputSchema.safeParse({ itemId: "i", fields: ["x=1"] });
+    const b = updateItemInputSchema.safeParse({
+      agentReason: "Testing current CLI write contract",
+      itemId: "i",
+      fields: ["x=1"],
+    });
     expect(a.success).toBe(true);
     expect(b.success).toBe(true);
   });
@@ -328,6 +347,7 @@ describe("updateItemInputSchema", () => {
 describe("trashItemInputSchema", () => {
   it("accepts a valid input with shareId + itemId", () => {
     const result = trashItemInputSchema.safeParse({
+      agentReason: "Testing current CLI write contract",
       shareId: "s",
       itemId: "i",
       confirm: true,
@@ -337,6 +357,7 @@ describe("trashItemInputSchema", () => {
 
   it("accepts a valid input with vaultName + itemTitle", () => {
     const result = trashItemInputSchema.safeParse({
+      agentReason: "Testing current CLI write contract",
       vaultName: "Vault",
       itemTitle: "T",
     });
@@ -349,6 +370,7 @@ describe("trashItemInputSchema", () => {
   // schema as written.
   it("accepts neither shareId nor vaultName (schema only forbids both-set)", () => {
     const result = trashItemInputSchema.safeParse({
+      agentReason: "Testing current CLI write contract",
       itemId: "i",
     });
     expect(result.success).toBe(true);
@@ -356,6 +378,7 @@ describe("trashItemInputSchema", () => {
 
   it("rejects when shareId AND vaultName are both set", () => {
     const result = trashItemInputSchema.safeParse({
+      agentReason: "Testing current CLI write contract",
       shareId: "s",
       vaultName: "v",
       itemId: "i",
@@ -365,6 +388,7 @@ describe("trashItemInputSchema", () => {
 
   it("rejects when itemId AND itemTitle are both set", () => {
     const result = trashItemInputSchema.safeParse({
+      agentReason: "Testing current CLI write contract",
       shareId: "s",
       itemId: "i",
       itemTitle: "T",
@@ -374,6 +398,7 @@ describe("trashItemInputSchema", () => {
 
   it("rejects when neither itemId nor itemTitle are set", () => {
     const result = trashItemInputSchema.safeParse({
+      agentReason: "Testing current CLI write contract",
       shareId: "s",
     });
     expectIssueWithMessage(result, "Provide exactly one of itemId or itemTitle.");
@@ -381,6 +406,7 @@ describe("trashItemInputSchema", () => {
 
   it("rejects shareId over 100 chars", () => {
     const result = trashItemInputSchema.safeParse({
+      agentReason: "Testing current CLI write contract",
       shareId: STR_101,
       itemId: "i",
     });
@@ -389,6 +415,7 @@ describe("trashItemInputSchema", () => {
 
   it("rejects vaultName over 255 chars", () => {
     const result = trashItemInputSchema.safeParse({
+      agentReason: "Testing current CLI write contract",
       vaultName: STR_256,
       itemId: "i",
     });
@@ -396,9 +423,23 @@ describe("trashItemInputSchema", () => {
   });
 
   it("accepts confirm true/false/undefined", () => {
-    const a = trashItemInputSchema.safeParse({ shareId: "s", itemId: "i", confirm: true });
-    const b = trashItemInputSchema.safeParse({ shareId: "s", itemId: "i", confirm: false });
-    const c = trashItemInputSchema.safeParse({ shareId: "s", itemId: "i" });
+    const a = trashItemInputSchema.safeParse({
+      agentReason: "Testing current CLI write contract",
+      shareId: "s",
+      itemId: "i",
+      confirm: true,
+    });
+    const b = trashItemInputSchema.safeParse({
+      agentReason: "Testing current CLI write contract",
+      shareId: "s",
+      itemId: "i",
+      confirm: false,
+    });
+    const c = trashItemInputSchema.safeParse({
+      agentReason: "Testing current CLI write contract",
+      shareId: "s",
+      itemId: "i",
+    });
     expect(a.success).toBe(true);
     expect(b.success).toBe(true);
     expect(c.success).toBe(true);
@@ -413,6 +454,7 @@ describe("trashItemInputSchema", () => {
 describe("untrashItemInputSchema", () => {
   it("accepts a valid input with shareId + itemId", () => {
     const result = untrashItemInputSchema.safeParse({
+      agentReason: "Testing current CLI write contract",
       shareId: "s",
       itemId: "i",
       confirm: true,
@@ -422,6 +464,7 @@ describe("untrashItemInputSchema", () => {
 
   it("accepts a valid input with vaultName + itemTitle", () => {
     const result = untrashItemInputSchema.safeParse({
+      agentReason: "Testing current CLI write contract",
       vaultName: "v",
       itemTitle: "T",
     });
@@ -432,6 +475,7 @@ describe("untrashItemInputSchema", () => {
   // schema allows neither scope to be set; handler requires exactly one.
   it("accepts neither shareId nor vaultName (schema only forbids both-set)", () => {
     const result = untrashItemInputSchema.safeParse({
+      agentReason: "Testing current CLI write contract",
       itemId: "i",
     });
     expect(result.success).toBe(true);
@@ -439,6 +483,7 @@ describe("untrashItemInputSchema", () => {
 
   it("rejects when shareId AND vaultName are both set", () => {
     const result = untrashItemInputSchema.safeParse({
+      agentReason: "Testing current CLI write contract",
       shareId: "s",
       vaultName: "v",
       itemId: "i",
@@ -448,6 +493,7 @@ describe("untrashItemInputSchema", () => {
 
   it("rejects when itemId AND itemTitle are both set", () => {
     const result = untrashItemInputSchema.safeParse({
+      agentReason: "Testing current CLI write contract",
       shareId: "s",
       itemId: "i",
       itemTitle: "T",
@@ -457,6 +503,7 @@ describe("untrashItemInputSchema", () => {
 
   it("rejects when neither itemId nor itemTitle are set", () => {
     const result = untrashItemInputSchema.safeParse({
+      agentReason: "Testing current CLI write contract",
       shareId: "s",
     });
     expectIssueWithMessage(result, "Provide exactly one of itemId or itemTitle.");
@@ -464,6 +511,7 @@ describe("untrashItemInputSchema", () => {
 
   it("rejects shareId over 100 chars", () => {
     const result = untrashItemInputSchema.safeParse({
+      agentReason: "Testing current CLI write contract",
       shareId: STR_101,
       itemId: "i",
     });
@@ -472,6 +520,7 @@ describe("untrashItemInputSchema", () => {
 
   it("rejects vaultName over 255 chars", () => {
     const result = untrashItemInputSchema.safeParse({
+      agentReason: "Testing current CLI write contract",
       vaultName: STR_256,
       itemId: "i",
     });
@@ -479,9 +528,23 @@ describe("untrashItemInputSchema", () => {
   });
 
   it("accepts confirm true/false/undefined", () => {
-    const a = untrashItemInputSchema.safeParse({ shareId: "s", itemId: "i", confirm: true });
-    const b = untrashItemInputSchema.safeParse({ shareId: "s", itemId: "i", confirm: false });
-    const c = untrashItemInputSchema.safeParse({ shareId: "s", itemId: "i" });
+    const a = untrashItemInputSchema.safeParse({
+      agentReason: "Testing current CLI write contract",
+      shareId: "s",
+      itemId: "i",
+      confirm: true,
+    });
+    const b = untrashItemInputSchema.safeParse({
+      agentReason: "Testing current CLI write contract",
+      shareId: "s",
+      itemId: "i",
+      confirm: false,
+    });
+    const c = untrashItemInputSchema.safeParse({
+      agentReason: "Testing current CLI write contract",
+      shareId: "s",
+      itemId: "i",
+    });
     expect(a.success).toBe(true);
     expect(b.success).toBe(true);
     expect(c.success).toBe(true);

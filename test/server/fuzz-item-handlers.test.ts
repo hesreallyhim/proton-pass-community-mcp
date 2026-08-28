@@ -62,6 +62,9 @@ const itemLikeArb = fc.record({
   create_time: fc.option(tokenArb, { nil: undefined }),
   modify_time: fc.option(tokenArb, { nil: undefined }),
   title: fc.option(labelArb, { nil: undefined }),
+  item_type: fc.option(fc.constantFrom("login", "credit_card", "ssh_key", "wifi", "custom"), {
+    nil: undefined,
+  }),
   password: fc.option(secretArb, { nil: undefined }),
   share: fc.option(
     fc.record({
@@ -101,7 +104,7 @@ const rawEntryArb = fc.oneof(
 
 const payloadScenarioArb = fc
   .record({
-    mode: fc.constantFrom("array", "items-object", "single-array-key"),
+    mode: fc.constantFrom("array", "items-object"),
     items: fc.array(rawEntryArb, { maxLength: 25 }),
     extraKey: tokenArb.filter((key) => key !== "items"),
   })
@@ -118,6 +121,32 @@ const paginationArb = fc.record({
 afterEach(restoreProcessEnvAndMocks);
 
 describe("fuzz: item handlers", () => {
+  it("rejects unknown list envelopes without exposing their contents", async () => {
+    await fc.assert(
+      fc.asyncProperty(
+        tokenArb.filter((key) => key !== "items"),
+        fc.array(rawEntryArb, { maxLength: 25 }),
+        async (key, items) => {
+          const tools = getRegisteredTools(
+            makeRunner({ stdout: JSON.stringify({ [key]: items }), stderr: "" }),
+          );
+          await expect(tools.list_items.handler({ shareId: "s1", output: "json" })).rejects.toThrow(
+            "Unexpected pass-cli item list shape",
+          );
+          await expect(
+            tools.search_items.handler({
+              query: "test",
+              field: "title",
+              match: "contains",
+              caseSensitive: false,
+            }),
+          ).rejects.toThrow("Unexpected pass-cli item list shape");
+        },
+      ),
+      { numRuns: 100 },
+    );
+  });
+
   it("listItemsHandler normalizes arbitrary CLI payloads into redacted item refs", async () => {
     await fc.assert(
       fc.asyncProperty(payloadScenarioArb, paginationArb, async (scenario, pagination) => {

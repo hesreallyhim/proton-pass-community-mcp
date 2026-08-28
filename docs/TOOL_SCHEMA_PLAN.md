@@ -20,12 +20,29 @@ Primary optimization target: item discovery (`pass-cli item list`) should return
 2. Current implementation requires explicit confirmation (`confirm: true`) and write gate (`ALLOW_WRITE=1`); see policy proposal below for elicitation-first migration.
 3. Read tools default to structured, token-efficient JSON in `structuredContent`.
 4. When `structuredContent` is returned, also return a `TextContent` serialization of that same JSON object for backwards compatibility/interoperability. This is not a separate human-output mode from the CLI.
-5. Listing/search tools return references, then callers use `view_item` for full content.
+5. Item listing/search tools return references, then callers use `view_item` for full content. `list_vaults` retains the upstream JSON payload without local pagination.
 6. Release branches may retain non-release code paths, but only release-scoped tools are registered/exposed by default.
 7. Authentication session lifecycle (`pass-cli login`, `pass-cli logout`) remains out-of-band and is not exposed as MCP tools, even when login is PAT-backed.
 8. PAT administration is evaluated separately from login/logout because it manages scoped credentials after bootstrap auth; see `docs/ADR/ADR-005-pat-auth-boundary-and-tooling.md`.
 9. CLI binary lifecycle commands (for example `pass-cli update` / track switching) remain out-of-band and are not exposed as MCP tools.
 10. Host SSH agent integration/lifecycle commands (`pass-cli ssh-agent *`) remain out-of-band and are not exposed as MCP tools.
+
+## Current CLI 2.3.3 Compatibility Policy
+
+This rehabilitation retains the existing 47 tools and seven static resources. [The per-tool source audit](./testing/PASS_CLI_2.3.3_COMPATIBILITY.md) records immutable upstream references, fixes, and fixture coverage. All new verification is static or fixture-based; it does not establish live vault conformance.
+
+`agentReason` must contain non-whitespace text and at most 300 Unicode code points; its original text is preserved. It is passed in a copy of the child environment as `PROTON_PASS_AGENT_REASON`, never as a command argument, never generated automatically, and never assigned to global process state. It provides an audit explanation, not permission to access secrets or mutate data.
+
+| Requirement                                                        | Existing tools                                                                                                                                                                                                                                          |
+| ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Required for every session type, validated before invoking the CLI | `update_item`, `trash_item`, `untrash_item`, `update_vault`                                                                                                                                                                                             |
+| Optional input; agent sessions require it upstream                 | `view_item`, `generate_item_totp`, `create_login_item`, `create_login_item_from_template`, `create_note_item`, `create_credit_card_item`, `create_wifi_item`, `create_custom_item`, `create_identity_item`, `move_item`, `delete_item`, `inject`, `run` |
+
+The four required inputs are an intentional compatibility change: upstream can mutate before it validates an agent reason. There is no reliable session-type field in `info` on which to base a security decision, so the server requires these inputs universally. An inherited environment reason does not replace a required tool input. Optional omissions preserve the inherited CLI environment for existing ordinary sessions. Even a valid reason cannot make audit delivery and mutation atomic; callers must inspect state before retrying a failed mutation.
+
+`download_item_attachment` now requires both `ALLOW_WRITE=1` and `confirm: true`, because it can overwrite local files. The same existing gates remain on all mutations, `inject`, and `run`. `delete_item` permanently deletes without requiring prior trash. Login, PAT/agent provisioning, and agent-token login remain out of band; no new token or agent-management tools are introduced. Capability denials do not become re-login instructions merely because their error text says `Forbidden`.
+
+`check_status` uses `info` and `--version`, with 2.3.3 as its advisory baseline. It checks session/account availability, not every upstream capability or network route. The old `test` subcommand is no longer called.
 
 ## Write Authorization and Confirmation Policy (Proposal)
 
@@ -83,9 +100,10 @@ This section defines the target mutation-safety model for this server, aligned w
 Title fallback policy:
 
 1. Use `content.title` when non-empty.
-2. Otherwise set `title: null` and `display_title: "[untitled:<short-id>]"`.
+2. Otherwise use the current metadata payload's top-level `title` when non-empty.
+3. Otherwise set `title: null` and `display_title: "[untitled:<short-id>]"`.
 
-Raw upstream shape reference (anonymized sample from `pass-cli item list --output json`):
+Legacy upstream shape reference (anonymized earlier `pass-cli item list --output json` payload, still normalized defensively):
 
 ```json
 {
@@ -117,7 +135,7 @@ Raw upstream shape reference (anonymized sample from `pass-cli item list --outpu
 
 Notes:
 
-1. `content.content.<Type>` (for example `Login`) is used to derive `ItemRef.type` (normalized to filter token format, for example `login`).
+1. Current top-level `item_type` takes precedence for `ItemRef.type`; snake_case and kebab-case names are normalized to filter tokens. Legacy `content.content.<Type>` (for example `Login`) remains a fallback.
 2. Nested secret-bearing fields (passwords, TOTP URIs, passkeys, notes) must not be surfaced in `ItemRef`.
 
 ### `CursorPage<T>`
@@ -151,8 +169,8 @@ Cursor is an offset string (`"0"`, `"100"`, ...).
 
 Notes:
 
-1. Treat invitation tokens as sensitive capabilities and do not expose them in list payloads.
-2. Include only stable metadata needed for triage and follow-up selection.
+1. In CLI 2.3.3's invitation list, the field named `token` serializes an invitation ID, not an authentication bearer token. It is projected to `InviteRef.id` so callers can select it for `accept_invite` or `reject_invite`; those existing tools keep the input name `inviteToken` and pass it as a positional ID after `--`.
+2. Exclude bearer credentials and raw invitation internals; include only metadata needed for triage and follow-up selection.
 
 ### `VaultMemberRef` (canonical vault-member list object)
 
@@ -176,13 +194,14 @@ Input:
 1. Existing selectors: `vaultName` or `shareId`.
 2. Existing filters: `filterType`, `filterState`, `sortBy`.
 3. Pagination: `pageSize`, `cursor`.
-4. Optional `output`, default `json`.
+4. Optional legacy `output` hint, default `json`; `human` still produces JSON references and rejects `pageSize`/`cursor`.
 
 Output:
 
 1. `structuredContent: CursorPage<ItemRef>`.
 2. No full sensitive fields.
 3. Reference-only output is the default and current policy (no full-item compatibility fallback mode).
+4. The CLI is always asked for JSON without `--show-secrets`. Only an array or an object with an `items` array is accepted; invalid JSON and unknown envelopes produce a generic error without the raw payload.
 
 ### `search_items` (MCP-native, not direct CLI parity)
 
@@ -192,7 +211,7 @@ Input:
 2. `field` (default and only supported value initially: `"title"`).
 3. `match` enum: `contains | prefix | exact` (default `contains`).
 4. `caseSensitive` boolean (default `false`).
-5. `vaultName` or `shareId` optional selector.
+5. `vaultName` or `shareId` optional selector. Omitting both searches the CLI's default vault, not all vaults.
 6. `filterType`, `filterState`, `sortBy` passthrough.
 7. `pageSize`, `cursor`.
 
@@ -213,11 +232,12 @@ Notes:
 Input:
 
 1. `pageSize`, `cursor`.
+2. Use `arguments: {}` when no pagination is needed. The tool now publishes its object schema correctly; omitting the entire arguments object no longer uses the previous outer Zod default.
 
 Output:
 
 1. `structuredContent: CursorPage<InviteRef>`.
-2. Reference-only invite metadata (no raw invite token material in list payloads).
+2. Reference-only invite metadata, including the invitation ID projected from current CLI `token`; no authentication bearer credentials.
 3. When structured parsing is unavailable, return best-effort normalized text in `content`.
 
 ### `list_vault_members`
@@ -277,17 +297,17 @@ Input summary convention:
 
 ### Session and Utilities
 
-| Tool                | Source                                 | Status                     | Input Summary                                          | Output Summary                                          |
-| ------------------- | -------------------------------------- | -------------------------- | ------------------------------------------------------ | ------------------------------------------------------- |
-| `login`             | `pass-cli login`                       | Out of Scope (Out-of-Band) | n/a                                                    | n/a                                                     |
-| `logout`            | `pass-cli logout`                      | Out of Scope (Out-of-Band) | n/a                                                    | n/a                                                     |
-| `check_status`      | `pass-cli test` + `pass-cli --version` | Implemented                | none                                                   | Connectivity/auth preflight + CLI version compatibility |
-| `view_session_info` | `pass-cli info`                        | Implemented                | `output?`                                              | Account/session info                                    |
-| `view_user_info`    | `pass-cli user info`                   | Implemented                | `output?`                                              | User profile                                            |
-| `update`            | `pass-cli update`                      | Out of Scope (Out-of-Band) | n/a                                                    | n/a                                                     |
-| `support`           | `pass-cli support`                     | Out of Scope (Out-of-Band) | n/a                                                    | n/a                                                     |
-| `inject`            | `pass-cli inject`                      | Implemented                | `inFile`, `outFile?`, `fileMode?`, `force?`, `confirm` | Output path/status                                      |
-| `run`               | `pass-cli run`                         | Implemented                | `command[]`, `envFile[]?`, `noMasking?`, `confirm`     | Exit code/stdout/stderr summary                         |
+| Tool                | Source                                 | Status                     | Input Summary                                          | Output Summary                                         |
+| ------------------- | -------------------------------------- | -------------------------- | ------------------------------------------------------ | ------------------------------------------------------ |
+| `login`             | `pass-cli login`                       | Out of Scope (Out-of-Band) | n/a                                                    | n/a                                                    |
+| `logout`            | `pass-cli logout`                      | Out of Scope (Out-of-Band) | n/a                                                    | n/a                                                    |
+| `check_status`      | `pass-cli info` + `pass-cli --version` | Implemented                | none                                                   | Session preflight + advisory CLI version compatibility |
+| `view_session_info` | `pass-cli info`                        | Implemented                | `output?`                                              | Account/session info                                   |
+| `view_user_info`    | `pass-cli user info`                   | Implemented                | `output?`                                              | User profile                                           |
+| `update`            | `pass-cli update`                      | Out of Scope (Out-of-Band) | n/a                                                    | n/a                                                    |
+| `support`           | `pass-cli support`                     | Out of Scope (Out-of-Band) | n/a                                                    | n/a                                                    |
+| `inject`            | `pass-cli inject`                      | Implemented                | `inFile`, `outFile?`, `fileMode?`, `force?`, `confirm` | Output path/status                                     |
+| `run`               | `pass-cli run`                         | Implemented                | `command[]`, `envFile[]?`, `noMasking?`, `confirm`     | Exit code/stdout/stderr summary                        |
 
 ### Personal Access Tokens
 
@@ -309,17 +329,17 @@ Notes:
 
 ### Vault Tools
 
-| Tool                  | Source                         | Status      | Input Summary                                              | Output Summary               |
-| --------------------- | ------------------------------ | ----------- | ---------------------------------------------------------- | ---------------------------- |
-| `list_vaults`         | `pass-cli vault list`          | Implemented | `output?`                                                  | Vault list                   |
-| `create_vault`        | `pass-cli vault create`        | Implemented | `name`, `confirm`                                          | Created vault status         |
-| `update_vault`        | `pass-cli vault update`        | Implemented | `shareId \| vaultName`, `newName`, `confirm`               | Update status                |
-| `delete_vault`        | `pass-cli vault delete`        | Implemented | `shareId \| vaultName`, `confirm`                          | Delete status                |
-| `share_vault`         | `pass-cli vault share`         | Implemented | `shareId \| vaultName`, `email`, `role?`, `confirm`        | Share result                 |
-| `transfer_vault`      | `pass-cli vault transfer`      | Implemented | `shareId \| vaultName`, `memberShareId`, `confirm`         | Transfer result              |
-| `list_vault_members`  | `pass-cli vault member list`   | Implemented | `shareId \| vaultName`, `pageSize?`, `cursor?`             | `CursorPage<VaultMemberRef>` |
-| `update_vault_member` | `pass-cli vault member update` | Implemented | `shareId \| vaultName`, `memberShareId`, `role`, `confirm` | Update status                |
-| `remove_vault_member` | `pass-cli vault member remove` | Implemented | `shareId \| vaultName`, `memberShareId`, `confirm`         | Remove status                |
+| Tool                  | Source                         | Status      | Input Summary                                               | Output Summary               |
+| --------------------- | ------------------------------ | ----------- | ----------------------------------------------------------- | ---------------------------- |
+| `list_vaults`         | `pass-cli vault list`          | Implemented | `output?`                                                   | Vault list                   |
+| `create_vault`        | `pass-cli vault create`        | Implemented | `name`, `confirm`                                           | Created vault status         |
+| `update_vault`        | `pass-cli vault update`        | Implemented | `shareId \| vaultName`, `newName`, `agentReason`, `confirm` | Update status                |
+| `delete_vault`        | `pass-cli vault delete`        | Implemented | `shareId \| vaultName`, `confirm`                           | Delete status                |
+| `share_vault`         | `pass-cli vault share`         | Implemented | `shareId \| vaultName`, `email`, `role?`, `confirm`         | Share result                 |
+| `transfer_vault`      | `pass-cli vault transfer`      | Implemented | `shareId \| vaultName`, `memberShareId`, `confirm`          | Transfer result              |
+| `list_vault_members`  | `pass-cli vault member list`   | Implemented | `shareId \| vaultName`, `pageSize?`, `cursor?`              | `CursorPage<VaultMemberRef>` |
+| `update_vault_member` | `pass-cli vault member update` | Implemented | `shareId \| vaultName`, `memberShareId`, `role`, `confirm`  | Update status                |
+| `remove_vault_member` | `pass-cli vault member remove` | Implemented | `shareId \| vaultName`, `memberShareId`, `confirm`          | Remove status                |
 
 ### Item Discovery and Read
 
@@ -334,28 +354,30 @@ Notes:
 
 | Tool           | Source                  | Status      | Input Summary                                                                                                                                      | Output Summary |
 | -------------- | ----------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- |
-| `update_item`  | `pass-cli item update`  | Implemented | required: `fields[]`, `confirm`; selector: `shareId \| vaultName`; xor: `itemId \| itemTitle`                                                      | Update status  |
+| `update_item`  | `pass-cli item update`  | Implemented | required: `fields[]`, `agentReason`, `confirm`; selector: `shareId \| vaultName`; xor: `itemId \| itemTitle`                                       | Update status  |
 | `move_item`    | `pass-cli item move`    | Implemented | required: `confirm`; source selector: `fromShareId \| fromVaultName`; destination selector: `toShareId \| toVaultName`; xor: `itemId \| itemTitle` | Move status    |
 | `delete_item`  | `pass-cli item delete`  | Implemented | required: `shareId`, `itemId`, `confirm`                                                                                                           | Delete status  |
 | `share_item`   | `pass-cli item share`   | Implemented | required: `shareId`, `itemId`, `email`, `confirm`; optional: `role`                                                                                | Share status   |
-| `trash_item`   | `pass-cli item trash`   | Implemented | required: `confirm`; selector: `shareId? \| vaultName?`; xor: `itemId \| itemTitle`                                                                | Trash status   |
-| `untrash_item` | `pass-cli item untrash` | Implemented | required: `confirm`; selector: `shareId? \| vaultName?`; xor: `itemId \| itemTitle`                                                                | Restore status |
+| `trash_item`   | `pass-cli item trash`   | Implemented | required: `confirm`, `agentReason`; selector: `shareId? \| vaultName?`; xor: `itemId \| itemTitle`                                                 | Trash status   |
+| `untrash_item` | `pass-cli item untrash` | Implemented | required: `confirm`, `agentReason`; selector: `shareId? \| vaultName?`; xor: `itemId \| itemTitle`                                                 | Restore status |
 
 ### Item Creation
 
-| Tool                              | Source                                          | Status                     | Input Summary                                                                                                                                                                 | Output Summary |
-| --------------------------------- | ----------------------------------------------- | -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- |
-| `create_login_item`               | `pass-cli item create login`                    | Implemented                | required: `title`, `confirm`; optional: selector (`shareId` or `vaultName`), `username`, `email`, `password`, `url`, `generatePassword`, `output`                             | Created item   |
-| `create_login_item_from_template` | `pass-cli item create login --from-template`    | Implemented                | required: `template.title`, `confirm`; optional: selector (`shareId` or `vaultName`), `template.username`, `template.email`, `template.password`, `template.urls[]`, `output` | Created item   |
-| `create_note_item`                | `pass-cli item create note`                     | Implemented                | required: `title`, `confirm`; optional: selector (`shareId` or `vaultName`), `note`                                                                                           | Created item   |
-| `create_credit_card_item`         | `pass-cli item create credit-card`              | Implemented                | required: `title`, `confirm`; optional: selector (`shareId` or `vaultName`), `cardholderName`, `number`, `cvv`, `expirationDate`, `pin`, `note`                               | Created item   |
-| `create_wifi_item`                | `pass-cli item create wifi`                     | Implemented                | required: `title`, `ssid`, `confirm`; optional: selector (`shareId` or `vaultName`), `password`, `security`, `note`                                                           | Created item   |
-| `create_custom_item`              | `pass-cli item create custom --from-template`   | Implemented                | required: `template.title`, `confirm`; optional: selector (`shareId` or `vaultName`), `template.note`, `template.sections[]`                                                  | Created item   |
-| `create_identity_item`            | `pass-cli item create identity --from-template` | Implemented                | required: `template.title`, `confirm`; optional: selector (`shareId` or `vaultName`), template identity fields                                                                | Created item   |
-| `generate_ssh_key_item`           | `pass-cli item create ssh-key generate`         | Out of Scope (Out-of-Band) | n/a                                                                                                                                                                           | n/a            |
-| `import_ssh_key_item`             | `pass-cli item create ssh-key import`           | Out of Scope (Out-of-Band) | n/a                                                                                                                                                                           | n/a            |
+| Tool                              | Source                                          | Status                     | Input Summary                                                                                                                                                                            | Output Summary |
+| --------------------------------- | ----------------------------------------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- |
+| `create_login_item`               | `pass-cli item create login`                    | Implemented                | required: `title`, `confirm`; optional: selector (`shareId` or `vaultName`), `username`, `email`, `password`, `url`, `generatePassword`                                                  | Created item   |
+| `create_login_item_from_template` | `pass-cli item create login --from-template`    | Implemented                | required: `template.title`, `confirm`; optional: selector (`shareId` or `vaultName`), `template.username`, `template.email`, `template.password`, `template.totp_uri`, `template.urls[]` | Created item   |
+| `create_note_item`                | `pass-cli item create note`                     | Implemented                | required: `title`, `confirm`; optional: selector (`shareId` or `vaultName`), `note`                                                                                                      | Created item   |
+| `create_credit_card_item`         | `pass-cli item create credit-card`              | Implemented                | required: `title`, `confirm`; optional: selector (`shareId` or `vaultName`), `cardholderName`, `number`, `cvv`, `expirationDate`, `pin`, `note`                                          | Created item   |
+| `create_wifi_item`                | `pass-cli item create wifi`                     | Implemented                | required: `title`, `ssid`, `confirm`; optional: selector (`shareId` or `vaultName`), `password`, `security`, `note`                                                                      | Created item   |
+| `create_custom_item`              | `pass-cli item create custom --from-template`   | Implemented                | required: `template.title`, `confirm`; optional: selector (`shareId` or `vaultName`), `template.note`, `template.sections[]`                                                             | Created item   |
+| `create_identity_item`            | `pass-cli item create identity --from-template` | Implemented                | required: `template.title`, `confirm`; optional: selector (`shareId` or `vaultName`), template identity fields                                                                           | Created item   |
+| `generate_ssh_key_item`           | `pass-cli item create ssh-key generate`         | Out of Scope (Out-of-Band) | n/a                                                                                                                                                                                      | n/a            |
+| `import_ssh_key_item`             | `pass-cli item create ssh-key import`           | Out of Scope (Out-of-Band) | n/a                                                                                                                                                                                      | n/a            |
 
 Notes:
+
+Current source-derived updates: optional `agentReason` applies to the seven creation tools above; WiFi uses `--from-template -` for every scope, including default vault, to avoid the direct flag-mode share-ID requirement. WiFi accepts `unspecified` and rejects whitespace-only SSIDs. Credit-card expiration is empty or `YYYY-MM` with year 2000–9999 and month 01–12. Custom field types use canonical lowercase `text`, `hidden`, `totp`, or `timestamp`; timestamps are signed 64-bit integer strings. Login templates accept nullable `totp_uri`. These are local input contracts, not claims that every upstream accepted input is exposed.
 
 1. Docs verification (snapshot `v1.5.2` and `protonpass.github.io`, checked on March 6, 2026): explicit template schema examples are login-centric upstream.
 2. Empirical validation against the throwaway account on March 6, 2026 (`scripts/pass-dev.sh`) confirmed `--get-template` and `--from-template` support for `note`, `credit-card`, `custom`, `wifi`, and `identity` (in addition to `login`).
@@ -367,13 +389,13 @@ Notes:
 
 ### Item Alias, Attachment, and Members
 
-| Tool                       | Source                              | Status      | Input Summary                                          | Output Summary       |
-| -------------------------- | ----------------------------------- | ----------- | ------------------------------------------------------ | -------------------- |
-| `create_item_alias`        | `pass-cli item alias create`        | Implemented | `shareId \| vaultName`, `prefix`, `output?`, `confirm` | Alias item           |
-| `download_item_attachment` | `pass-cli item attachment download` | Implemented | `shareId`, `itemId`, `attachmentId`, `outputPath`      | Download status/path |
-| `list_item_members`        | `pass-cli item member list`         | Implemented | `shareId`, `itemId`, `output?`                         | Member list          |
-| `update_item_member`       | `pass-cli item member update`       | Implemented | `shareId`, `memberShareId`, `role`, `confirm`          | Update status        |
-| `remove_item_member`       | `pass-cli item member remove`       | Implemented | `shareId`, `memberShareId`, `confirm`                  | Remove status        |
+| Tool                       | Source                              | Status      | Input Summary                                                | Output Summary       |
+| -------------------------- | ----------------------------------- | ----------- | ------------------------------------------------------------ | -------------------- |
+| `create_item_alias`        | `pass-cli item alias create`        | Implemented | `shareId \| vaultName`, `prefix`, `output?`, `confirm`       | Alias item           |
+| `download_item_attachment` | `pass-cli item attachment download` | Implemented | `shareId`, `itemId`, `attachmentId`, `outputPath`, `confirm` | Download status/path |
+| `list_item_members`        | `pass-cli item member list`         | Implemented | `shareId`, `itemId`, `output?`                               | Member list          |
+| `update_item_member`       | `pass-cli item member update`       | Implemented | `shareId`, `memberShareId`, `role`, `confirm`                | Update status        |
+| `remove_item_member`       | `pass-cli item member remove`       | Implemented | `shareId`, `memberShareId`, `confirm`                        | Remove status        |
 
 ### Share, Invite, Password, TOTP, User, Settings, SSH Agent
 

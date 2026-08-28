@@ -47,12 +47,14 @@ describe("write handlers", () => {
     });
 
     await trashItemHandler(runner, {
+      agentReason: "Testing current CLI write contract",
       shareId: "s1",
       itemId: "i1",
       confirm: true,
     });
 
     await untrashItemHandler(runner, {
+      agentReason: "Testing current CLI write contract",
       vaultName: "Work",
       itemTitle: "GitHub",
       confirm: true,
@@ -69,23 +71,19 @@ describe("write handlers", () => {
       "To Vault",
     ]);
 
-    expect(runner).toHaveBeenNthCalledWith(2, [
-      "item",
-      "trash",
-      "--share-id",
-      "s1",
-      "--item-id",
-      "i1",
-    ]);
+    expect(runner).toHaveBeenNthCalledWith(
+      2,
+      ["item", "trash", "--share-id", "s1", "--item-id", "i1"],
+      undefined,
+      { agentReason: "Testing current CLI write contract" },
+    );
 
-    expect(runner).toHaveBeenNthCalledWith(3, [
-      "item",
-      "untrash",
-      "--vault-name",
-      "Work",
-      "--item-title",
-      "GitHub",
-    ]);
+    expect(runner).toHaveBeenNthCalledWith(
+      3,
+      ["item", "untrash", "--vault-name", "Work", "--item-title", "GitHub"],
+      undefined,
+      { agentReason: "Testing current CLI write contract" },
+    );
   });
 
   it("updateItemHandler validates selectors and builds field arguments", async () => {
@@ -94,6 +92,7 @@ describe("write handlers", () => {
 
     await expect(
       updateItemHandler(runner, {
+        agentReason: "Testing current CLI write contract",
         shareId: "s",
         vaultName: "v",
         itemId: "i",
@@ -104,6 +103,7 @@ describe("write handlers", () => {
 
     await expect(
       updateItemHandler(runner, {
+        agentReason: "Testing current CLI write contract",
         itemId: "i",
         itemTitle: "t",
         fields: ["password=1"],
@@ -113,12 +113,14 @@ describe("write handlers", () => {
 
     await expect(
       updateItemHandler(runner, {
+        agentReason: "Testing current CLI write contract",
         fields: ["password=1"],
         confirm: true,
       }),
     ).rejects.toThrow("Provide itemId or itemTitle");
 
     const resultById = await updateItemHandler(runner, {
+      agentReason: "Testing current CLI write contract",
       shareId: "s1",
       itemId: "i1",
       fields: ["password=abc", "username=u"],
@@ -126,35 +128,46 @@ describe("write handlers", () => {
     });
 
     const resultByTitle = await updateItemHandler(runner, {
+      agentReason: "Testing current CLI write contract",
       vaultName: "Work",
       itemTitle: "GitHub",
       fields: ["password=xyz"],
       confirm: true,
     });
 
-    expect(runner).toHaveBeenNthCalledWith(1, [
-      "item",
-      "update",
-      "--share-id",
-      "s1",
-      "--item-id",
-      "i1",
-      "--field",
-      "password=abc",
-      "--field",
-      "username=u",
-    ]);
+    expect(runner).toHaveBeenNthCalledWith(
+      1,
+      [
+        "item",
+        "update",
+        "--share-id",
+        "s1",
+        "--item-id",
+        "i1",
+        "--field",
+        "password=abc",
+        "--field",
+        "username=u",
+      ],
+      undefined,
+      { agentReason: "Testing current CLI write contract" },
+    );
 
-    expect(runner).toHaveBeenNthCalledWith(2, [
-      "item",
-      "update",
-      "--vault-name",
-      "Work",
-      "--item-title",
-      "GitHub",
-      "--field",
-      "password=xyz",
-    ]);
+    expect(runner).toHaveBeenNthCalledWith(
+      2,
+      [
+        "item",
+        "update",
+        "--vault-name",
+        "Work",
+        "--item-title",
+        "GitHub",
+        "--field",
+        "password=xyz",
+      ],
+      undefined,
+      { agentReason: "Testing current CLI write contract" },
+    );
 
     expect(resultById).toEqual({ content: [{ type: "text", text: "updated" }] });
     expect(resultByTitle).toEqual({ content: [{ type: "text", text: "updated" }] });
@@ -188,6 +201,7 @@ describe("write handlers", () => {
       itemId: "i1",
       attachmentId: "a1",
       outputPath: "./tmp.bin",
+      confirm: true,
     });
 
     const listResult = await listItemMembersHandler(runner, {
@@ -272,7 +286,7 @@ describe("write handlers", () => {
     await shareItemHandler(runner, {
       shareId: "s2",
       itemId: "i2",
-      email: "editor@example.com",
+      email: "-editor@example.com",
       role: "editor",
       confirm: true,
     });
@@ -284,6 +298,7 @@ describe("write handlers", () => {
       "s1",
       "--item-id",
       "i1",
+      "--",
       "viewer@example.com",
     ]);
     expect(runner).toHaveBeenNthCalledWith(2, [
@@ -293,9 +308,10 @@ describe("write handlers", () => {
       "s2",
       "--item-id",
       "i2",
-      "editor@example.com",
       "--role",
       "editor",
+      "--",
+      "-editor@example.com",
     ]);
   });
 
@@ -364,6 +380,46 @@ describe("write handlers", () => {
     ]);
   });
 
+  it("attachment download refuses filesystem writes without both gates", async () => {
+    const runner = makeRunner({ stdout: "", stderr: "" });
+    const input = { shareId: "s1", itemId: "i1", attachmentId: "a1", outputPath: "existing.bin" };
+    delete process.env.ALLOW_WRITE;
+    await expect(
+      downloadItemAttachmentHandler(runner, { ...input, confirm: true }),
+    ).rejects.toThrow("ALLOW_WRITE");
+    process.env.ALLOW_WRITE = "1";
+    await expect(downloadItemAttachmentHandler(runner, input)).rejects.toThrow(
+      "explicit confirmation",
+    );
+    expect(runner).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ["600", "0600"],
+    ["0640", "0640"],
+    ["4755", "04755"],
+  ])(
+    "injectHandler treats file mode %s as octal and preserves rendered text",
+    async (fileMode, expectedMode) => {
+      process.env.ALLOW_WRITE = "1";
+      const stdout = '  {"secret":"fixture"}\n\n';
+      const runner = makeRunner({ stdout, stderr: "" });
+      const result = await injectHandler(runner, {
+        inFile: "template.env",
+        fileMode,
+        confirm: true,
+      });
+      expect(runner).toHaveBeenCalledWith([
+        "inject",
+        "--in-file",
+        "template.env",
+        "--file-mode",
+        expectedMode,
+      ]);
+      expect(result.content[0].text).toBe(stdout);
+    },
+  );
+
   it("runHandler enforces gate and builds env-file/no-masking command", async () => {
     process.env.ALLOW_WRITE = "1";
     const runner = makeRunner({ stdout: "ran", stderr: "" });
@@ -410,8 +466,8 @@ describe("write handlers", () => {
       confirm: true,
     });
 
-    expect(runner).toHaveBeenNthCalledWith(1, ["invite", "accept", "--invite-token", "tok-accept"]);
-    expect(runner).toHaveBeenNthCalledWith(2, ["invite", "reject", "--invite-token", "tok-reject"]);
+    expect(runner).toHaveBeenNthCalledWith(1, ["invite", "accept", "--", "tok-accept"]);
+    expect(runner).toHaveBeenNthCalledWith(2, ["invite", "reject", "--", "tok-reject"]);
   });
 
   it("settings default-vault handlers enforce gate and call expected commands", async () => {
