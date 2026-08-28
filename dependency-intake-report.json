@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-27T15:23:13.672Z",
+  "generated_at": "2026-08-28T00:15:08.991Z",
   "repo": "hesreallyhim/proton-pass-community-mcp",
   "ecosystems": ["npm", "github-actions"],
   "tooling": {
@@ -22,35 +22,6 @@
     }
   },
   "upgrades": [
-    {
-      "ecosystem": "npm",
-      "name": "@modelcontextprotocol/inspector",
-      "current": "0.22.0",
-      "target": "1.0.2",
-      "specifier": "^0.22.0",
-      "selected": true,
-      "latest": "2.4.0",
-      "versions_in_range": ["1.0.0", "1.0.1", "1.0.2"],
-      "sources": {
-        "registry": "https://registry.npmjs.org/@modelcontextprotocol/inspector",
-        "repo": "https://github.com/modelcontextprotocol/inspector",
-        "release_notes": [
-          {
-            "url": "https://github.com/modelcontextprotocol/inspector/releases/tag/1.0.0"
-          },
-          {
-            "url": "https://github.com/modelcontextprotocol/inspector/releases/tag/1.0.2"
-          }
-        ]
-      },
-      "risk_flags": ["major_version_bump", "maintenance_line_deprecated"],
-      "notes": [
-        "Accept 1.0.2 security maintenance; defer 2.4.0 because current CLI separator ordering and PASS_CLI_BIN inheritance must migrate."
-      ],
-      "selected_version": "1.0.2",
-      "pr_numbers": [155],
-      "resulting_specifier": "^1.0.2"
-    },
     {
       "ecosystem": "npm",
       "name": "@vitest/coverage-v8",
@@ -434,7 +405,7 @@
       "current": "0.22.0",
       "target": "2.4.0",
       "specifier": "^0.22.0",
-      "selected": false,
+      "selected": true,
       "latest": "2.4.0",
       "versions_in_range": ["2.0.0", "2.1.0", "2.2.0", "2.3.0", "2.4.0"],
       "sources": {
@@ -456,24 +427,25 @@
         "error_exit_semantics_change"
       ],
       "notes": [
-        "Deferred: existing options-before-separator CLI invocation is incompatible.",
-        "PASS_CLI_BIN must be passed explicitly via -e or config for v2 fixture safety.",
-        "Current PR also loses undeclared Node types; direct @types/node is now declared independently."
+        "Initial classic 1.0.2 selection superseded by verified 2.4.0 migration.",
+        "CLI ordering, explicit child -e environment, isolated catalog/storage, and v2 error envelopes are covered by current 47-tool fixture smoke.",
+        "Interactive fixture launch checked loopback UI/API availability and configuration; native keyring and browser interaction are not verified.",
+        "Node 24 types remain explicit."
       ],
-      "selected_version": "1.0.2",
+      "selected_version": "2.4.0",
       "pr_numbers": [155],
-      "resulting_specifier": "^1.0.2"
+      "resulting_specifier": "^2.4.0"
     }
   ],
   "summary": {
-    "total_upgrades": 16,
-    "major_bumps": 4,
+    "total_upgrades": 15,
+    "major_bumps": 3,
     "needs_attention": [
-      "Defer TypeScript 7 and Inspector 2.",
+      "Defer TypeScript 7 until supported by the lint peer range.",
       "Retain cloc 2.11.0; registry latest tag is older.",
       "Keep Node 24 type definitions.",
-      "Codacy upload failures are an existing external CI issue.",
-      "The existing Inspector smoke script asserts an obsolete eight-tool surface; a 47-tool fixture comparison was used for this review."
+      "Codacy upload token/endpoint failure remains an owner configuration issue.",
+      "No live Proton Pass validation; see source-derived 47-tool audit."
     ],
     "selected_upgrades": 13
   },
@@ -491,7 +463,7 @@
       "title": "chore(deps-dev): bump @modelcontextprotocol/inspector from 0.22.0 to 2.2.0",
       "url": "https://github.com/hesreallyhim/proton-pass-community-mcp/pull/155",
       "head_sha": "ccc9adf751e7ea5107753f543ae593a3d36e5d7a",
-      "disposition": "Defer v2; apply compatible maintenance 1.0.2 and direct Node types."
+      "disposition": "Superseded by 2.4.0 with migrated CLI/web entrypoints, fixture environment isolation, current 47-tool smoke, and direct Node types."
     },
     {
       "number": 154,
@@ -552,29 +524,384 @@
   ],
   "transitive_changes": [
     {
+      "path": "node_modules/@alcalzone/ansi-tokenize",
+      "current": null,
+      "target": "0.2.5"
+    },
+    {
+      "path": "node_modules/@cspotcode/source-map-support",
+      "current": "0.8.1",
+      "target": null
+    },
+    {
+      "path": "node_modules/@cspotcode/source-map-support/node_modules/@jridgewell/trace-mapping",
+      "current": "0.3.9",
+      "target": null
+    },
+    {
+      "path": "node_modules/@floating-ui/core",
+      "current": "1.8.0",
+      "target": null
+    },
+    {
+      "path": "node_modules/@floating-ui/dom",
+      "current": "1.8.0",
+      "target": null
+    },
+    {
+      "path": "node_modules/@floating-ui/react-dom",
+      "current": "2.1.9",
+      "target": null
+    },
+    {
+      "path": "node_modules/@floating-ui/utils",
+      "current": "0.2.12",
+      "target": null
+    },
+    {
       "path": "node_modules/@hono/node-server",
       "current": "2.1.0",
       "target": "2.1.1"
     },
     {
+      "path": "node_modules/@mcp-ui/client",
+      "current": "6.1.1",
+      "target": null
+    },
+    {
+      "path": "node_modules/@mcp-ui/client/node_modules/zod",
+      "current": "3.25.76",
+      "target": null
+    },
+    {
+      "path": "node_modules/@modelcontextprotocol/client",
+      "current": null,
+      "target": "2.0.0"
+    },
+    {
+      "path": "node_modules/@modelcontextprotocol/core",
+      "current": null,
+      "target": "2.0.0"
+    },
+    {
       "path": "node_modules/@modelcontextprotocol/inspector-cli",
       "current": "0.22.0",
-      "target": "1.0.2"
+      "target": null
     },
     {
       "path": "node_modules/@modelcontextprotocol/inspector-client",
       "current": "0.22.0",
-      "target": "1.0.2"
+      "target": null
+    },
+    {
+      "path": "node_modules/@modelcontextprotocol/inspector-client/node_modules/zod",
+      "current": "3.25.76",
+      "target": null
     },
     {
       "path": "node_modules/@modelcontextprotocol/inspector-server",
       "current": "0.22.0",
-      "target": "1.0.2"
+      "target": null
+    },
+    {
+      "path": "node_modules/@modelcontextprotocol/inspector-server/node_modules/zod",
+      "current": "3.25.76",
+      "target": null
+    },
+    {
+      "path": "node_modules/@modelcontextprotocol/inspector/node_modules/ajv",
+      "current": null,
+      "target": "8.20.0"
+    },
+    {
+      "path": "node_modules/@modelcontextprotocol/inspector/node_modules/json-schema-traverse",
+      "current": null,
+      "target": "1.0.0"
+    },
+    {
+      "path": "node_modules/@modelcontextprotocol/inspector/node_modules/zod",
+      "current": "3.25.76",
+      "target": null
+    },
+    {
+      "path": "node_modules/@modelcontextprotocol/sdk/node_modules/pkce-challenge",
+      "current": "5.0.1",
+      "target": null
+    },
+    {
+      "path": "node_modules/@modelcontextprotocol/server",
+      "current": null,
+      "target": "2.0.0"
+    },
+    {
+      "path": "node_modules/@modelcontextprotocol/server-legacy",
+      "current": null,
+      "target": "2.0.0"
+    },
+    {
+      "path": "node_modules/@napi-rs/keyring",
+      "current": null,
+      "target": "1.3.0"
+    },
+    {
+      "path": "node_modules/@napi-rs/keyring-darwin-arm64",
+      "current": null,
+      "target": "1.3.0"
+    },
+    {
+      "path": "node_modules/@napi-rs/keyring-darwin-x64",
+      "current": null,
+      "target": "1.3.0"
+    },
+    {
+      "path": "node_modules/@napi-rs/keyring-freebsd-x64",
+      "current": null,
+      "target": "1.3.0"
+    },
+    {
+      "path": "node_modules/@napi-rs/keyring-linux-arm-gnueabihf",
+      "current": null,
+      "target": "1.3.0"
+    },
+    {
+      "path": "node_modules/@napi-rs/keyring-linux-arm64-gnu",
+      "current": null,
+      "target": "1.3.0"
+    },
+    {
+      "path": "node_modules/@napi-rs/keyring-linux-arm64-musl",
+      "current": null,
+      "target": "1.3.0"
+    },
+    {
+      "path": "node_modules/@napi-rs/keyring-linux-riscv64-gnu",
+      "current": null,
+      "target": "1.3.0"
+    },
+    {
+      "path": "node_modules/@napi-rs/keyring-linux-x64-gnu",
+      "current": null,
+      "target": "1.3.0"
+    },
+    {
+      "path": "node_modules/@napi-rs/keyring-linux-x64-musl",
+      "current": null,
+      "target": "1.3.0"
+    },
+    {
+      "path": "node_modules/@napi-rs/keyring-win32-arm64-msvc",
+      "current": null,
+      "target": "1.3.0"
+    },
+    {
+      "path": "node_modules/@napi-rs/keyring-win32-ia32-msvc",
+      "current": null,
+      "target": "1.3.0"
+    },
+    {
+      "path": "node_modules/@napi-rs/keyring-win32-x64-msvc",
+      "current": null,
+      "target": "1.3.0"
     },
     {
       "path": "node_modules/@oxc-project/types",
       "current": "0.143.0",
       "target": "0.147.0"
+    },
+    {
+      "path": "node_modules/@pinojs/redact",
+      "current": null,
+      "target": "0.4.0"
+    },
+    {
+      "path": "node_modules/@radix-ui/number",
+      "current": "1.1.3",
+      "target": null
+    },
+    {
+      "path": "node_modules/@radix-ui/primitive",
+      "current": "1.1.7",
+      "target": null
+    },
+    {
+      "path": "node_modules/@radix-ui/react-arrow",
+      "current": "1.1.15",
+      "target": null
+    },
+    {
+      "path": "node_modules/@radix-ui/react-checkbox",
+      "current": "1.3.11",
+      "target": null
+    },
+    {
+      "path": "node_modules/@radix-ui/react-collection",
+      "current": "1.1.15",
+      "target": null
+    },
+    {
+      "path": "node_modules/@radix-ui/react-compose-refs",
+      "current": "1.1.5",
+      "target": null
+    },
+    {
+      "path": "node_modules/@radix-ui/react-context",
+      "current": "1.2.2",
+      "target": null
+    },
+    {
+      "path": "node_modules/@radix-ui/react-dialog",
+      "current": "1.1.23",
+      "target": null
+    },
+    {
+      "path": "node_modules/@radix-ui/react-direction",
+      "current": "1.1.4",
+      "target": null
+    },
+    {
+      "path": "node_modules/@radix-ui/react-dismissable-layer",
+      "current": "1.1.19",
+      "target": null
+    },
+    {
+      "path": "node_modules/@radix-ui/react-focus-guards",
+      "current": "1.1.6",
+      "target": null
+    },
+    {
+      "path": "node_modules/@radix-ui/react-focus-scope",
+      "current": "1.1.16",
+      "target": null
+    },
+    {
+      "path": "node_modules/@radix-ui/react-icons",
+      "current": "1.3.2",
+      "target": null
+    },
+    {
+      "path": "node_modules/@radix-ui/react-id",
+      "current": "1.1.4",
+      "target": null
+    },
+    {
+      "path": "node_modules/@radix-ui/react-label",
+      "current": "2.1.15",
+      "target": null
+    },
+    {
+      "path": "node_modules/@radix-ui/react-popover",
+      "current": "1.1.23",
+      "target": null
+    },
+    {
+      "path": "node_modules/@radix-ui/react-popper",
+      "current": "1.3.7",
+      "target": null
+    },
+    {
+      "path": "node_modules/@radix-ui/react-portal",
+      "current": "1.1.17",
+      "target": null
+    },
+    {
+      "path": "node_modules/@radix-ui/react-presence",
+      "current": "1.1.10",
+      "target": null
+    },
+    {
+      "path": "node_modules/@radix-ui/react-primitive",
+      "current": "2.1.10",
+      "target": null
+    },
+    {
+      "path": "node_modules/@radix-ui/react-roving-focus",
+      "current": "1.1.19",
+      "target": null
+    },
+    {
+      "path": "node_modules/@radix-ui/react-select",
+      "current": "2.3.7",
+      "target": null
+    },
+    {
+      "path": "node_modules/@radix-ui/react-slot",
+      "current": "1.3.3",
+      "target": null
+    },
+    {
+      "path": "node_modules/@radix-ui/react-switch",
+      "current": "1.3.7",
+      "target": null
+    },
+    {
+      "path": "node_modules/@radix-ui/react-tabs",
+      "current": "1.1.21",
+      "target": null
+    },
+    {
+      "path": "node_modules/@radix-ui/react-toast",
+      "current": "1.2.23",
+      "target": null
+    },
+    {
+      "path": "node_modules/@radix-ui/react-tooltip",
+      "current": "1.2.16",
+      "target": null
+    },
+    {
+      "path": "node_modules/@radix-ui/react-use-callback-ref",
+      "current": "1.1.4",
+      "target": null
+    },
+    {
+      "path": "node_modules/@radix-ui/react-use-controllable-state",
+      "current": "1.2.6",
+      "target": null
+    },
+    {
+      "path": "node_modules/@radix-ui/react-use-effect-event",
+      "current": "0.0.5",
+      "target": null
+    },
+    {
+      "path": "node_modules/@radix-ui/react-use-is-hydrated",
+      "current": "0.1.3",
+      "target": null
+    },
+    {
+      "path": "node_modules/@radix-ui/react-use-layout-effect",
+      "current": "1.1.4",
+      "target": null
+    },
+    {
+      "path": "node_modules/@radix-ui/react-use-previous",
+      "current": "1.1.4",
+      "target": null
+    },
+    {
+      "path": "node_modules/@radix-ui/react-use-rect",
+      "current": "1.1.4",
+      "target": null
+    },
+    {
+      "path": "node_modules/@radix-ui/react-use-size",
+      "current": "1.1.4",
+      "target": null
+    },
+    {
+      "path": "node_modules/@radix-ui/react-visually-hidden",
+      "current": "1.2.11",
+      "target": null
+    },
+    {
+      "path": "node_modules/@radix-ui/rect",
+      "current": "1.1.3",
+      "target": null
+    },
+    {
+      "path": "node_modules/@rolldown/binding-android-arm-eabi",
+      "current": null,
+      "target": "1.2.6"
     },
     {
       "path": "node_modules/@rolldown/binding-android-arm64",
@@ -649,7 +976,22 @@
     {
       "path": "node_modules/@tsconfig/node10",
       "current": "1.0.12",
-      "target": "1.0.13"
+      "target": null
+    },
+    {
+      "path": "node_modules/@tsconfig/node12",
+      "current": "1.0.11",
+      "target": null
+    },
+    {
+      "path": "node_modules/@tsconfig/node14",
+      "current": "1.0.3",
+      "target": null
+    },
+    {
+      "path": "node_modules/@tsconfig/node16",
+      "current": "1.0.4",
+      "target": null
     },
     {
       "path": "node_modules/@typescript-eslint/eslint-plugin",
@@ -702,6 +1044,11 @@
       "target": "8.68.0"
     },
     {
+      "path": "node_modules/@vitejs/plugin-react",
+      "current": null,
+      "target": "6.1.0"
+    },
+    {
       "path": "node_modules/@vitest/expect",
       "current": "4.1.10",
       "target": "4.1.11"
@@ -737,9 +1084,149 @@
       "target": "4.1.11"
     },
     {
+      "path": "node_modules/acorn-walk",
+      "current": "8.3.5",
+      "target": null
+    },
+    {
+      "path": "node_modules/ansi-escapes",
+      "current": null,
+      "target": "7.3.0"
+    },
+    {
+      "path": "node_modules/ansi-regex",
+      "current": "5.0.1",
+      "target": "6.3.0"
+    },
+    {
+      "path": "node_modules/ansi-styles",
+      "current": "4.3.0",
+      "target": "6.2.3"
+    },
+    {
+      "path": "node_modules/arg",
+      "current": "4.1.3",
+      "target": null
+    },
+    {
+      "path": "node_modules/aria-hidden",
+      "current": "1.2.6",
+      "target": null
+    },
+    {
+      "path": "node_modules/atomic-sleep",
+      "current": null,
+      "target": "1.0.0"
+    },
+    {
+      "path": "node_modules/atomically",
+      "current": null,
+      "target": "2.1.1"
+    },
+    {
+      "path": "node_modules/auto-bind",
+      "current": null,
+      "target": "5.0.1"
+    },
+    {
       "path": "node_modules/body-parser/node_modules/content-type",
       "current": "2.0.0",
       "target": "2.1.0"
+    },
+    {
+      "path": "node_modules/chalk",
+      "current": "4.1.2",
+      "target": "5.6.2"
+    },
+    {
+      "path": "node_modules/chalk/node_modules/supports-color",
+      "current": "7.2.0",
+      "target": null
+    },
+    {
+      "path": "node_modules/chokidar",
+      "current": null,
+      "target": "4.0.3"
+    },
+    {
+      "path": "node_modules/class-variance-authority",
+      "current": "0.7.1",
+      "target": null
+    },
+    {
+      "path": "node_modules/cli-boxes",
+      "current": null,
+      "target": "3.0.0"
+    },
+    {
+      "path": "node_modules/cli-cursor",
+      "current": null,
+      "target": "4.0.0"
+    },
+    {
+      "path": "node_modules/cli-truncate",
+      "current": null,
+      "target": "5.2.0"
+    },
+    {
+      "path": "node_modules/cliui",
+      "current": "8.0.1",
+      "target": null
+    },
+    {
+      "path": "node_modules/clsx",
+      "current": "2.1.1",
+      "target": null
+    },
+    {
+      "path": "node_modules/cmdk",
+      "current": "1.1.1",
+      "target": null
+    },
+    {
+      "path": "node_modules/code-excerpt",
+      "current": null,
+      "target": "4.0.0"
+    },
+    {
+      "path": "node_modules/color-convert",
+      "current": "2.0.1",
+      "target": null
+    },
+    {
+      "path": "node_modules/color-name",
+      "current": "1.1.4",
+      "target": null
+    },
+    {
+      "path": "node_modules/concat-map",
+      "current": "0.0.1",
+      "target": null
+    },
+    {
+      "path": "node_modules/concurrently",
+      "current": "9.2.4",
+      "target": null
+    },
+    {
+      "path": "node_modules/concurrently/node_modules/shell-quote",
+      "current": "1.9.0",
+      "target": null
+    },
+    {
+      "path": "node_modules/convert-to-spaces",
+      "current": null,
+      "target": "2.0.1"
+    },
+    {
+      "path": "node_modules/create-require",
+      "current": "1.1.1",
+      "target": null
+    },
+    {
+      "path": "node_modules/data-uri-to-buffer",
+      "current": "4.0.1",
+      "target": null
     },
     {
       "path": "node_modules/default-browser",
@@ -747,9 +1234,39 @@
       "target": "5.5.1"
     },
     {
+      "path": "node_modules/detect-node-es",
+      "current": "1.1.0",
+      "target": null
+    },
+    {
+      "path": "node_modules/diff",
+      "current": "4.0.4",
+      "target": null
+    },
+    {
+      "path": "node_modules/emoji-regex",
+      "current": "8.0.0",
+      "target": "10.6.0"
+    },
+    {
+      "path": "node_modules/environment",
+      "current": null,
+      "target": "1.1.0"
+    },
+    {
       "path": "node_modules/es-module-lexer",
       "current": "2.3.1",
       "target": "2.3.2"
+    },
+    {
+      "path": "node_modules/es-toolkit",
+      "current": null,
+      "target": "1.51.0"
+    },
+    {
+      "path": "node_modules/escalade",
+      "current": "3.2.0",
+      "target": null
     },
     {
       "path": "node_modules/eventsource-parser",
@@ -762,9 +1279,84 @@
       "target": "3.1.6"
     },
     {
+      "path": "node_modules/fetch-blob",
+      "current": "3.2.0",
+      "target": null
+    },
+    {
+      "path": "node_modules/formdata-polyfill",
+      "current": "4.0.10",
+      "target": null
+    },
+    {
+      "path": "node_modules/fs.realpath",
+      "current": "1.0.0",
+      "target": null
+    },
+    {
+      "path": "node_modules/get-caller-file",
+      "current": "2.0.5",
+      "target": null
+    },
+    {
+      "path": "node_modules/get-east-asian-width",
+      "current": null,
+      "target": "1.6.0"
+    },
+    {
+      "path": "node_modules/get-nonce",
+      "current": "1.0.1",
+      "target": null
+    },
+    {
+      "path": "node_modules/glob",
+      "current": "7.2.3",
+      "target": null
+    },
+    {
+      "path": "node_modules/glob/node_modules/balanced-match",
+      "current": "1.0.2",
+      "target": null
+    },
+    {
+      "path": "node_modules/glob/node_modules/brace-expansion",
+      "current": "1.1.18",
+      "target": null
+    },
+    {
+      "path": "node_modules/glob/node_modules/minimatch",
+      "current": "3.1.5",
+      "target": null
+    },
+    {
+      "path": "node_modules/graceful-fs",
+      "current": null,
+      "target": "4.2.11"
+    },
+    {
       "path": "node_modules/hono",
       "current": "4.13.1",
       "target": "4.13.5"
+    },
+    {
+      "path": "node_modules/indent-string",
+      "current": null,
+      "target": "5.0.0"
+    },
+    {
+      "path": "node_modules/inflight",
+      "current": "1.0.6",
+      "target": null
+    },
+    {
+      "path": "node_modules/ink",
+      "current": null,
+      "target": "6.8.0"
+    },
+    {
+      "path": "node_modules/interpret",
+      "current": "1.4.0",
+      "target": null
     },
     {
       "path": "node_modules/ip-address",
@@ -772,9 +1364,54 @@
       "target": "10.5.0"
     },
     {
+      "path": "node_modules/is-core-module",
+      "current": "2.16.2",
+      "target": null
+    },
+    {
+      "path": "node_modules/is-fullwidth-code-point",
+      "current": "3.0.0",
+      "target": "5.1.0"
+    },
+    {
+      "path": "node_modules/is-in-ci",
+      "current": null,
+      "target": "2.0.0"
+    },
+    {
       "path": "node_modules/jose",
       "current": "6.2.8",
       "target": "6.2.10"
+    },
+    {
+      "path": "node_modules/loose-envify",
+      "current": "1.4.0",
+      "target": null
+    },
+    {
+      "path": "node_modules/loose-envify/node_modules/js-tokens",
+      "current": "4.0.0",
+      "target": null
+    },
+    {
+      "path": "node_modules/lucide-react",
+      "current": "0.523.0",
+      "target": null
+    },
+    {
+      "path": "node_modules/make-error",
+      "current": "1.3.6",
+      "target": null
+    },
+    {
+      "path": "node_modules/mimic-fn",
+      "current": null,
+      "target": "2.1.0"
+    },
+    {
+      "path": "node_modules/minimist",
+      "current": "1.2.8",
+      "target": null
     },
     {
       "path": "node_modules/negotiator",
@@ -782,9 +1419,164 @@
       "target": "1.1.0"
     },
     {
+      "path": "node_modules/negotiator/node_modules/content-type",
+      "current": null,
+      "target": "2.1.0"
+    },
+    {
+      "path": "node_modules/node-domexception",
+      "current": "1.0.0",
+      "target": null
+    },
+    {
+      "path": "node_modules/node-fetch",
+      "current": "3.3.2",
+      "target": null
+    },
+    {
+      "path": "node_modules/on-exit-leak-free",
+      "current": null,
+      "target": "2.1.2"
+    },
+    {
+      "path": "node_modules/onetime",
+      "current": null,
+      "target": "5.1.2"
+    },
+    {
+      "path": "node_modules/patch-console",
+      "current": null,
+      "target": "2.0.0"
+    },
+    {
+      "path": "node_modules/path-is-absolute",
+      "current": "1.0.1",
+      "target": null
+    },
+    {
+      "path": "node_modules/path-is-inside",
+      "current": "1.0.2",
+      "target": null
+    },
+    {
+      "path": "node_modules/path-parse",
+      "current": "1.0.7",
+      "target": null
+    },
+    {
       "path": "node_modules/picomatch",
       "current": "4.0.5",
       "target": "4.0.7"
+    },
+    {
+      "path": "node_modules/pino",
+      "current": null,
+      "target": "9.14.0"
+    },
+    {
+      "path": "node_modules/pino-abstract-transport",
+      "current": null,
+      "target": "2.0.0"
+    },
+    {
+      "path": "node_modules/pino-std-serializers",
+      "current": null,
+      "target": "7.1.0"
+    },
+    {
+      "path": "node_modules/pkce-challenge",
+      "current": "4.1.0",
+      "target": "5.0.1"
+    },
+    {
+      "path": "node_modules/prismjs",
+      "current": "1.30.0",
+      "target": null
+    },
+    {
+      "path": "node_modules/process-warning",
+      "current": null,
+      "target": "5.1.0"
+    },
+    {
+      "path": "node_modules/proper-lockfile",
+      "current": null,
+      "target": "4.1.2"
+    },
+    {
+      "path": "node_modules/quick-format-unescaped",
+      "current": null,
+      "target": "4.0.4"
+    },
+    {
+      "path": "node_modules/react",
+      "current": "18.3.1",
+      "target": "19.2.8"
+    },
+    {
+      "path": "node_modules/react-dom",
+      "current": "18.3.1",
+      "target": null
+    },
+    {
+      "path": "node_modules/react-reconciler",
+      "current": null,
+      "target": "0.33.0"
+    },
+    {
+      "path": "node_modules/react-remove-scroll",
+      "current": "2.7.2",
+      "target": null
+    },
+    {
+      "path": "node_modules/react-remove-scroll-bar",
+      "current": "2.3.8",
+      "target": null
+    },
+    {
+      "path": "node_modules/react-simple-code-editor",
+      "current": "0.14.1",
+      "target": null
+    },
+    {
+      "path": "node_modules/react-style-singleton",
+      "current": "2.2.3",
+      "target": null
+    },
+    {
+      "path": "node_modules/readdirp",
+      "current": null,
+      "target": "4.1.2"
+    },
+    {
+      "path": "node_modules/real-require",
+      "current": null,
+      "target": "0.2.0"
+    },
+    {
+      "path": "node_modules/rechoir",
+      "current": "0.6.2",
+      "target": null
+    },
+    {
+      "path": "node_modules/require-directory",
+      "current": "2.1.1",
+      "target": null
+    },
+    {
+      "path": "node_modules/resolve",
+      "current": "1.22.12",
+      "target": null
+    },
+    {
+      "path": "node_modules/restore-cursor",
+      "current": null,
+      "target": "4.0.0"
+    },
+    {
+      "path": "node_modules/retry",
+      "current": null,
+      "target": "0.12.0"
     },
     {
       "path": "node_modules/rolldown",
@@ -792,9 +1584,199 @@
       "target": "1.2.6"
     },
     {
+      "path": "node_modules/rxjs",
+      "current": "7.8.2",
+      "target": null
+    },
+    {
+      "path": "node_modules/safe-stable-stringify",
+      "current": null,
+      "target": "2.5.0"
+    },
+    {
+      "path": "node_modules/scheduler",
+      "current": "0.23.2",
+      "target": "0.27.0"
+    },
+    {
+      "path": "node_modules/serve-handler",
+      "current": "6.1.7",
+      "target": null
+    },
+    {
+      "path": "node_modules/serve-handler/node_modules/balanced-match",
+      "current": "1.0.2",
+      "target": null
+    },
+    {
+      "path": "node_modules/serve-handler/node_modules/brace-expansion",
+      "current": "1.1.18",
+      "target": null
+    },
+    {
+      "path": "node_modules/serve-handler/node_modules/bytes",
+      "current": "3.0.0",
+      "target": null
+    },
+    {
+      "path": "node_modules/serve-handler/node_modules/content-disposition",
+      "current": "0.5.2",
+      "target": null
+    },
+    {
+      "path": "node_modules/serve-handler/node_modules/mime-db",
+      "current": "1.33.0",
+      "target": null
+    },
+    {
+      "path": "node_modules/serve-handler/node_modules/mime-types",
+      "current": "2.1.18",
+      "target": null
+    },
+    {
+      "path": "node_modules/serve-handler/node_modules/minimatch",
+      "current": "3.1.5",
+      "target": null
+    },
+    {
+      "path": "node_modules/serve-handler/node_modules/path-to-regexp",
+      "current": "3.3.0",
+      "target": null
+    },
+    {
+      "path": "node_modules/serve-handler/node_modules/range-parser",
+      "current": "1.2.0",
+      "target": null
+    },
+    {
+      "path": "node_modules/shell-quote",
+      "current": "1.10.0",
+      "target": null
+    },
+    {
+      "path": "node_modules/shelljs",
+      "current": "0.8.5",
+      "target": null
+    },
+    {
+      "path": "node_modules/shx",
+      "current": "0.3.4",
+      "target": null
+    },
+    {
+      "path": "node_modules/signal-exit",
+      "current": null,
+      "target": "3.0.7"
+    },
+    {
+      "path": "node_modules/slice-ansi",
+      "current": null,
+      "target": "8.0.0"
+    },
+    {
+      "path": "node_modules/sonic-boom",
+      "current": null,
+      "target": "4.2.1"
+    },
+    {
+      "path": "node_modules/spawn-rx",
+      "current": "5.1.2",
+      "target": null
+    },
+    {
+      "path": "node_modules/split2",
+      "current": null,
+      "target": "4.2.0"
+    },
+    {
+      "path": "node_modules/stack-utils",
+      "current": null,
+      "target": "2.0.6"
+    },
+    {
+      "path": "node_modules/stack-utils/node_modules/escape-string-regexp",
+      "current": null,
+      "target": "2.0.0"
+    },
+    {
+      "path": "node_modules/string-width",
+      "current": "4.2.3",
+      "target": "8.2.2"
+    },
+    {
+      "path": "node_modules/strip-ansi",
+      "current": "6.0.1",
+      "target": "7.2.0"
+    },
+    {
+      "path": "node_modules/stubborn-fs",
+      "current": null,
+      "target": "2.0.0"
+    },
+    {
+      "path": "node_modules/stubborn-utils",
+      "current": null,
+      "target": "1.0.2"
+    },
+    {
+      "path": "node_modules/supports-color",
+      "current": "8.1.1",
+      "target": null
+    },
+    {
+      "path": "node_modules/supports-preserve-symlinks-flag",
+      "current": "1.0.0",
+      "target": null
+    },
+    {
+      "path": "node_modules/tagged-tag",
+      "current": null,
+      "target": "1.0.0"
+    },
+    {
+      "path": "node_modules/tailwind-merge",
+      "current": "2.6.1",
+      "target": null
+    },
+    {
+      "path": "node_modules/terminal-size",
+      "current": null,
+      "target": "4.0.1"
+    },
+    {
+      "path": "node_modules/thread-stream",
+      "current": null,
+      "target": "3.2.0"
+    },
+    {
+      "path": "node_modules/tree-kill",
+      "current": "1.2.2",
+      "target": null
+    },
+    {
+      "path": "node_modules/ts-node",
+      "current": "10.9.2",
+      "target": null
+    },
+    {
+      "path": "node_modules/tslib",
+      "current": "2.8.1",
+      "target": null
+    },
+    {
+      "path": "node_modules/type-fest",
+      "current": null,
+      "target": "5.8.0"
+    },
+    {
       "path": "node_modules/type-is/node_modules/content-type",
       "current": "2.0.0",
       "target": "2.1.0"
+    },
+    {
+      "path": "node_modules/undici",
+      "current": null,
+      "target": "8.10.0"
     },
     {
       "path": "node_modules/undici-types",
@@ -802,9 +1784,79 @@
       "target": "7.18.2"
     },
     {
+      "path": "node_modules/use-callback-ref",
+      "current": "1.3.3",
+      "target": null
+    },
+    {
+      "path": "node_modules/use-sidecar",
+      "current": "1.1.3",
+      "target": null
+    },
+    {
+      "path": "node_modules/v8-compile-cache-lib",
+      "current": "3.0.1",
+      "target": null
+    },
+    {
       "path": "node_modules/vite",
       "current": "8.2.1",
       "target": "8.2.2"
+    },
+    {
+      "path": "node_modules/web-streams-polyfill",
+      "current": "3.3.3",
+      "target": null
+    },
+    {
+      "path": "node_modules/when-exit",
+      "current": null,
+      "target": "2.1.5"
+    },
+    {
+      "path": "node_modules/widest-line",
+      "current": null,
+      "target": "6.0.0"
+    },
+    {
+      "path": "node_modules/wrap-ansi",
+      "current": "7.0.0",
+      "target": "9.0.2"
+    },
+    {
+      "path": "node_modules/wrap-ansi/node_modules/string-width",
+      "current": null,
+      "target": "7.2.0"
+    },
+    {
+      "path": "node_modules/y18n",
+      "current": "5.0.8",
+      "target": null
+    },
+    {
+      "path": "node_modules/yaml",
+      "current": null,
+      "target": "2.9.0"
+    },
+    {
+      "path": "node_modules/yargs",
+      "current": "17.7.2",
+      "target": null
+    },
+    {
+      "path": "node_modules/yargs-parser",
+      "current": "21.1.1",
+      "target": null
+    },
+    {
+      "path": "node_modules/yn",
+      "current": "3.1.1",
+      "target": null
+    },
+    {
+      "path": "node_modules/yoga-layout",
+      "current": null,
+      "target": "3.2.1"
     }
   ],
   "retained_direct_dependencies": [
@@ -845,7 +1897,8 @@
       "note": "Already latest stable."
     }
   ],
-  "validation": {
+  "branch": "codex/rehabilitation-2026-08-27",
+  "prior_dependency_validation": {
     "node": "v24.18.0",
     "npm": "11.16.0",
     "tests": 158,
@@ -856,5 +1909,39 @@
     "mock_inspector_tools": 47,
     "action_references_verified": 38,
     "live_proton_cli_executed": false
-  }
+  },
+  "validation": {
+    "status": "passed",
+    "node": "v24.18.0",
+    "npm": "11.16.0",
+    "tests": 247,
+    "test_files": 11,
+    "fuzz_tests": 3,
+    "known_npm_audit_vulnerabilities": 0,
+    "unaddressed_installed_packages_below_wanted": 0,
+    "intentional_peer_update_suggestions": 3,
+    "mock_inspector_tools": 47,
+    "packed_package_tools": 47,
+    "packed_package_resources": 7,
+    "published_object_input_schemas": 44,
+    "action_references_verified": 38,
+    "clean_install": true,
+    "packed_package_smoke": true,
+    "inspector_v2_smoke": true,
+    "live_proton_cli_executed": false,
+    "remote_prs_modified": false,
+    "unresolved_external_issue": "Codacy API token/endpoint upload failure requires owner configuration.",
+    "coverage_percent": {
+      "statements": 95.95,
+      "branches": 86.4,
+      "functions": 97.65,
+      "lines": 96.61
+    },
+    "complexity_average_per_function": 2.38,
+    "complexity_warnings": [
+      "src/pass-cli/runner.ts has264 physical lines, above the250-line warning but below the500-line gate."
+    ]
+  },
+  "rehabilitation_runtime_commit": "f7221c5",
+  "rehabilitation_packaging_commit": "4aafacb"
 }
