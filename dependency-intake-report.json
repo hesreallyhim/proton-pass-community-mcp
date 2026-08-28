@@ -1939,8 +1939,9 @@
     },
     "complexity_average_per_function": 2.38,
     "complexity_warnings": [
-      "src/pass-cli/runner.ts has264 physical lines, above the250-line warning but below the500-line gate."
-    ]
+      "src/pass-cli/runner.ts has 264 physical lines, above the 250-line warning but below the 500-line gate."
+    ],
+    "coverage_note": "Recorded acceptance-run percentages; randomized fuzz runs varied in branch coverage from 86.21% to 86.40% with unchanged runtime source."
   },
   "rehabilitation_runtime_commit": "f7221c5",
   "rehabilitation_packaging_commit": "4aafacb"

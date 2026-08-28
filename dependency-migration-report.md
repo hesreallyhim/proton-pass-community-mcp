@@ -87,7 +87,7 @@ The five stale action PRs can be closed as superseded once the consolidated upda
 ## Validation and remaining operational notes
 
 - `npm ci` succeeds on Node 24.18.0/npm 11.16.0, without peer bypasses or newly approved installation scripts.
-- `npm run check` passes lint, formatting, typecheck, three fuzz tests, and all 247 tests across 11 files. Final coverage is 95.95% statements, 86.40% branches, 97.65% functions, and 96.61% lines.
+- `npm run check` passes lint, formatting, typecheck, three fuzz tests, and all 247 tests across 11 files. Recorded acceptance-run coverage is 95.95% statements, 86.40% branches, 97.65% functions, and 96.61% lines. Repeated runs varied slightly in branch coverage (86.21–86.40%) because fuzz cases are randomized.
 - `npm run check:release:package` passes, including the actual cold-cache production tarball install and MCP stdio checks: 47 tools, 7 resources, exact field text, per-call reason isolation, and invalid/disabled writes with zero CLI calls.
 - `npm run mcp:inspect:smoke` passes on Inspector 2.4.0 with explicit environment isolation and v2 error envelopes.
 - `npm audit --json` reports zero known advisories; `npm ls --all` reports a valid tree. Manifest/lockfile ranges, every locked Node engine range, Vitest/coverage pairing, and all 12 optional keyring platform entries were checked.
