@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.0.0](https://github.com/hesreallyhim/proton-pass-community-mcp/compare/v1.1.2...v2.0.0) (2026-08-29)
+
+
+### ⚠ BREAKING CHANGES
+
+* update_item, trash_item, untrash_item, and update_vault require agentReason. Attachment downloads require ALLOW_WRITE=1 and confirm=true. Item discovery always returns filtered JSON references, and empty list_invites requests require an arguments object.
+
+### Bug Fixes
+
+* repo maintenance and updates ([#157](https://github.com/hesreallyhim/proton-pass-community-mcp/issues/157)) ([16fb8e3](https://github.com/hesreallyhim/proton-pass-community-mcp/commit/16fb8e3730e74ce0a1be178ae9cbdb0390b6e2a1))
+
 ## [1.1.2](https://github.com/hesreallyhim/proton-pass-community-mcp/compare/v1.1.1...v1.1.2) (2026-05-07)
 
 
