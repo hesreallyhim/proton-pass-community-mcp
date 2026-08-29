@@ -38,7 +38,8 @@ function toInviteRef(rawInvite: unknown, index: number): InviteRef {
     };
   }
 
-  const id = firstString(invite, ["invite_id", "invitation_id", "id"]) ?? `invite-${index + 1}`;
+  const id =
+    firstString(invite, ["token", "invite_id", "invitation_id", "id"]) ?? `invite-${index + 1}`;
 
   return {
     id,
@@ -58,20 +59,22 @@ function toInviteRef(rawInvite: unknown, index: number): InviteRef {
   };
 }
 
-export const listInvitesInputSchema = z
-  .object({
-    pageSize: z
-      .number()
-      .int()
-      .min(1)
-      .max(MAX_INVITE_PAGE_SIZE)
-      .optional()
-      .describe(PAGE_SIZE_DESCRIPTION),
-    cursor: z.string().max(20).optional().describe(CURSOR_DESCRIPTION),
-  })
-  .default({});
+export const listInvitesInputSchema = z.object({
+  pageSize: z
+    .number()
+    .int()
+    .min(1)
+    .max(MAX_INVITE_PAGE_SIZE)
+    .optional()
+    .describe(PAGE_SIZE_DESCRIPTION),
+  cursor: z.string().max(20).optional().describe(CURSOR_DESCRIPTION),
+});
 
-const inviteTokenInput = z.string().min(1).max(4096).describe("Invitation token");
+const inviteTokenInput = z
+  .string()
+  .min(1)
+  .max(4096)
+  .describe("Invitation token returned as id by list_invites");
 
 export const inviteAcceptInputSchema = z.object({
   inviteToken: inviteTokenInput,
@@ -122,7 +125,7 @@ export async function inviteAcceptHandler(
   { inviteToken, confirm }: InviteAcceptInput,
 ) {
   requireWriteGate(confirm);
-  const { stdout, stderr } = await passCli(["invite", "accept", "--invite-token", inviteToken]);
+  const { stdout, stderr } = await passCli(["invite", "accept", "--", inviteToken]);
   return asWriteResult(stdout, stderr);
 }
 
@@ -131,6 +134,6 @@ export async function inviteRejectHandler(
   { inviteToken, confirm }: InviteRejectInput,
 ) {
   requireWriteGate(confirm);
-  const { stdout, stderr } = await passCli(["invite", "reject", "--invite-token", inviteToken]);
+  const { stdout, stderr } = await passCli(["invite", "reject", "--", inviteToken]);
   return asWriteResult(stdout, stderr);
 }

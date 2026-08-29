@@ -2,7 +2,6 @@
   "semanticsByCommand": {
     "info": "format",
     "user info": "format",
-    "test": "none",
     "settings view": "none",
     "settings set default-vault": "none",
     "settings unset default-vault": "none",

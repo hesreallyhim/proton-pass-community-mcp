@@ -1,5 +1,6 @@
 import { asJsonTextOrRaw, asTextContent, joinStdoutStderr } from "../../pass-cli/output.js";
 import type { PassCliRunner } from "../../pass-cli/runner.js";
+import { invokeWithAgentReason } from "../shared/agent-reason.js";
 import { appendOptionalScopeArgs } from "./handler-helpers.js";
 import type {
   CreateCreditCardItemInput,
@@ -31,7 +32,7 @@ export async function createLoginItemHandler(passCli: PassCliRunner, input: Crea
   }
 
   // pass-cli does not support --output for login create.
-  const { stdout, stderr } = await passCli(args);
+  const { stdout, stderr } = await invokeWithAgentReason(passCli, args, input.agentReason);
   const out = joinStdoutStderr(stdout, stderr);
   return asTextContent(asJsonTextOrRaw(out));
 }
@@ -45,7 +46,12 @@ export async function createLoginItemFromTemplateHandler(
   const args: string[] = ["item", "create", "login", "--from-template", "-"];
   appendOptionalScopeArgs(args, input.shareId, input.vaultName);
   // pass-cli does not support --output for login create.
-  const { stdout, stderr } = await passCli(args, JSON.stringify(input.template));
+  const { stdout, stderr } = await invokeWithAgentReason(
+    passCli,
+    args,
+    input.agentReason,
+    JSON.stringify(input.template),
+  );
   const out = joinStdoutStderr(stdout, stderr);
   return asTextContent(asJsonTextOrRaw(out));
 }
@@ -58,7 +64,7 @@ export async function createNoteItemHandler(passCli: PassCliRunner, input: Creat
   args.push("--title", input.title);
   if (input.note !== undefined) args.push("--note", input.note);
 
-  const { stdout, stderr } = await passCli(args);
+  const { stdout, stderr } = await invokeWithAgentReason(passCli, args, input.agentReason);
   const out = joinStdoutStderr(stdout, stderr);
   return asTextContent(asJsonTextOrRaw(out));
 }
@@ -80,7 +86,7 @@ export async function createCreditCardItemHandler(
   if (input.pin !== undefined) args.push("--pin", input.pin);
   if (input.note !== undefined) args.push("--note", input.note);
 
-  const { stdout, stderr } = await passCli(args);
+  const { stdout, stderr } = await invokeWithAgentReason(passCli, args, input.agentReason);
   const out = joinStdoutStderr(stdout, stderr);
   return asTextContent(asJsonTextOrRaw(out));
 }
@@ -88,14 +94,23 @@ export async function createCreditCardItemHandler(
 export async function createWifiItemHandler(passCli: PassCliRunner, input: CreateWifiItemInput) {
   requireWriteGate(input.confirm);
 
-  const args: string[] = ["item", "create", "wifi"];
+  // The CLI requires --share-id for flag-based WiFi creation, even with --vault-name.
+  // Its template route supports all existing scope modes and keeps secrets off argv.
+  const args: string[] = ["item", "create", "wifi", "--from-template", "-"];
   appendOptionalScopeArgs(args, input.shareId, input.vaultName);
-  args.push("--title", input.title, "--ssid", input.ssid);
-  if (input.password !== undefined) args.push("--password", input.password);
-  if (input.security !== undefined) args.push("--security", input.security);
-  if (input.note !== undefined) args.push("--note", input.note);
-
-  const { stdout, stderr } = await passCli(args);
+  const template = {
+    title: input.title,
+    ssid: input.ssid,
+    password: input.password,
+    security: input.security,
+    note: input.note,
+  };
+  const { stdout, stderr } = await invokeWithAgentReason(
+    passCli,
+    args,
+    input.agentReason,
+    JSON.stringify(template),
+  );
   const out = joinStdoutStderr(stdout, stderr);
   return asTextContent(asJsonTextOrRaw(out));
 }
@@ -109,7 +124,12 @@ export async function createCustomItemHandler(
   const args: string[] = ["item", "create", "custom", "--from-template", "-"];
   appendOptionalScopeArgs(args, input.shareId, input.vaultName);
 
-  const { stdout, stderr } = await passCli(args, JSON.stringify(input.template));
+  const { stdout, stderr } = await invokeWithAgentReason(
+    passCli,
+    args,
+    input.agentReason,
+    JSON.stringify(input.template),
+  );
   const out = joinStdoutStderr(stdout, stderr);
   return asTextContent(asJsonTextOrRaw(out));
 }
@@ -123,7 +143,12 @@ export async function createIdentityItemHandler(
   const args: string[] = ["item", "create", "identity", "--from-template", "-"];
   appendOptionalScopeArgs(args, input.shareId, input.vaultName);
 
-  const { stdout, stderr } = await passCli(args, JSON.stringify(input.template));
+  const { stdout, stderr } = await invokeWithAgentReason(
+    passCli,
+    args,
+    input.agentReason,
+    JSON.stringify(input.template),
+  );
   const out = joinStdoutStderr(stdout, stderr);
   return asTextContent(asJsonTextOrRaw(out));
 }

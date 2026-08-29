@@ -28,27 +28,42 @@ export function appendRequiredItemSelectorArgs(
   else args.push("--item-title", itemTitle!);
 }
 
+type ViewReference = Pick<
+  ViewItemInput | ItemTotpInput,
+  "uri" | "shareId" | "vaultName" | "itemId" | "itemTitle" | "field"
+>;
+
+function ensureUriArgumentExclusivity(reference: ViewReference): void {
+  const { uri, shareId, vaultName, itemId, itemTitle, field } = reference;
+  const usingUri = !!uri;
+  if (usingUri && (shareId || vaultName || itemId || itemTitle)) {
+    throw new Error("uri is mutually exclusive with selector arguments.");
+  }
+  if (usingUri && field) {
+    throw new Error("Encode the field in uri instead of combining uri with field.");
+  }
+}
+
+function validateViewReference(reference: ViewReference): void {
+  const { uri, shareId, vaultName, itemId, itemTitle } = reference;
+  const usingSelectors = (shareId || vaultName) && (itemId || itemTitle);
+  if (!uri && !usingSelectors) {
+    throw new Error("Provide either uri OR (shareId|vaultName) AND (itemId|itemTitle).");
+  }
+  ensureUriArgumentExclusivity(reference);
+  if (shareId && vaultName) throw new Error("shareId and vaultName are mutually exclusive.");
+  if (itemId && itemTitle) throw new Error("itemId and itemTitle are mutually exclusive.");
+}
+
 export function buildViewLikeArgs(
   command: "view" | "totp",
   input: ViewItemInput | ItemTotpInput,
 ): string[] {
   const { uri, shareId, vaultName, itemId, itemTitle, field, output } = input;
-
-  const usingUri = !!uri;
-  const usingSelectors = (shareId || vaultName) && (itemId || itemTitle);
-
-  if (!usingUri && !usingSelectors) {
-    throw new Error("Provide either uri OR (shareId|vaultName) AND (itemId|itemTitle).");
-  }
-  if (usingUri && (shareId || vaultName || itemId || itemTitle)) {
-    throw new Error("uri is mutually exclusive with selector arguments.");
-  }
-  if (shareId && vaultName) throw new Error("shareId and vaultName are mutually exclusive.");
-  if (itemId && itemTitle) throw new Error("itemId and itemTitle are mutually exclusive.");
-
+  validateViewReference({ uri, shareId, vaultName, itemId, itemTitle, field });
   const args: string[] = ["item", command];
 
-  if (usingUri) {
+  if (uri) {
     args.push("--output", output, "--", uri!);
     return args;
   }

@@ -1,9 +1,11 @@
 {
   "upstream_repo": "https://github.com/protonpass/pass-cli",
-  "latest_known_version": "2.2.0",
+  "latest_known_version": "2.3.3",
   "latest_known_version_source": "https://api.github.com/repos/protonpass/pass-cli/tags?per_page=100",
   "latest_known_version_changelog_source": "https://raw.githubusercontent.com/protonpass/pass-cli/main/CHANGELOG.md",
-  "latest_known_version_published_date": "2026-06-25",
-  "last_checked_utc": "2026-06-25T13:43:03.522Z",
-  "cache_policy": "Upstream docs may be fetched into docs/upstream/pass-cli/ for local analysis only; directory is git-ignored."
+  "latest_known_version_published_date": "2026-08-25",
+  "last_checked_utc": "2026-08-28T00:10:58.102Z",
+  "cache_policy": "Upstream docs may be fetched into docs/upstream/pass-cli/ for local analysis only; directory is git-ignored.",
+  "reviewed_commit": "51a4c9b110a0ffe6e81f4f5d3877b9e5a0c24112",
+  "reviewed_version": "2.3.3"
 }

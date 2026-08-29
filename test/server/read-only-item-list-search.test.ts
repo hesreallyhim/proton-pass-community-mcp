@@ -47,7 +47,52 @@ describe("read-only handlers", () => {
       "--output",
       "json",
     ]);
-    expect(runner).toHaveBeenNthCalledWith(2, ["item", "list", "--output", "human", "--", "Work"]);
+    expect(runner).toHaveBeenNthCalledWith(2, ["item", "list", "--output", "json", "--", "Work"]);
+  });
+
+  it("reads current CLI summary types and keeps legacy human requests reference-only", async () => {
+    const runner = makeRunner({
+      stdout: JSON.stringify({
+        items: [
+          { id: "i1", share_id: "s1", title: "Card", item_type: "credit_card" },
+          {
+            id: "i2",
+            share_id: "s1",
+            title: "SSH",
+            item_type: "ssh_key",
+            content: { content: { Login: {} }, password: "must-not-escape" },
+            note: "must-not-escape",
+            extra_fields: ["must-not-escape"],
+          },
+        ],
+      }),
+      stderr: "",
+    });
+    const result = await listItemsHandler(runner, { shareId: "s1", output: "human" });
+    expect(result.structuredContent.items.map((item) => item.type)).toEqual([
+      "credit-card",
+      "ssh-key",
+    ]);
+    expect(JSON.stringify(result)).not.toContain("must-not-escape");
+  });
+
+  it.each([
+    "not-json must-not-escape",
+    '{"secret":"must-not-escape"}',
+    '{"other":["must-not-escape"]}',
+  ])("rejects unrecognized list/search output without returning it: %s", async (stdout) => {
+    const runner = makeRunner({ stdout, stderr: "" });
+    await expect(listItemsHandler(runner, { shareId: "s1", output: "json" })).rejects.toThrow(
+      /pass-cli item list/,
+    );
+    await expect(
+      searchItemsHandler(runner, {
+        query: "test",
+        field: "title",
+        match: "contains",
+        caseSensitive: false,
+      }),
+    ).rejects.toThrow(/pass-cli item list/);
   });
 
   it("listItemsHandler paginates json output by default with item refs only", async () => {

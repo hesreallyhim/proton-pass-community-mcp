@@ -14,6 +14,6 @@ export async function generateTotpHandler(
   passCli: PassCliRunner,
   { secretOrUri, output }: GenerateTotpInput,
 ) {
-  const { stdout } = await passCli(["totp", "generate", secretOrUri, "--output", output]);
+  const { stdout } = await passCli(["totp", "generate", "--output", output, "--", secretOrUri]);
   return asTextContent(asJsonTextOrRaw(stdout));
 }

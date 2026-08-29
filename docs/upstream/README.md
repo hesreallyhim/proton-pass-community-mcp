@@ -26,6 +26,8 @@ Maintained fields used by CI watch:
 5. `latest_known_version_published_date`
 6. `last_checked_utc`
 
+The optional `reviewed_version` and `reviewed_commit` identify a completed source audit independently of the latest-release alert. CLI 2.3.3 was reviewed at `51a4c9b110a0ffe6e81f4f5d3877b9e5a0c24112`; the [compatibility matrix](../testing/PASS_CLI_2.3.3_COMPATIBILITY.md) records scope and fixture coverage. A source audit is not a live vault smoke test.
+
 ## Local Sync (On Demand)
 
 Fetch docs to local ignored cache only when needed:

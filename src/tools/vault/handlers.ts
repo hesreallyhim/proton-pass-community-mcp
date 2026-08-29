@@ -1,5 +1,6 @@
 import { asJsonTextOrRaw, asTextContent, asWriteResult } from "../../pass-cli/output.js";
 import type { PassCliRunner } from "../../pass-cli/runner.js";
+import { agentReasonInput, invokeWithAgentReason } from "../shared/agent-reason.js";
 import { extractArrayFromParsed, paginateRefs } from "../shared/pagination.js";
 import { appendScopeArgs } from "../shared/scope.js";
 import { DEFAULT_VAULT_MEMBER_PAGE_SIZE } from "./constants.js";
@@ -74,13 +75,17 @@ export async function createVaultHandler(
 
 export async function updateVaultHandler(
   passCli: PassCliRunner,
-  { shareId, vaultName, newName, confirm }: UpdateVaultInput,
+  { shareId, vaultName, newName, confirm, agentReason }: UpdateVaultInput,
 ) {
   requireWriteGate(confirm);
   const args = ["vault", "update"];
   appendScopeArgs(args, { shareId, vaultName });
   args.push("--name", newName);
-  const { stdout, stderr } = await passCli(args);
+  const { stdout, stderr } = await invokeWithAgentReason(
+    passCli,
+    args,
+    agentReasonInput.parse(agentReason),
+  );
   return asWriteResult(stdout, stderr);
 }
 
@@ -91,8 +96,8 @@ export async function shareVaultHandler(
   requireWriteGate(confirm);
   const args = ["vault", "share"];
   appendScopeArgs(args, { shareId, vaultName });
-  args.push(email);
   if (role) args.push("--role", role);
+  args.push("--", email);
   const { stdout, stderr } = await passCli(args);
   return asWriteResult(stdout, stderr);
 }
@@ -139,7 +144,7 @@ export async function transferVaultHandler(
   requireWriteGate(confirm);
   const args = ["vault", "transfer"];
   appendScopeArgs(args, { shareId, vaultName });
-  args.push(memberShareId);
+  args.push("--", memberShareId);
   const { stdout, stderr } = await passCli(args);
   return asWriteResult(stdout, stderr);
 }

@@ -132,13 +132,13 @@ export function createItemToolDefinitions(passCli: PassCliRunner): ToolDefinitio
     ),
     inputTool(
       "delete_item",
-      "Delete an item by share ID and item ID.",
+      "Permanently delete an item by share ID and item ID, bypassing trash.",
       deleteItemInputSchema,
       (input) => deleteItemHandler(passCli, input),
     ),
     inputTool(
       "download_item_attachment",
-      "Download an item attachment to a local path.",
+      "Download an item attachment to a local path, potentially overwriting it. Requires write permission and confirmation.",
       downloadItemAttachmentInputSchema,
       (input) => downloadItemAttachmentHandler(passCli, input),
     ),

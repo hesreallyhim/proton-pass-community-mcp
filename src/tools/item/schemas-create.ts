@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { agentReasonInput } from "../shared/agent-reason.js";
+
 import { WIFI_SECURITY_OPTIONS } from "./constants.js";
 import { confirmInput } from "../shared/schema-fragments.js";
 
@@ -16,6 +18,7 @@ export const createLoginItemInputSchema = z.object({
     .max(100)
     .optional()
     .describe('Set to "true" to auto-generate, or pass generator options'),
+  agentReason: agentReasonInput.optional(),
   confirm: confirmInput,
 });
 
@@ -26,6 +29,7 @@ export const loginItemTemplateSchema = z
     username: z.string().max(255).nullable().optional().describe("Optional username"),
     email: z.string().max(255).nullable().optional().describe("Optional email"),
     password: z.string().max(1024).nullable().optional().describe("Optional password"),
+    totp_uri: z.string().max(2048).nullable().optional().describe("Optional TOTP URI or secret"),
   })
   .strict();
 
@@ -33,6 +37,7 @@ export const createLoginItemFromTemplateInputSchema = z.object({
   shareId: z.string().max(100).optional().describe("Share ID for the new item"),
   vaultName: z.string().max(255).optional().describe("Vault name for the new item"),
   template: loginItemTemplateSchema.describe("Login template payload"),
+  agentReason: agentReasonInput.optional(),
   confirm: confirmInput,
 });
 
@@ -41,6 +46,7 @@ export const createNoteItemInputSchema = z.object({
   vaultName: z.string().max(255).optional().describe("Vault name for the new item"),
   title: z.string().max(255).describe("Title for the new note item"),
   note: z.string().max(10000).optional().describe("Optional note content"),
+  agentReason: agentReasonInput.optional(),
   confirm: confirmInput,
 });
 
@@ -53,11 +59,15 @@ export const createCreditCardItemInputSchema = z.object({
   cvv: z.string().max(16).optional().describe("CVV/CVC security code"),
   expirationDate: z
     .string()
-    .regex(/^\d{4}-\d{2}$/, "Expected YYYY-MM")
+    .regex(
+      /^(?:[2-9]\d{3}-(?:0[1-9]|1[0-2]))?$/,
+      "Expected empty string or YYYY-MM (year 2000-9999, month 01-12)",
+    )
     .optional()
     .describe("Expiration date (YYYY-MM)"),
   pin: z.string().max(64).optional().describe("Card PIN"),
   note: z.string().max(10000).optional().describe("Optional note content"),
+  agentReason: agentReasonInput.optional(),
   confirm: confirmInput,
 });
 
@@ -65,7 +75,12 @@ export const createWifiItemInputSchema = z.object({
   shareId: z.string().max(100).optional().describe("Share ID for the new item"),
   vaultName: z.string().max(255).optional().describe("Vault name for the new item"),
   title: z.string().max(255).describe("Title for the new WiFi item"),
-  ssid: z.string().min(1).max(255).describe("Network SSID (required, non-empty)"),
+  ssid: z
+    .string()
+    .min(1)
+    .max(255)
+    .refine((value) => value.trim().length > 0, "SSID must not be blank")
+    .describe("Network SSID (required, non-empty)"),
   password: z
     .string()
     .max(2048)
@@ -74,18 +89,29 @@ export const createWifiItemInputSchema = z.object({
   security: z
     .enum(WIFI_SECURITY_OPTIONS)
     .optional()
-    .describe("WiFi security type: wpa, wpa2, wpa3, wep, open, none"),
+    .describe("WiFi security type: wpa, wpa2, wpa3, wep, open, none, unspecified"),
   note: z.string().max(10000).optional().describe("Optional note content"),
+  agentReason: agentReasonInput.optional(),
   confirm: confirmInput,
 });
+
+function isSigned64BitInteger(value: string): boolean {
+  if (!/^[+-]?\d+$/.test(value)) return false;
+  const integer = BigInt(value);
+  return integer >= -(2n ** 63n) && integer < 2n ** 63n;
+}
 
 const customTemplateFieldSchema = z
   .object({
     field_name: z.string().min(1).max(255).describe("Field display name"),
-    field_type: z.string().min(1).max(100).describe("Field type (for example text, hidden, totp)"),
+    field_type: z.enum(["text", "hidden", "totp", "timestamp"]).describe("Custom field type"),
     value: z.string().max(10000).describe("Field value"),
   })
-  .strict();
+  .strict()
+  .refine((field) => field.field_type !== "timestamp" || isSigned64BitInteger(field.value), {
+    message: "Timestamp value must be a signed 64-bit integer in seconds",
+    path: ["value"],
+  });
 
 const customTemplateSectionSchema = z
   .object({
@@ -106,6 +132,7 @@ export const createCustomItemInputSchema = z.object({
   shareId: z.string().max(100).optional().describe("Share ID for the new item"),
   vaultName: z.string().max(255).optional().describe("Vault name for the new item"),
   template: customItemTemplateSchema.describe("Custom item template payload"),
+  agentReason: agentReasonInput.optional(),
   confirm: confirmInput,
 });
 
@@ -152,6 +179,7 @@ export const createIdentityItemInputSchema = z.object({
   shareId: z.string().max(100).optional().describe("Share ID for the new item"),
   vaultName: z.string().max(255).optional().describe("Vault name for the new item"),
   template: identityItemTemplateSchema.describe("Identity item template payload"),
+  agentReason: agentReasonInput.optional(),
   confirm: confirmInput,
 });
 

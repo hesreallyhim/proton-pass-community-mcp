@@ -1,7 +1,7 @@
 {
-  "captured_at": "2026-03-11T13:17:46.286Z",
-  "captured_by": "scripts/pass-dev.sh item create <type> --get-template",
-  "pass_cli_version": "Proton Pass CLI 1.6.1 (0977a19)",
+  "captured_at": "2026-08-28T00:10:58.102Z",
+  "captured_by": "Static source review of protonpass/pass-cli at 51a4c9b110a0ffe6e81f4f5d3877b9e5a0c24112; no CLI execution",
+  "pass_cli_version": "Proton Pass CLI 2.3.3 (51a4c9b; source-derived)",
   "templates": {
     "credit-card": {
       "title": "",
@@ -85,6 +85,7 @@
       "username": null,
       "email": null,
       "password": null,
+      "totp_uri": null,
       "urls": []
     },
     "note": {

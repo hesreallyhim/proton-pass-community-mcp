@@ -1,6 +1,10 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 
 import { createServer, PassCliAuthError, startServer } from "../../src/server.js";
+import { createCoreToolDefinitions } from "../../src/server/tool-definitions-core.js";
+import { createItemToolDefinitions } from "../../src/server/tool-definitions-item.js";
 
 import { makeRunner, restoreProcessEnvAndMocks } from "./test-support.js";
 
@@ -11,6 +15,41 @@ describe("server setup", () => {
     const runner = makeRunner({ stdout: "", stderr: "" });
     const server = createServer({ runPassCli: runner });
     expect(server).toBeTruthy();
+  });
+
+  it("publishes input fields through MCP and accepts an empty invite argument object", async () => {
+    const runner = makeRunner({ stdout: "[]", stderr: "" });
+    const server = createServer({ runPassCli: runner });
+    const client = new Client({ name: "schema-contract-test", version: "1.0.0" });
+    const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair();
+    try {
+      await server.connect(serverTransport);
+      await client.connect(clientTransport);
+      const listed = await client.listTools();
+      const definitions = [
+        ...createCoreToolDefinitions(runner),
+        ...createItemToolDefinitions(runner),
+      ];
+      for (const definition of definitions) {
+        if (definition.kind !== "input") continue;
+        const published = listed.tools.find((tool) => tool.name === definition.name);
+        expect(
+          Object.keys(published?.inputSchema.properties ?? {}).sort(),
+          definition.name,
+        ).toEqual(Object.keys(definition.inputSchema.shape).sort());
+      }
+      const invites = listed.tools.find((tool) => tool.name === "list_invites");
+      expect(invites?.inputSchema.properties).toMatchObject({
+        pageSize: { type: "integer" },
+        cursor: { type: "string" },
+      });
+      const result = await client.callTool({ name: "list_invites", arguments: {} });
+      expect(result.isError).not.toBe(true);
+      expect(runner).toHaveBeenCalledWith(["invite", "list", "--output", "json"]);
+    } finally {
+      await client.close();
+      await server.close();
+    }
   });
 
   it("registers item template resources and serves JSON payloads", async () => {
@@ -44,7 +83,7 @@ describe("server setup", () => {
     expect(indexPayload.template_types).toEqual(
       expect.arrayContaining(["login", "note", "credit-card", "wifi", "custom", "identity"]),
     );
-    expect(indexPayload.pass_cli_version).toContain("1.6.1");
+    expect(indexPayload.pass_cli_version).toContain("2.3.3");
 
     const loginResult = await resources["pass://templates/item-create/login"].readCallback(
       new URL("pass://templates/item-create/login"),
@@ -121,7 +160,12 @@ describe("server setup", () => {
       confirm: true,
     });
     await tools.create_vault.handler({ name: "Sandbox", confirm: true });
-    await tools.update_vault.handler({ vaultName: "Sandbox", newName: "Sandbox 2", confirm: true });
+    await tools.update_vault.handler({
+      vaultName: "Sandbox",
+      newName: "Sandbox 2",
+      agentReason: "Rename test fixture vault",
+      confirm: true,
+    });
     await tools.delete_vault.handler({ vaultName: "Sandbox", confirm: true });
     await tools.list_shares.handler({ output: "json" });
     await tools.list_invites.handler({});
@@ -195,17 +239,20 @@ describe("server setup", () => {
       confirm: true,
     });
     await tools.update_item.handler({
+      agentReason: "Update test fixture item",
       shareId: "s1",
       itemId: "i1",
       fields: ["password=updated"],
       confirm: true,
     });
     await tools.trash_item.handler({
+      agentReason: "Update test fixture item",
       shareId: "s1",
       itemId: "i1",
       confirm: true,
     });
     await tools.untrash_item.handler({
+      agentReason: "Update test fixture item",
       shareId: "s1",
       itemId: "i1",
       confirm: true,
@@ -220,6 +267,7 @@ describe("server setup", () => {
       itemId: "i1",
       attachmentId: "a1",
       outputPath: "./tmp.bin",
+      confirm: true,
     });
     await tools.share_item.handler({
       shareId: "s1",

@@ -11,6 +11,12 @@ import {
 } from "../../src/server.js";
 
 import { makeRunner, restoreProcessEnvAndMocks } from "./test-support.js";
+import {
+  createCreditCardItemInputSchema,
+  createWifiItemInputSchema,
+  customItemTemplateSchema,
+  loginItemTemplateSchema,
+} from "../../src/tools/item/schemas-create.js";
 
 afterEach(restoreProcessEnvAndMocks);
 
@@ -190,23 +196,84 @@ describe("write handlers", () => {
       "Demo",
     ]);
 
-    expect(runner).toHaveBeenNthCalledWith(3, [
-      "item",
-      "create",
-      "wifi",
-      "--share-id",
-      "s1",
-      "--title",
-      "Cafe WiFi",
-      "--ssid",
-      "Cafe",
-      "--password",
-      "",
-      "--security",
-      "open",
-      "--note",
-      "Guest",
-    ]);
+    expect(runner).toHaveBeenNthCalledWith(
+      3,
+      ["item", "create", "wifi", "--from-template", "-", "--share-id", "s1"],
+      JSON.stringify({
+        title: "Cafe WiFi",
+        ssid: "Cafe",
+        password: "",
+        security: "open",
+        note: "Guest",
+      }),
+    );
+  });
+
+  it.each([
+    [{ vaultName: "Work" }, ["--vault-name", "Work"]],
+    [{}, []],
+  ])("createWifiItemHandler uses template stdin for scope %j", async (scope, scopeArgs) => {
+    process.env.ALLOW_WRITE = "1";
+    const runner = makeRunner({ stdout: "created", stderr: "" });
+    await createWifiItemHandler(runner, {
+      ...scope,
+      title: "Guest",
+      ssid: "Guest",
+      security: "unspecified",
+      confirm: true,
+    });
+    expect(runner).toHaveBeenCalledWith(
+      ["item", "create", "wifi", "--from-template", "-", ...scopeArgs],
+      '{"title":"Guest","ssid":"Guest","security":"unspecified"}',
+    );
+  });
+
+  it("login templates accept and forward the current CLI TOTP field", async () => {
+    process.env.ALLOW_WRITE = "1";
+    const runner = makeRunner({ stdout: "created", stderr: "" });
+    const template = loginItemTemplateSchema.parse({
+      title: "TOTP login",
+      totp_uri: "otpauth://totp/Example?secret=JBSWY3DPEHPK3PXP",
+    });
+    await createLoginItemFromTemplateHandler(runner, { template, confirm: true });
+    expect(runner).toHaveBeenCalledWith(
+      ["item", "create", "login", "--from-template", "-"],
+      JSON.stringify(template),
+    );
+    expect(loginItemTemplateSchema.parse({ title: "No TOTP", totp_uri: null }).totp_uri).toBeNull();
+  });
+
+  it("validates card expiration, nonblank WiFi SSID, and signed 64-bit custom timestamps", () => {
+    for (const expirationDate of ["", "2000-01", "9999-12"]) {
+      expect(
+        createCreditCardItemInputSchema.safeParse({ title: "Card", expirationDate }).success,
+      ).toBe(true);
+    }
+    for (const expirationDate of ["1999-12", "2027-00", "2027-13", "2027-1"]) {
+      expect(
+        createCreditCardItemInputSchema.safeParse({ title: "Card", expirationDate }).success,
+      ).toBe(false);
+    }
+    expect(createWifiItemInputSchema.safeParse({ title: "Guest", ssid: " \t\n" }).success).toBe(
+      false,
+    );
+    const custom = (value: string, field_type = "timestamp") => ({
+      title: "Custom",
+      sections: [{ section_name: "Dates", fields: [{ field_name: "Date", field_type, value }] }],
+    });
+    for (const value of ["-9223372036854775808", "+0", "9223372036854775807"]) {
+      expect(customItemTemplateSchema.safeParse(custom(value)).success).toBe(true);
+    }
+    for (const value of [
+      "-9223372036854775809",
+      "9223372036854775808",
+      "1.5",
+      " 1",
+      "not a date",
+    ]) {
+      expect(customItemTemplateSchema.safeParse(custom(value)).success).toBe(false);
+    }
+    expect(customItemTemplateSchema.safeParse(custom("plain text", "unknown")).success).toBe(false);
   });
 
   it("createCustom/Identity handlers validate scope and forward template stdin", async () => {

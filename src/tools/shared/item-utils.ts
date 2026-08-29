@@ -111,9 +111,12 @@ export function normalizeItemTypeKey(rawTypeKey: string): string | null {
 }
 
 /**
- * Extracts typed content key from content.content.<Type> and normalizes it.
+ * Normalizes current summary item_type, falling back to older typed-content output.
  */
 export function extractItemType(item: JsonRecord): string | null {
+  const summaryType = asNonEmptyString(item.item_type);
+  if (summaryType) return normalizeItemTypeKey(summaryType);
+
   const content = asRecord(item.content);
   const nestedTypedContent = asRecord(content?.content);
   if (!nestedTypedContent) return null;

@@ -13,8 +13,9 @@ export async function shareItemHandler(
   { shareId, itemId, email, role, confirm }: ShareItemInput,
 ) {
   requireWriteGate(confirm);
-  const args = ["item", "share", "--share-id", shareId, "--item-id", itemId, email];
+  const args = ["item", "share", "--share-id", shareId, "--item-id", itemId];
   if (role) args.push("--role", role);
+  args.push("--", email);
   const { stdout, stderr } = await passCli(args);
   return asWriteResult(stdout, stderr);
 }

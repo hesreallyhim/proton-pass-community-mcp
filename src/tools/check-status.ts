@@ -16,11 +16,11 @@ export async function checkPassConnectivity(
   passCli: PassCliRunner,
 ): Promise<PassConnectivityStatus> {
   try {
-    const { stdout, stderr } = await passCli(["test"]);
+    const { stdout, stderr } = await passCli(["info"]);
     const out = joinStdoutStderr(stdout, stderr);
     return {
       status: "ok",
-      message: out || "Connection test succeeded.",
+      message: out || "Session information retrieved successfully.",
     };
   } catch (error) {
     if (error instanceof PassCliAuthError) {

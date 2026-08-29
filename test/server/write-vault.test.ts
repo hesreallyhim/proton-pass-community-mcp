@@ -35,39 +35,38 @@ describe("write handlers", () => {
 
     await expect(
       updateVaultHandler(runner, {
+        agentReason: "Testing current CLI write contract",
         newName: "X",
         confirm: true,
       }),
     ).rejects.toThrow("exactly one");
 
     await updateVaultHandler(runner, {
+      agentReason: "Testing current CLI write contract",
       shareId: "s1",
       newName: "Renamed",
       confirm: true,
     });
 
     await updateVaultHandler(runner, {
+      agentReason: "Testing current CLI write contract",
       vaultName: "Work",
       newName: "Renamed2",
       confirm: true,
     });
 
-    expect(runner).toHaveBeenNthCalledWith(1, [
-      "vault",
-      "update",
-      "--share-id",
-      "s1",
-      "--name",
-      "Renamed",
-    ]);
-    expect(runner).toHaveBeenNthCalledWith(2, [
-      "vault",
-      "update",
-      "--vault-name",
-      "Work",
-      "--name",
-      "Renamed2",
-    ]);
+    expect(runner).toHaveBeenNthCalledWith(
+      1,
+      ["vault", "update", "--share-id", "s1", "--name", "Renamed"],
+      undefined,
+      { agentReason: "Testing current CLI write contract" },
+    );
+    expect(runner).toHaveBeenNthCalledWith(
+      2,
+      ["vault", "update", "--vault-name", "Work", "--name", "Renamed2"],
+      undefined,
+      { agentReason: "Testing current CLI write contract" },
+    );
   });
 
   it("deleteVaultHandler validates selector exclusivity and supports both modes", async () => {
@@ -102,7 +101,7 @@ describe("write handlers", () => {
 
     await shareVaultHandler(runner, {
       vaultName: "Work",
-      email: "manager@example.com",
+      email: "-manager@example.com",
       role: "manager",
       confirm: true,
     });
@@ -112,6 +111,7 @@ describe("write handlers", () => {
       "share",
       "--share-id",
       "s1",
+      "--",
       "user@example.com",
     ]);
 
@@ -120,9 +120,10 @@ describe("write handlers", () => {
       "share",
       "--vault-name",
       "Work",
-      "manager@example.com",
       "--role",
       "manager",
+      "--",
+      "-manager@example.com",
     ]);
   });
 
@@ -139,11 +140,18 @@ describe("write handlers", () => {
 
     await transferVaultHandler(runner, {
       shareId: "s1",
-      memberShareId: "m1",
+      memberShareId: "-member-1",
       confirm: true,
     });
 
-    expect(runner).toHaveBeenCalledWith(["vault", "transfer", "--share-id", "s1", "m1"]);
+    expect(runner).toHaveBeenCalledWith([
+      "vault",
+      "transfer",
+      "--share-id",
+      "s1",
+      "--",
+      "-member-1",
+    ]);
   });
 
   it("vault member write handlers validate scope and build command arguments", async () => {

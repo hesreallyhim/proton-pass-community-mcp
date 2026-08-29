@@ -1,5 +1,6 @@
 import { asWriteResult } from "../../pass-cli/output.js";
 import type { PassCliRunner } from "../../pass-cli/runner.js";
+import { agentReasonInput, invokeWithAgentReason } from "../shared/agent-reason.js";
 import { appendOptionalScopeArgs, appendRequiredItemSelectorArgs } from "./handler-helpers.js";
 import type {
   DeleteItemInput,
@@ -42,13 +43,13 @@ export async function moveItemHandler(passCli: PassCliRunner, input: MoveItemInp
   if (input.toShareId) args.push("--to-share-id", input.toShareId);
   else args.push("--to-vault-name", input.toVaultName!);
 
-  const { stdout, stderr } = await passCli(args);
+  const { stdout, stderr } = await invokeWithAgentReason(passCli, args, input.agentReason);
   return asWriteResult(stdout, stderr);
 }
 
 export async function updateItemHandler(
   passCli: PassCliRunner,
-  { shareId, vaultName, itemId, itemTitle, fields, confirm }: UpdateItemInput,
+  { shareId, vaultName, itemId, itemTitle, fields, confirm, agentReason }: UpdateItemInput,
 ) {
   requireWriteGate(confirm);
 
@@ -57,13 +58,17 @@ export async function updateItemHandler(
   appendRequiredItemSelectorArgs(args, itemId, itemTitle);
   for (const field of fields) args.push("--field", field);
 
-  const { stdout, stderr } = await passCli(args);
+  const { stdout, stderr } = await invokeWithAgentReason(
+    passCli,
+    args,
+    agentReasonInput.parse(agentReason),
+  );
   return asWriteResult(stdout, stderr);
 }
 
 export async function trashItemHandler(
   passCli: PassCliRunner,
-  { shareId, vaultName, itemId, itemTitle, confirm }: TrashItemInput,
+  { shareId, vaultName, itemId, itemTitle, confirm, agentReason }: TrashItemInput,
 ) {
   requireWriteGate(confirm);
 
@@ -71,13 +76,17 @@ export async function trashItemHandler(
   appendOptionalScopeArgs(args, shareId, vaultName);
   appendRequiredItemSelectorArgs(args, itemId, itemTitle);
 
-  const { stdout, stderr } = await passCli(args);
+  const { stdout, stderr } = await invokeWithAgentReason(
+    passCli,
+    args,
+    agentReasonInput.parse(agentReason),
+  );
   return asWriteResult(stdout, stderr);
 }
 
 export async function untrashItemHandler(
   passCli: PassCliRunner,
-  { shareId, vaultName, itemId, itemTitle, confirm }: UntrashItemInput,
+  { shareId, vaultName, itemId, itemTitle, confirm, agentReason }: UntrashItemInput,
 ) {
   requireWriteGate(confirm);
 
@@ -85,14 +94,19 @@ export async function untrashItemHandler(
   appendOptionalScopeArgs(args, shareId, vaultName);
   appendRequiredItemSelectorArgs(args, itemId, itemTitle);
 
-  const { stdout, stderr } = await passCli(args);
+  const { stdout, stderr } = await invokeWithAgentReason(
+    passCli,
+    args,
+    agentReasonInput.parse(agentReason),
+  );
   return asWriteResult(stdout, stderr);
 }
 
 export async function downloadItemAttachmentHandler(
   passCli: PassCliRunner,
-  { shareId, itemId, attachmentId, outputPath }: DownloadItemAttachmentInput,
+  { shareId, itemId, attachmentId, outputPath, confirm }: DownloadItemAttachmentInput,
 ) {
+  requireWriteGate(confirm);
   const { stdout, stderr } = await passCli([
     "item",
     "attachment",
@@ -111,17 +125,14 @@ export async function downloadItemAttachmentHandler(
 
 export async function deleteItemHandler(
   passCli: PassCliRunner,
-  { shareId, itemId, confirm }: DeleteItemInput,
+  { shareId, itemId, confirm, agentReason }: DeleteItemInput,
 ) {
   requireWriteGate(confirm);
 
-  const { stdout, stderr } = await passCli([
-    "item",
-    "delete",
-    "--share-id",
-    shareId,
-    "--item-id",
-    itemId,
-  ]);
+  const { stdout, stderr } = await invokeWithAgentReason(
+    passCli,
+    ["item", "delete", "--share-id", shareId, "--item-id", itemId],
+    agentReason,
+  );
   return asWriteResult(stdout, stderr);
 }

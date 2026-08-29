@@ -14,12 +14,14 @@
 
 It is an independent community project. It is not affiliated with or endorsed by Proton AG.
 
-It is designed as a production-ready integration layer:
+The integration provides:
 
 - typed tool inputs with `zod`
 - stdio transport for MCP clients
 
-### 📌 Current Version of `pass-cli` used in development: v2.2.0
+### CLI compatibility baseline: 2.3.3
+
+The current rehabilitation targets the existing 47 tools against the published CLI 2.3.3 source. Validation covers schemas, subprocess behavior, fixtures, and the installed npm package; live vault compatibility has not been revalidated. See the [compatibility audit](./docs/testing/PASS_CLI_2.3.3_COMPATIBILITY.md) for per-tool evidence and limits.
 
 ## Available Tools
 
@@ -73,12 +75,13 @@ The server exposes the following MCP tool surface:
 | `generate_totp`                   | Generate TOTP from secret/URI                    |
 | `score_password`                  | Score password strength                          |
 
-Coverage goal: provide comprehensive support for Proton Pass CLI workflows that fit MCP tool semantics.
-Intentionally excluded are CLI behaviors that are purely interactive or otherwise not a good fit for reliable MCP tool execution.
+Coverage goal: provide comprehensive support for Proton Pass CLI workflows that fit MCP tool semantics. Intentionally excluded are CLI behaviors that are purely interactive or otherwise not a good fit for reliable MCP tool execution.
 
 The `search_items` operation is additional functionality that is not provided by the base CLI.
 
-Mutative tools currently require write gate opt-in (`ALLOW_WRITE=1`) and explicit per-call confirmation (`confirm: true`).
+Mutative tools require write gate opt-in (`ALLOW_WRITE=1`) and explicit per-call confirmation (`confirm: true`). This includes `download_item_attachment`, which can overwrite a local file, and `inject`/`run`. `delete_item` permanently deletes an item without requiring it to be trashed first.
+
+**Changed input requirements:** `update_item`, `trash_item`, `untrash_item`, and `update_vault` require an explicit `agentReason` for every session type. CLI 2.3.3 can apply these mutations before validating an agent audit reason, so the server validates the reason before invoking the CLI. Other audited tools accept an optional `agentReason`; see [audit-reason policy](./docs/TOOL_SCHEMA_PLAN.md#current-cli-233-compatibility-policy).
 
 Proposed protocol-aligned confirmation policy (elicitation-first with fail-closed fallback) is documented in [docs/TOOL_SCHEMA_PLAN.md](./docs/TOOL_SCHEMA_PLAN.md#write-authorization-and-confirmation-policy-proposal).
 
@@ -98,11 +101,11 @@ Snapshot artifact source:
 
 - [docs/testing/item-create-templates.snapshot.json](./docs/testing/item-create-templates.snapshot.json)
 
-These template resources are example well-formed payloads from `pass-cli --get-template`, not authoritative validation schemas.
+These resources reflect the six existing CLI template types, refreshed from the 2.3.3 source without executing the CLI. They are examples, not authoritative validation schemas or necessarily create-ready values (WiFi still needs a nonblank SSID). Login templates now include `totp_uri`.
 
 ## Item Discovery Contract
 
-`list_items` and `search_items` return token-efficient results. These operations do not contain the full contents or secrets of any items, thus preventing unnecessary leakage of sensitive data from the CLI to the host application or the LLM.
+`list_items` and `search_items` project CLI JSON into item references, omitting nested item contents and secrets. Unknown JSON envelopes and invalid JSON fail without returning the raw payload. The legacy `list_items.output: "human"` hint also returns JSON references and cannot bypass this projection; it does not accept pagination parameters. Explicit `view_item` field reads preserve the field's text rather than parsing JSON-looking secrets.
 
 `list_items` and `search_items` both support MCP pagination:
 
@@ -120,6 +123,7 @@ These template resources are example well-formed payloads from `pass-cli --get-t
 - title-only search (`field: "title"`)
 - matching modes: `contains`, `prefix`, `exact`
 - optional `caseSensitive`
+- an omitted vault/share selector searches the CLI's default vault, not all vaults
 
 ## Requirements
 
@@ -253,6 +257,8 @@ Example MCP server config using environment overrides:
    - `possibly_incompatible`: semver indicates potential drift, or version parsing/execution prevented a strict comparison
 10. Version assessments are advisory. `check_status` is marked as an MCP error only when connectivity/authentication fails.
 11. There is no MCP-specific API token auth layer in this server. Authentication methods are those supported by `pass-cli` in the server process environment.
+12. Agent provisioning and agent-token login also remain outside MCP. `agentReason` is an audit explanation, not a credential or authorization grant. It is forwarded only to that invocation as `PROTON_PASS_AGENT_REASON`; the server does not invent reasons or mutate its process environment. Non-agent sessions can omit it except on the four mutation tools listed above. Permission/capability denials remain errors rather than instructions to reauthenticate.
+13. A valid reason does not make mutation and audit delivery atomic. Never automatically retry a failed mutation: inspect its state first. `check_status` uses `info` plus `--version`; it is a session preflight, not proof that every capability or remote API call will succeed.
 
 ### Test Account Workflow
 

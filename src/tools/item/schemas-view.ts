@@ -1,6 +1,9 @@
 import { z } from "zod";
 
+import { agentReasonInput } from "../shared/agent-reason.js";
+
 export const viewItemInputSchema = z.object({
+  agentReason: agentReasonInput.optional(),
   uri: z.string().max(1024).optional().describe("Item URI (e.g. pass://<shareId>/<itemId>)"),
   shareId: z.string().max(100).optional().describe("Share ID containing the item"),
   vaultName: z.string().max(255).optional().describe("Vault name containing the item"),
@@ -11,6 +14,7 @@ export const viewItemInputSchema = z.object({
 });
 
 export const itemTotpInputSchema = z.object({
+  agentReason: agentReasonInput.optional(),
   uri: z
     .string()
     .max(1024)

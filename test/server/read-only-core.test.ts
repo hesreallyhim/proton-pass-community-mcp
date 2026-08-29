@@ -33,7 +33,7 @@ describe("read-only handlers", () => {
     const result = await checkPassCliVersion(runner);
 
     expect(runner).toHaveBeenCalledWith(["--version"]);
-    expect(result.baselineVersion).toBe("1.9.0");
+    expect(result.baselineVersion).toBe("2.3.3");
     expect(result.detectedVersion).toBe("1.5.9");
     expect(result.compatibilityStatus).toBe("possibly_incompatible");
   });
@@ -51,9 +51,9 @@ describe("read-only handlers", () => {
 
   it("checkStatusHandler combines version and connectivity checks", async () => {
     const runner = makeRunner(async (args) => {
-      if (args[0] === "--version") return { stdout: "1.9.0 (abc123)", stderr: "" };
-      if (args[0] === "test") return { stdout: "Connection successful", stderr: "" };
-      return { stdout: "", stderr: "" };
+      if (args[0] === "--version") return { stdout: "2.3.3 (abc123)", stderr: "" };
+      if (args[0] === "info") return { stdout: "Session available", stderr: "" };
+      throw new Error(`Unexpected command: ${args.join(" ")}`);
     });
 
     const result = (await checkStatusHandler(runner)) as any;
@@ -61,6 +61,8 @@ describe("read-only handlers", () => {
     expect(result.structuredContent.overall_status).toBe("ok");
     expect(result.structuredContent.version.compatibilityStatus).toBe("equal");
     expect(result.structuredContent.connectivity.status).toBe("ok");
+    expect(runner).toHaveBeenCalledWith(["info"]);
+    expect(runner).toHaveBeenCalledWith(["--version"]);
     expect(runner).toHaveBeenCalledTimes(2);
   });
 
@@ -78,7 +80,7 @@ describe("read-only handlers", () => {
 
   it("checkStatusHandler enriches structuredContent with auth error fields", async () => {
     const runner = makeRunner(async (args) => {
-      if (args[0] === "--version") return { stdout: "1.9.0 (abc123)", stderr: "" };
+      if (args[0] === "--version") return { stdout: "2.3.3 (abc123)", stderr: "" };
       throw new PassCliAuthError("AUTH_EXPIRED");
     });
 
@@ -93,8 +95,8 @@ describe("read-only handlers", () => {
   it("checkStatusHandler reports warn when version is not parseable but connectivity ok", async () => {
     const runner = makeRunner(async (args) => {
       if (args[0] === "--version") return { stdout: "not-a-version", stderr: "" };
-      if (args[0] === "test") return { stdout: "ok", stderr: "" };
-      return { stdout: "", stderr: "" };
+      if (args[0] === "info") return { stdout: "ok", stderr: "" };
+      throw new Error(`Unexpected command: ${args.join(" ")}`);
     });
 
     const result = (await checkStatusHandler(runner)) as any;
@@ -107,8 +109,8 @@ describe("read-only handlers", () => {
   it("checkStatusHandler allows local version drift override", async () => {
     const runner = makeRunner(async (args) => {
       if (args[0] === "--version") return { stdout: "0.9.0", stderr: "" };
-      if (args[0] === "test") return { stdout: "ok", stderr: "" };
-      return { stdout: "", stderr: "" };
+      if (args[0] === "info") return { stdout: "ok", stderr: "" };
+      throw new Error(`Unexpected command: ${args.join(" ")}`);
     });
 
     const result = (await checkStatusHandler(runner, { allowVersionDrift: true })) as any;
@@ -141,11 +143,15 @@ describe("read-only handlers", () => {
     expect(result.content[0].text).toContain('"vaults": 1');
   });
 
-  it("listSharesHandler supports vault/item filters and output format", async () => {
+  it.each([
+    { filter: { onlyVaults: true }, args: ["--only-vaults", "true"] },
+    { filter: { onlyItems: true }, args: ["--only-items", "true"] },
+    { filter: { onlyItems: false, onlyVaults: false }, args: [] },
+  ])("listSharesHandler forwards boolean filter values ($args)", async ({ filter, args }) => {
     const runner = makeRunner({ stdout: '{"shares":[]}', stderr: "" });
-    const result = await listSharesHandler(runner, { onlyVaults: true, output: "json" });
+    const result = await listSharesHandler(runner, { ...filter, output: "json" });
 
-    expect(runner).toHaveBeenCalledWith(["share", "list", "--output", "json", "--vaults"]);
+    expect(runner).toHaveBeenCalledWith(["share", "list", "--output", "json", ...args]);
     expect(result.content[0].text).toContain('"shares"');
   });
 
@@ -189,6 +195,19 @@ describe("read-only handlers", () => {
         default_format: "human",
       },
       rawText: "Default vault: shr_abc\nDefault format: human",
+    });
+  });
+
+  it("viewSettingsHandler normalizes the CLI's annotated default settings", async () => {
+    const stdout =
+      "Current settings:\n  default_share_id: (none) (default)\n  default_format: human (default)\n";
+    const runner = makeRunner({ stdout, stderr: "" });
+
+    const result = (await viewSettingsHandler(runner)) as any;
+
+    expect(result.structuredContent).toEqual({
+      settings: { default_share_id: null, default_format: "human" },
+      rawText: stdout.trim(),
     });
   });
 
@@ -255,14 +274,31 @@ describe("read-only handlers", () => {
     expect(result).toEqual({ content: [{ type: "text", text: "not-json" }] });
   });
 
-  it("listInvitesHandler does not expose raw invite token as an identifier", async () => {
+  it("listInvitesHandler uses the CLI token as the actionable invitation ID", async () => {
     const runner = makeRunner({
-      stdout: '{"invites":[{"token":"sensitive-token-value"}]}',
+      stdout: JSON.stringify({
+        invites: [
+          {
+            token: "invite-token-1",
+            invite_type: "vault",
+            inviter: "owner@example.com",
+            name: "Team Vault",
+          },
+        ],
+      }),
       stderr: "",
     });
 
     const result = (await listInvitesHandler(runner, {})) as any;
-    expect(result.structuredContent.items[0].id).toBe("invite-1");
+    expect(result.structuredContent.items[0]).toEqual({
+      id: "invite-token-1",
+      type: "vault",
+      target_name: "Team Vault",
+      inviter: "owner@example.com",
+      role: null,
+      state: null,
+      create_time: null,
+    });
   });
 
   it("listVaultMembersHandler validates selector exclusivity and paginates refs", async () => {
@@ -282,6 +318,12 @@ describe("read-only handlers", () => {
           user_email: "bob@example.com",
           share_role: "viewer",
         },
+        {
+          member_share_id: "mem-3",
+          name: "charlie",
+          email: "charlie@example.com",
+          role: { Custom: { name: "Audit only", permission: 2 } },
+        },
       ],
     };
 
@@ -296,7 +338,7 @@ describe("read-only handlers", () => {
 
     const result = (await listVaultMembersHandler(runner, {
       shareId: "s1",
-      pageSize: 1,
+      pageSize: 2,
       cursor: "1",
     })) as any;
     const structured = result.structuredContent;
@@ -311,9 +353,9 @@ describe("read-only handlers", () => {
       "json",
     ]);
     expect(structured.scope).toEqual({ shareId: "s1" });
-    expect(structured.pageSize).toBe(1);
-    expect(structured.total).toBe(2);
-    expect(structured.returned).toBe(1);
+    expect(structured.pageSize).toBe(2);
+    expect(structured.total).toBe(3);
+    expect(structured.returned).toBe(2);
     expect(structured.nextCursor).toBeNull();
     expect(structured.items[0]).toEqual({
       id: "mem-2",
@@ -322,6 +364,12 @@ describe("read-only handlers", () => {
       role: "viewer",
       state: null,
       create_time: null,
+    });
+    expect(structured.items[1]).toMatchObject({
+      id: "mem-3",
+      username: "charlie",
+      email: "charlie@example.com",
+      role: "Audit only",
     });
   });
 

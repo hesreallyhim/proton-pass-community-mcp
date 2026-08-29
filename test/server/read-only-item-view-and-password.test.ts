@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it } from "vitest";
 
 import {
   generatePassphraseHandler,
+  generatePassphraseInputSchema,
   generateRandomPasswordHandler,
   generateTotpHandler,
   itemTotpHandler,
@@ -85,6 +86,57 @@ describe("read-only handlers", () => {
       "--output",
       "human",
     ]);
+  });
+
+  it.each([
+    { label: "numeric text", stdout: "1e3\n", expected: "1e3" },
+    { label: "JSON-looking text", stdout: '{ "key" : true }\n', expected: '{ "key" : true }' },
+    { label: "significant whitespace", stdout: " \tvalue \r\n", expected: " \tvalue \r" },
+    { label: "a trailing newline in the value", stdout: "value\n\n", expected: "value\n" },
+    { label: "no CLI newline", stdout: " value\r", expected: " value\r" },
+    { label: "an empty value", stdout: "\n", expected: "" },
+  ])("viewItemHandler preserves raw field output: $label", async ({ stdout, expected }) => {
+    const runner = makeRunner({ stdout, stderr: "" });
+    const selected = await viewItemHandler(runner, {
+      shareId: "share-1",
+      itemId: "item-1",
+      field: "password",
+      output: "json",
+    });
+    const referenced = await viewItemHandler(runner, {
+      uri: "pass://share-1/item-1/password",
+      output: "json",
+    });
+
+    expect(selected.content[0].text).toBe(expected);
+    expect(referenced.content[0].text).toBe(expected);
+  });
+
+  it("viewItemHandler still formats whole-item JSON output", async () => {
+    const runner = makeRunner({ stdout: '{ "name" : "Example" }\n', stderr: "" });
+
+    const result = await viewItemHandler(runner, {
+      uri: "pass://share-1/item-1",
+      output: "json",
+    });
+
+    expect(result.content[0].text).toBe('{\n  "name": "Example"\n}');
+  });
+
+  it.each([
+    { name: "viewItemHandler", handler: viewItemHandler },
+    { name: "itemTotpHandler", handler: itemTotpHandler },
+  ])("$name rejects combining a URI with an explicit field", async ({ handler }) => {
+    const runner = makeRunner();
+
+    await expect(
+      handler(runner, {
+        uri: "pass://share-1/item-1",
+        field: "totp",
+        output: "json",
+      }),
+    ).rejects.toThrow("Encode the field in uri");
+    expect(runner).not.toHaveBeenCalled();
   });
 
   it("itemTotpHandler validates selector combinations and builds arguments", async () => {
@@ -192,9 +244,10 @@ describe("read-only handlers", () => {
     expect(runner).toHaveBeenNthCalledWith(3, [
       "password",
       "score",
-      "MySecureP@ssw0rd",
       "--output",
       "json",
+      "--",
+      "MySecureP@ssw0rd",
     ]);
 
     expect(randomResult).toEqual({ content: [{ type: "text", text: "generated-value" }] });
@@ -204,20 +257,56 @@ describe("read-only handlers", () => {
     });
   });
 
-  it("generateTotpHandler forwards secret and output format", async () => {
-    const runner = makeRunner({ stdout: '{"totp":"123456"}', stderr: "" });
-    const result = await generateTotpHandler(runner, {
-      secretOrUri: "otpauth://totp/Example?secret=JBSWY3DPEHPK3PXP",
-      output: "json",
-    });
+  it("passphrase separators use CLI enum names instead of literal separators", async () => {
+    const runner = makeRunner({ stdout: "generated-value\n", stderr: "" });
+    const input = generatePassphraseInputSchema.parse({ separator: "numbers-and-symbols" });
+
+    await generatePassphraseHandler(runner, input);
 
     expect(runner).toHaveBeenCalledWith([
-      "totp",
+      "password",
       "generate",
-      "otpauth://totp/Example?secret=JBSWY3DPEHPK3PXP",
+      "passphrase",
+      "--separator",
+      "numbers-and-symbols",
+    ]);
+    expect(generatePassphraseInputSchema.safeParse({ separator: "-" }).success).toBe(false);
+    expect(generatePassphraseInputSchema.safeParse({ separator: "custom" }).success).toBe(false);
+  });
+
+  it("scorePasswordHandler puts leading-dash passwords after the terminator", async () => {
+    const runner = makeRunner({ stdout: "{}", stderr: "" });
+
+    await scorePasswordHandler(runner, { password: "--output", output: "json" });
+
+    expect(runner).toHaveBeenCalledWith([
+      "password",
+      "score",
       "--output",
       "json",
+      "--",
+      "--output",
     ]);
-    expect(result.content[0].text).toContain('"totp": "123456"');
   });
+
+  it.each(["otpauth://totp/Example?secret=JBSWY3DPEHPK3PXP", "--output"])(
+    "generateTotpHandler forwards input after the terminator: %s",
+    async (secretOrUri) => {
+      const runner = makeRunner({ stdout: '{"totp":"123456"}', stderr: "" });
+      const result = await generateTotpHandler(runner, {
+        secretOrUri,
+        output: "json",
+      });
+
+      expect(runner).toHaveBeenCalledWith([
+        "totp",
+        "generate",
+        "--output",
+        "json",
+        "--",
+        secretOrUri,
+      ]);
+      expect(result.content[0].text).toContain('"totp": "123456"');
+    },
+  );
 });

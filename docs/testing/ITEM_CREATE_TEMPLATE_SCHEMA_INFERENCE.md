@@ -5,6 +5,8 @@ description: Inferred per-type `item create <type> --from-template` input contra
 
 # Item Create Template Schema Inference (pass-cli 1.5.2)
 
+Historical evidence: the observations below describe the March probes and are not a live validation of the current CLI. The tracked template snapshot has since been refreshed from CLI 2.3.3 source, including login `totp_uri`; see the [current compatibility audit](./PASS_CLI_2.3.3_COMPATIBILITY.md). No live probe was rerun for that refresh.
+
 ## Scope
 
 This document captures **inferred** input schemas for:

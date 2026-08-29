@@ -9,13 +9,8 @@ if [[ "$cmd1" == "info" ]]; then
   exit 0
 fi
 
-if [[ "$cmd1" == "test" ]]; then
-  printf 'mock-pass-test-ok\n'
-  exit 0
-fi
-
 if [[ "$cmd1" == "--version" ]]; then
-  printf '1.9.0 (mock)\n'
+  printf '2.3.3 (mock)\n'
   exit 0
 fi
 
