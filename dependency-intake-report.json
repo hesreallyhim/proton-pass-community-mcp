@@ -1,0 +1,20 @@
+{
+  "generated_at": "2026-09-10T10:06:00-04:00",
+  "repo": "hesreallyhim/proton-pass-community-mcp",
+  "ecosystems": ["node"],
+  "tooling": { "npm_check_updates": { "command": "npm exec --yes npm-check-updates -- --jsonUpgraded", "result_after_update": { "typescript": "^7.0.2" } }, "osv": { "command": "npm audit --omit=dev --json", "result_after_update": "0 vulnerabilities" } },
+  "summary": { "total_upgrades": 11, "major_bumps": 4, "needs_attention": ["TypeScript 7 is deferred until typescript-eslint supports it."] },
+  "upgrades": [
+    { "ecosystem": "node", "name": "zod", "current": "4.4.3", "target": "4.6.1", "versions_in_range": ["4.6.1"], "sources": { "registry": "https://www.npmjs.com/package/zod" }, "risk_flags": [], "notes": ["Applied."] },
+    { "ecosystem": "node", "name": "@modelcontextprotocol/inspector", "current": "2.4.0", "target": "2.6.0", "versions_in_range": ["2.6.0"], "sources": { "registry": "https://www.npmjs.com/package/@modelcontextprotocol/inspector" }, "risk_flags": [], "notes": ["Applied; exceeds open PR target 2.5.0."] },
+    { "ecosystem": "node", "name": "@types/node", "current": "24.13.3", "target": "26.5.1", "versions_in_range": ["26.4.1", "26.5.1"], "sources": { "registry": "https://www.npmjs.com/package/@types/node" }, "risk_flags": ["major_version_bump"], "notes": ["Applied; exceeds open PR target 26.4.1."] },
+    { "ecosystem": "node", "name": "vitest", "current": "4.1.11", "target": "5.0.0", "versions_in_range": ["5.0.0"], "sources": { "registry": "https://www.npmjs.com/package/vitest" }, "risk_flags": ["major_version_bump"], "notes": ["Applied with the coverage provider; test and coverage suites pass."] },
+    { "ecosystem": "node", "name": "@vitest/coverage-v8", "current": "4.1.11", "target": "5.0.0", "versions_in_range": ["5.0.0"], "sources": { "registry": "https://www.npmjs.com/package/@vitest/coverage-v8" }, "risk_flags": ["major_version_bump"], "notes": ["Applied with Vitest 5."] },
+    { "ecosystem": "node", "name": "eslint", "current": "10.9.1", "target": "10.10.0", "versions_in_range": ["10.10.0"], "sources": { "registry": "https://www.npmjs.com/package/eslint" }, "risk_flags": [], "notes": ["Applied."] },
+    { "ecosystem": "node", "name": "globals", "current": "17.11.0", "target": "17.12.0", "versions_in_range": ["17.12.0"], "sources": { "registry": "https://www.npmjs.com/package/globals" }, "risk_flags": [], "notes": ["Applied."] },
+    { "ecosystem": "node", "name": "tsx", "current": "4.23.12", "target": "4.23.13", "versions_in_range": ["4.23.13"], "sources": { "registry": "https://www.npmjs.com/package/tsx" }, "risk_flags": [], "notes": ["Applied."] },
+    { "ecosystem": "node", "name": "typescript-eslint", "current": "8.68.0", "target": "8.70.0", "versions_in_range": ["8.70.0"], "sources": { "registry": "https://www.npmjs.com/package/typescript-eslint" }, "risk_flags": [], "notes": ["Applied."] },
+    { "ecosystem": "node", "name": "qs", "current": "6.15.3", "target": "6.16.0", "versions_in_range": ["6.16.0"], "sources": { "registry": "https://www.npmjs.com/package/qs" }, "risk_flags": ["security_fix"], "vulnerabilities": [{ "alerts": [54, 55], "status": "resolved" }], "notes": ["Transitive dependency; production audit is clean."] },
+    { "ecosystem": "node", "name": "typescript", "current": "6.0.3", "target": "7.0.2", "versions_in_range": ["7.0.2"], "sources": { "registry": "https://www.npmjs.com/package/typescript" }, "risk_flags": ["major_version_bump", "peer_dependency_incompatible"], "notes": ["Deferred: typescript-eslint@8.70.0 requires TypeScript >=4.8.4 <6.1.0."] }
+  ]
+}
