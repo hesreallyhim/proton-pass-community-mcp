@@ -105,4 +105,8 @@ Changes that add or materially alter runtime behavior, schemas, tool contracts, 
 - Tool registration: `src/server/register-tools.ts`
 - Tool handlers: `src/tools/*`
 - CLI runner and normalization: `src/pass-cli/*`
-- Contract tests: `test/server.test.ts`
+- Contract tests: `test/server/`
+
+### Module size and complexity
+
+CI reports source size and complexity on every run (`scripts/check-complexity-thresholds.mjs`). A file in `src/` warns above 250 lines and fails above 500, and the average cyclomatic complexity per function warns above 3 and fails above 5. Pull request runs only warn; the limits are enforced on the push to `main`, so treat a warning that crosses a limit as blocking. When a module grows, split it into focused schema, handler and helper files behind a barrel `index.ts`, as `src/tools/item/` and `src/tools/vault/` do.

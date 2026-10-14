@@ -41,7 +41,7 @@ export function toItemRef(rawItem: unknown, index: number): ItemRef {
 
   const existingUri = firstString(item, ["uri"]);
   const parsedUri = parsePassUri(existingUri);
-  // Item list JSON is interpreted as snake_case-first (see ADR-002).
+  // Item list JSON is read snake_case-first; camelCase keys are not guessed (see docs/TOOL_SCHEMA_PLAN.md).
   const id = firstString(item, ["id", "item_id"]) ?? parsedUri.itemId ?? `item-${index + 1}`;
   const shareId =
     firstString(item, ["share_id"]) ??
