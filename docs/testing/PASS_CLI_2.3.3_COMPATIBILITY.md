@@ -8,7 +8,7 @@ Audit date: 2026-08-27. Upstream reference: [`51a4c9b110a0ffe6e81f4f5d3877b9e5a0
 
 ## Shared boundary and policies
 
-The [runner](../../src/pass-cli/runner.ts) forces JSON only for format-capable commands, preserves attachment output paths, and leaves child arguments after `--` untouched. Known named flags bind leading-hyphen values with equals syntax so their contents remain data; this also protects literal `--output` and `--` values. It writes template input to child stdin and closes the pipe. Some legacy `output` inputs remain accepted; the [MCP output policy](../adr/ADR-001-mcp-output-format-boundary.md) controls their effective format.
+The [runner](../../src/pass-cli/runner.ts) forces JSON only for format-capable commands, preserves attachment output paths, and leaves child arguments after `--` untouched. Known named flags bind leading-hyphen values with equals syntax so their contents remain data; this also protects literal `--output` and `--` values. It writes template input to child stdin and closes the pipe. Some legacy `output` inputs remain accepted; the [MCP output policy](../TOOL_SCHEMA_PLAN.md#design-rules) controls their effective format.
 
 In the inventory, `scope` means one share-ID or vault-name selector; `selector` means one item-ID or item-title selector. Explicit selectors and schema bounds may be narrower than upstream. Omitted scope uses the configured default vault only where that existing tool allows omission. The [write gate](../../src/tools/shared/write-gate.ts) requires both `ALLOW_WRITE=1` and `confirm: true`; it now also covers attachment download.
 

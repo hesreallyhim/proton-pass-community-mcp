@@ -48,7 +48,7 @@ Out of scope:
 3. Session storage and key provider are environment-controlled (`PROTON_PASS_SESSION_DIR`, `PROTON_PASS_KEY_PROVIDER`).
 4. Desktop app/browser extension auth state is treated as independent from this CLI-scoped workflow.
 5. PAT-backed login does not change the boundary: `pass-cli login` and `pass-cli logout` remain out-of-band operations for this MCP server.
-6. PAT administration is a separate tool-surface question from login itself; see `docs/ADR/ADR-005-pat-auth-boundary-and-tooling.md`.
+6. PAT administration is a separate tool-surface question from login itself; see design rule 8 in `docs/TOOL_SCHEMA_PLAN.md`.
 7. For project development, the canonical CLI entrypoints are `npm run pass -- ...`, `scripts/pass ...`, or `scripts/pass-dev.sh ...`; bare `pass-cli` is outside the normal repo safety convention.
 8. Repo-local session isolation reduces cross-account mixups, but the expected-account preflight is the actual guardrail that rejects a non-throwaway account.
 

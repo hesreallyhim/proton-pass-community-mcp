@@ -18,12 +18,12 @@ Primary optimization target: item discovery (`pass-cli item list`) should return
 
 1. Tool names use snake_case without provider prefix and prefer natural-language order (for example `list_vaults`, `view_item`).
 2. Current implementation requires explicit confirmation (`confirm: true`) and write gate (`ALLOW_WRITE=1`); see policy proposal below for elicitation-first migration.
-3. Read tools default to structured, token-efficient JSON in `structuredContent`.
+3. Read tools default to structured, token-efficient JSON in `structuredContent`. Tool output is read by the model; presenting results to the user is left to the client.
 4. When `structuredContent` is returned, also return a `TextContent` serialization of that same JSON object for backwards compatibility/interoperability. This is not a separate human-output mode from the CLI.
 5. Item listing/search tools return references, then callers use `view_item` for full content. `list_vaults` retains the upstream JSON payload without local pagination.
 6. Release branches may retain non-release code paths, but only release-scoped tools are registered/exposed by default.
 7. Authentication session lifecycle (`pass-cli login`, `pass-cli logout`) remains out-of-band and is not exposed as MCP tools, even when login is PAT-backed.
-8. PAT administration is evaluated separately from login/logout because it manages scoped credentials after bootstrap auth; see `docs/ADR/ADR-005-pat-auth-boundary-and-tooling.md`.
+8. PAT administration is evaluated separately from login/logout because it manages scoped credentials after bootstrap auth. Metadata and access operations (list, delete, grant or revoke access, inspect access) are candidates for future tools. `pat create` and `pat renew` stay out of scope: each prints a new bearer token once, which would end up in tool transcripts and model context. No PAT resources are exposed, because PAT state is dynamic and security-sensitive.
 9. CLI binary lifecycle commands (for example `pass-cli update` / track switching) remain out-of-band and are not exposed as MCP tools.
 10. Host SSH agent integration/lifecycle commands (`pass-cli ssh-agent *`) remain out-of-band and are not exposed as MCP tools.
 
@@ -102,6 +102,8 @@ Title fallback policy:
 1. Use `content.title` when non-empty.
 2. Otherwise use the current metadata payload's top-level `title` when non-empty.
 3. Otherwise set `title: null` and `display_title: "[untitled:<short-id>]"`.
+
+Key-shape policy: item-list parsing treats snake_case keys (`id`, `share_id`, `vault_id`) as canonical and also reads nested `share` / `vault` objects. camelCase keys are not guessed. If upstream changes the shape, update the parser and its fixtures explicitly rather than widening key matching.
 
 Legacy upstream shape reference (anonymized earlier `pass-cli item list --output json` payload, still normalized defensively):
 

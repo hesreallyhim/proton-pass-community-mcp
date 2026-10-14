@@ -60,11 +60,12 @@
     "analyze:complexity": "node scripts/complexity-report.mjs",
     "analyze:complexity:json": "node scripts/complexity-report.mjs --json-out docs/testing/complexity-report.json",
     "check:complexity-thresholds": "node scripts/check-complexity-thresholds.mjs",
+    "check:complexity": "node scripts/complexity-report.mjs src --json-out .tmp/complexity-report.json > /dev/null && node scripts/check-complexity-thresholds.mjs --report .tmp/complexity-report.json --enforce",
     "check:production-hygiene": "node scripts/check-production-hygiene.mjs",
     "check:upstream:pass-cli": "node scripts/check-pass-cli-upstream.mjs",
     "check:package:smoke": "npm run build && node scripts/check-package-smoke.mjs",
     "check:release:package": "npm run lint && npm run typecheck && npm run test && npm run check:package:smoke",
-    "check": "npm run lint && npm run format:check && npm run typecheck && npm run test:fuzz && npm run coverage",
+    "check": "npm run lint && npm run format:check && npm run typecheck && npm run check:complexity && npm run test:fuzz && npm run coverage",
     "prepare": "husky"
   },
   "engines": {
