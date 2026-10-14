@@ -33,14 +33,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Generate complexity report
-        run: |
-          mkdir -p .tmp
-          npm run analyze:complexity -- src --json-out .tmp/complexity-report.json
-
-      - name: Enforce complexity thresholds
-        run: npm run check:complexity-thresholds -- --report .tmp/complexity-report.json --enforce
-
       - name: Run checks
         run: npm run check
 

@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 import { execFileSync } from "node:child_process";
-import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
-import { basename, extname, join, relative } from "node:path";
+import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { basename, dirname, extname, join, relative } from "node:path";
 import process from "node:process";
 
 import { format as formatWithPrettier } from "prettier";
@@ -412,6 +412,7 @@ async function main() {
   if (jsonOut) {
     const rawJson = JSON.stringify(report);
     const formattedJson = await formatWithPrettier(rawJson, { parser: "json" });
+    mkdirSync(dirname(jsonOut), { recursive: true });
     writeFileSync(
       jsonOut,
       formattedJson.endsWith("\n") ? formattedJson : `${formattedJson}\n`,

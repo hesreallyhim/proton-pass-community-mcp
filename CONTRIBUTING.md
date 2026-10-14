@@ -109,4 +109,4 @@ Changes that add or materially alter runtime behavior, schemas, tool contracts, 
 
 ### Module size and complexity
 
-CI checks source size and complexity on every run (`scripts/check-complexity-thresholds.mjs`). A file in `src/` fails CI above 500 lines, and the run fails if the average cyclomatic complexity per function exceeds 5. Files above 250 lines and an average above 3 produce warnings: those are targets, not gates. When a module grows, split it into focused schema, handler and helper files behind a barrel `index.ts`, as `src/tools/item/` and `src/tools/vault/` do.
+`npm run check` includes a source size and complexity gate (`npm run check:complexity`), so it runs in the pre-commit hook and in CI alike. A file in `src/` fails the gate above 500 lines, and the gate fails if the average cyclomatic complexity per function exceeds 5. Files above 250 lines and an average above 3 produce warnings: those are targets, not gates. When a module grows, split it into focused schema, handler and helper files behind a barrel `index.ts`, as `src/tools/item/` and `src/tools/vault/` do.
